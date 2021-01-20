@@ -1,0 +1,16 @@
+{
+  "auth": {
+    "gogogarden7541b9f4": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  },
+  "storage": {
+    "thegarden": {
+      "service": "S3",
+      "providerPlugin": "awscloudformation"
+    }
+  }
+}

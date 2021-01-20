@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-gogogarden-dev-191046-authRole",
+      "UnauthRoleArn": "arn:aws:iam::936128281727:role/amplify-gogogarden-dev-191046-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::936128281727:role/amplify-gogogarden-dev-191046-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-gogogarden-dev-191046-deployment",
+      "UnauthRoleName": "amplify-gogogarden-dev-191046-unauthRole",
+      "StackName": "amplify-gogogarden-dev-191046",
+      "StackId": "arn:aws:cloudformation:us-east-1:936128281727:stack/amplify-gogogarden-dev-191046/c3f0de50-593a-11eb-88b3-0a046979ecfd",
+      "AmplifyAppId": "dqdz6hqjrjf5u"
+    },
+    "categories": {
+      "auth": {
+        "gogogarden7541b9f4": {}
+      }
+    }
+  }
+}
