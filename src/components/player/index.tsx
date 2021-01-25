@@ -6,7 +6,7 @@ const PlayerContainer = styled.div`
    height: 5vh;
   width: 100%;
     align-items: center;
-    box-shadow: 1px 1px 3px $everyOtherRowBg;
+    box-shadow: 1px 1px 3px;
     height: 100%;
     justify-content: space-between;
     padding-left: 0.5em;
@@ -17,6 +17,8 @@ const client = new ClientLibrary()
 const App = () => {
 
   const [searchText, setSearchText] = useState('')
+
+  
   return (
     <div>
       <PlayerContainer>
