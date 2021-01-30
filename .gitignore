@@ -18,3 +18,4 @@ amplifytools.xcconfig
 .secret-*
 yarn.lock
 yarn-error.log
+package-lock.json
