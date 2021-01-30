@@ -1,7 +1,7 @@
-import create from 'zustand'
+import create from 'zustand';
 import { clamp } from '../helpers';
 
-type PlayerStatus = "idle" | "playing";
+type PlayerStatus = 'idle' | 'playing';
 
 export type PlayerStore = {
   playing: boolean;
@@ -25,23 +25,23 @@ export type PlayerStore = {
   rewind: (secs: number) => void;
   lastVol: number;
   setTrackDuration: (duration: number) => void;
-}
+};
 
 export const usePlayerStore = create<PlayerStore>((set, get) => ({
   playing: false,
   volume: 80,
   progress: 0,
-  trackDuration:0,
+  trackDuration: 0,
   lastVol: 80,
   currentTrackId: undefined,
   cuePosition: 0,
-  play(trackId: string){
+  play(trackId: string) {
     set({
       playing: true,
       currentTrackId: trackId,
     });
   },
-  resume(){
+  resume() {
     set({
       playing: true,
     });
@@ -58,7 +58,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
   },
   setTrackDuration(duration: number) {
     set({
-      trackDuration:duration,
+      trackDuration: duration,
     });
   },
   setCuePosition(cuePos: number) {
@@ -68,58 +68,58 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
   },
   forward(secs: number) {
     set({
-      cuePosition: get().progress + secs * 1000
+      cuePosition: get().progress + secs * 1000,
     });
   },
   rewind(secs: number) {
     set({
-      cuePosition: get().progress - secs * 1000
+      cuePosition: get().progress - secs * 1000,
     });
   },
   setVolume(vol: number) {
     set({
-      volume: clamp(vol, 0, 100)
+      volume: clamp(vol, 0, 100),
     });
   },
   volumeUp() {
     get().setVolume(get().volume + 10);
   },
   volumeDown() {
-    get().setVolume(get().volume - 10);;
+    get().setVolume(get().volume - 10);
   },
   mute() {
     set({
       lastVol: get().volume,
-      volume: 0
+      volume: 0,
     });
   },
   unmute() {
     set({
       lastVol: 80,
-      volume: get().lastVol
+      volume: get().lastVol,
     });
   },
   toggleMute() {
     const muted = playerStoreSelectors.muted(get());
-    if (muted){
+    if (muted) {
       get().unmute();
     } else {
       get().mute();
     }
   },
-}))
+}));
 
 export type PlayerStoreSelectors = typeof playerStoreSelectors;
 
 export const playerStoreSelectors = {
   muted: (state: PlayerStore) => state.volume <= 0,
   playerState: (state: PlayerStore) => {
-    if(!state.playing && state.currentTrackId){
-      return 'paused'
+    if (!state.playing && state.currentTrackId) {
+      return 'paused';
     }
-    if(!state.playing && !state.currentTrackId){
-      return 'idle'
+    if (!state.playing && !state.currentTrackId) {
+      return 'idle';
     }
-    return 'playing'
-  }
-}
+    return 'playing';
+  },
+};

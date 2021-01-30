@@ -1,7 +1,7 @@
-import React from "react";
-import { cx } from "@emotion/css";
-import { formatDate, formatTimeSecs } from "../helpers";
-import { IconSpeaker } from "./icons";
+import React from 'react';
+import { cx } from '@emotion/css';
+import { formatDate, formatTimeSecs } from '../helpers';
+import { IconSpeaker } from './icons';
 import { TrackModel } from '../stores/TracksStore';
 
 export type TrackProps = {
@@ -16,9 +16,9 @@ export function Track(props: TrackProps) {
     <div
       onClick={onClick}
       className={cx(
-        "flex flex-column items-center justify-between text-left cursor-pointer w-full p-3 rounded-lg border border-transparent",
-        "hover:shadow-lg hover:border hover:border-gray-200",
-        "focus:outline-none focus:bg-gray-100 focus:border focus:border-gray-200"
+        'flex flex-column items-center justify-between text-left cursor-pointer w-full p-3 rounded-lg border border-transparent',
+        'hover:shadow-lg hover:border hover:border-gray-200',
+        'focus:outline-none focus:bg-gray-100 focus:border focus:border-gray-200',
       )}
     >
       <div className="flex items-center justify-start text-left">
@@ -41,18 +41,17 @@ export function Track(props: TrackProps) {
         </div>
         <div className="ml-2 md:flex md:flex-col md:flex-col-reverse">
           <div className="text-sm md:text-base text-gray-700">
-            <span>{formatDate(track.lastModified)}</span>
-            <span className="mx-1 inline-block md:hidden">&bull;</span>
+            <span>{track.artist}</span>
             <span className="inline-block md:hidden">
-              {/* {formatTimeSecs(track.duration)} */}
+              - {track.album}
             </span>
           </div>
           <div
-            className={cx("font-bold leading-tight", "md:text-lg", {
-              "text-indigo-600": playing,
+            className={cx('font-bold leading-tight', 'md:text-lg', {
+              'text-indigo-600': playing,
             })}
           >
-            {track.key}
+            {track.title}
           </div>
         </div>
       </div>

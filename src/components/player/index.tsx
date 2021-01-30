@@ -1,27 +1,26 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react'
-import styled from '@emotion/styled'
-import { Helmet } from "react-helmet";
-import { PlayerStore, usePlayerStore } from '../../stores/PlayerStore'
-import { TrackModel, useTracksStore } from '../../stores/TracksStore'
-import shallow from 'zustand/shallow'
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import styled from '@emotion/styled';
+import { Helmet } from 'react-helmet';
+import {
+  PlayerStore,
+  usePlayerStore,
+} from '../../stores/PlayerStore';
+import { TrackModel, useTracksStore } from '../../stores/TracksStore';
+import shallow from 'zustand/shallow';
 import { cx } from '@emotion/css';
-import { Slider } from "@reach/slider";
+import { Slider } from '@reach/slider';
 
 import { formatDate, formatTime } from '../../helpers';
-import { IconBackThirty, IconPause, IconPlay, IconSkipThirty, IconSoundcloud, IconSpeaker } from '../icons';
+import {
+  IconBackThirty,
+  IconPause,
+  IconPlay,
+  IconSkipThirty,
+  IconSoundcloud,
+  IconSpeaker,
+} from '../icons';
 import { useMedia } from '../../workers/useMedia';
 
-const PlayerContainer = styled.div`
-  height: 5vh;
-  width: 100%;
-  align-items: center;
-  box-shadow: 1px 1px 3px;
-  height: 100%;
-  justify-content: space-between;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-
-`
 const Player = () => {
   const playerSelectors = (state: PlayerStore) => ({
     playing: state.playing,
@@ -44,8 +43,8 @@ const Player = () => {
     forward: state.forward,
     rewind: state.rewind,
     lastVol: state.lastVol,
-    setTrackDuration: state.setTrackDuration
-  })
+    setTrackDuration: state.setTrackDuration,
+  });
 
   const {
     playing,
@@ -68,19 +67,25 @@ const Player = () => {
     forward,
     rewind,
     lastVol,
-    setTrackDuration
-  } = usePlayerStore(playerSelectors,shallow);
+    setTrackDuration,
+  } = usePlayerStore(playerSelectors, shallow);
 
-  const tracks = useTracksStore((state) => state.tracks)
-  const fetchTracksState = useTracksStore((state) => state.fetchTracksState)
-  const findTrackById = useTracksStore((state) => state.findById)
+  const tracks = useTracksStore((state) => state.tracks);
+  const fetchTracksState = useTracksStore(
+    (state) => state.fetchTracksState,
+  );
+  const findTrackById = useTracksStore((state) => state.findById);
 
-  const currentTrack = currentTrackId ? findTrackById(currentTrackId): null;
-  const showPlayer = fetchTracksState !== "pending" && tracks.length > 0 && currentTrack;
+  const currentTrack = currentTrackId
+    ? findTrackById(currentTrackId)
+    : null;
+  const showPlayer =
+    fetchTracksState !== 'pending' &&
+    tracks.length > 0 &&
+    currentTrack;
 
+  const [searchText, setSearchText] = useState('');
 
-  const [searchText, setSearchText] = useState('')
-  
   return (
     <React.Fragment>
       {showPlayer && currentTrack && (
@@ -88,22 +93,28 @@ const Player = () => {
           <Helmet>
             <title>{currentTrack.title}</title>
           </Helmet>
-          <div className="bg-white px-3 pt-3 pb-1" style={{boxShadow: "0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)" }}>
+          <div
+            className="bg-white px-3 pt-3 pb-1"
+            style={{
+              boxShadow:
+                '0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            }}
+          >
             <iframe
-                key={currentTrack.key}
-                title={currentTrack.title}
-                width="100%"
-                height="120"
-                allow="autoplay"
-                src={currentTrack.url}
-                frameBorder="0"
-              />
+              key={currentTrack.key}
+              title={currentTrack.title}
+              width="100%"
+              height="120"
+              allow="autoplay"
+              src={currentTrack.url}
+              frameBorder="0"
+            />
           </div>
-          </React.Fragment>
+        </React.Fragment>
       )}
     </React.Fragment>
-  )
-}
+  );
+};
 
 type PlayerControlsProps = {
   track: TrackModel;
@@ -146,7 +157,7 @@ function PlayerControls({
 }: PlayerControlsProps) {
   const [debug] = useState(false);
 
-  const isMed = useMedia("(min-width: 768px)");
+  const isMed = useMedia('(min-width: 768px)');
 
   const lastSeekPos = useRef(0);
   const [playerProgress, setPlayerProgress] = useState(0);
@@ -180,7 +191,7 @@ function PlayerControls({
     <React.Fragment>
       {playerReady && (
         <div
-          className={cx("gap-5 grid grid-cols-3 xl:grid-cols-10", {
+          className={cx('gap-5 grid grid-cols-3 xl:grid-cols-10', {
             hidden: useEmbed,
           })}
         >
@@ -208,10 +219,10 @@ function PlayerControls({
                 title="Rewind 30 seconds"
                 onClick={() => onRewind(30)}
                 className={cx(
-                  "bg-transparent rounded-full text-gray-700 p-2",
-                  "transition-all duration-200 ease-in-out",
-                  "hover:text-gray-900",
-                  "focus:outline-none focus:bg-gray-200"
+                  'bg-transparent rounded-full text-gray-700 p-2',
+                  'transition-all duration-200 ease-in-out',
+                  'hover:text-gray-900',
+                  'focus:outline-none focus:bg-gray-200',
                 )}
               >
                 <IconBackThirty className="fill-current h-8 w-8" />
@@ -219,10 +230,10 @@ function PlayerControls({
               <button
                 onClick={() => (playing ? onPause() : onResume())}
                 className={cx(
-                  "p-2 rounded-full bg-indigo-600 border shadow-md text-white leading-none",
-                  "transition-all duration-200 ease-in-out",
-                  "hover:bg-indigo-700 hover:shadow-lg",
-                  "focus:outline-none focus:bg-indigo-700"
+                  'p-2 rounded-full bg-indigo-600 border shadow-md text-white leading-none',
+                  'transition-all duration-200 ease-in-out',
+                  'hover:bg-indigo-700 hover:shadow-lg',
+                  'focus:outline-none focus:bg-indigo-700',
                 )}
               >
                 {playing ? (
@@ -235,10 +246,10 @@ function PlayerControls({
                 title="Forward 30 seconds"
                 onClick={() => onForward(30)}
                 className={cx(
-                  "bg-transparent rounded-full text-gray-700 p-2",
-                  "transition-all duration-200 ease-in-out",
-                  "hover:text-gray-900",
-                  "focus:outline-none focus:bg-gray-200"
+                  'bg-transparent rounded-full text-gray-700 p-2',
+                  'transition-all duration-200 ease-in-out',
+                  'hover:text-gray-900',
+                  'focus:outline-none focus:bg-gray-200',
                 )}
               >
                 <IconSkipThirty className="fill-current h-8 w-8" />
@@ -277,9 +288,9 @@ function PlayerControls({
             <div className="flex space-x-1 items-center">
               <a
                 className={cx(
-                  "inline-block p-2 rounded-full",
-                  "transition-all duration-200 ease-in-out",
-                  "hover:bg-gray-200 "
+                  'inline-block p-2 rounded-full',
+                  'transition-all duration-200 ease-in-out',
+                  'hover:bg-gray-200 ',
                 )}
                 title="Open in SoundCloud"
                 target="_blank"
@@ -291,12 +302,12 @@ function PlayerControls({
               <div className="flex space-x-1 items-center">
                 <button
                   className={cx(
-                    "inline-block p-1 rounded-full",
-                    "transition-all duration-200 ease-in-out",
-                    "hover:bg-gray-200",
-                    "focus:outline-none"
+                    'inline-block p-1 rounded-full',
+                    'transition-all duration-200 ease-in-out',
+                    'hover:bg-gray-200',
+                    'focus:outline-none',
                   )}
-                  title={muted ? "Unmute" : "Mute"}
+                  title={muted ? 'Unmute' : 'Mute'}
                   onClick={() => {
                     muted ? onUnmute() : onMute();
                   }}
@@ -329,6 +340,5 @@ function PlayerControls({
     </React.Fragment>
   );
 }
-
 
 export default Player;
