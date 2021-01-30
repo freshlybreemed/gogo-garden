@@ -1,5 +1,5 @@
 import create from 'zustand'
-import { clamp } from './helpers';
+import { clamp } from '../helpers';
 
 type PlayerStatus = "idle" | "playing";
 
@@ -12,6 +12,7 @@ export type PlayerStore = {
   cuePosition: number;
   play: (trackId: string) => void;
   pause: () => void;
+  resume: () => void;
   setProgress: (progress: number) => void;
   setVolume: (vol: number) => void;
   volumeUp: () => void;
@@ -26,7 +27,7 @@ export type PlayerStore = {
   setTrackDuration: (duration: number) => void;
 }
 
-export const [usePlayerStore] = create<PlayerStore>((set, get) => ({
+export const usePlayerStore = create<PlayerStore>((set, get) => ({
   playing: false,
   volume: 80,
   progress: 0,
@@ -38,6 +39,11 @@ export const [usePlayerStore] = create<PlayerStore>((set, get) => ({
     set({
       playing: true,
       currentTrackId: trackId,
+    });
+  },
+  resume(){
+    set({
+      playing: true,
     });
   },
   pause() {
