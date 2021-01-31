@@ -1,8 +1,8 @@
 import React from 'react';
 import { cx } from '@emotion/css';
-import { formatDate, formatTimeSecs } from '../helpers';
-import { IconSpeaker } from './icons';
-import { TrackModel } from '../stores/TracksStore';
+import { formatDate, formatTimeSecs } from '../../helpers';
+import { IconSpeaker } from '../icons';
+import { TrackModel } from '../../stores/TracksStore';
 
 export type TrackProps = {
   track: TrackModel;
@@ -23,11 +23,11 @@ export function Track(props: TrackProps) {
     >
       <div className="flex items-center justify-start text-left">
         <div className="flex-shrink-0 h-16 w-16 rounded-lg overflow-hidden relative">
-          {/* <img
+          <div
             className="w-full h-full bg-gray-200"
-            src={track.picture_large}
-            alt={track.name}
-          /> */}
+            // src={track.picture_large}
+            // alt={track.name}
+          />
           {/* {track.key} */}
           {playing && (
             <div className="absolute inset-0 flex items-center justify-center">
