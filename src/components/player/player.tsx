@@ -126,12 +126,9 @@ export function MP3Player(props: MP3PlayerWidgetProps) {
 
   return (
     <div style={{ transform: showNative ? 'scale(1)' : 'scale(0)' }}>
-      <audio
-        ref={widgetIframeRef}
-        title={track.title}
-        autoPlay
-        src={track.url}
-      />
+      <audio ref={widgetIframeRef} title={track.title} autoPlay>
+        <source src={track.url} />
+      </audio>
     </div>
   );
 }
