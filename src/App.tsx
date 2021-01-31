@@ -1,17 +1,13 @@
 import './App.css';
-import Amplify, { Storage } from 'aws-amplify';
-import React, { useState, useEffect } from 'react';
-import jsmediatags from 'jsmediatags';
-import logo from './logo.svg';
-import awsExports from './aws-exports';
+import React, { useState } from 'react';
 import Library from './components/library';
 import Player from './components/player';
-
-Amplify.configure(awsExports);
+import Navigation from './components/navigation';
 
 export default function App() {
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [searchText, setSearchText] = useState<string>('');
 
+  // const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   // const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
   //   e.preventDefault();
   //   const songs = e.target.files;
@@ -34,37 +30,38 @@ export default function App() {
   //   console.log(selectedFiles);
   // };
 
-  const uploadSong = async (
-    e: React.MouseEvent<HTMLInputElement, MouseEvent>,
-  ) => {
-    e.preventDefault();
-    selectedFiles.forEach((song: any) => {
-      Storage.put(`${song.artist}/${song.album}/${song.name}`, song, {
-        progressCallback(progress: any) {
-          console.log(
-            `Uploaded: ${Math.floor(
-              (progress.loaded / progress.total) * 100,
-            )}%`,
-          );
-        },
-      })
-        .then((result) => {
-          console.log(result);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    });
-    console.log('done');
-  };
-  
+  // const uploadSong = async (
+  //   e: React.MouseEvent<HTMLInputElement, MouseEvent>,
+  // ) => {
+  //   e.preventDefault();
+  //   selectedFiles.forEach((song: any) => {
+  //     Storage.put(`${song.artist}/${song.album}/${song.name}`, song, {
+  //       progressCallback(progress: any) {
+  //         console.log(
+  //           `Uploaded: ${Math.floor(
+  //             (progress.loaded / progress.total) * 100,
+  //           )}%`,
+  //         );
+  //       },
+  //     })
+  //       .then((result) => {
+  //         console.log(result);
+  //       })
+  //       .catch((err) => {
+  //         console.error(err);
+  //       });
+  //   });
+  //   console.log('done');
+  // };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h1>GoGo Garden</h1>
-        {/* <form id="upload-form">
+    <div className="flex flex-col h-full text-gray-900">
+      <Navigation
+        searchText={searchText}
+        onSearchChange={setSearchText}
+        onSearchClose={() => setSearchText('')}
+      />
+      {/* <form id="upload-form">
           <label className="custom-file-upload">
             <input
               onChange={handleChange}
@@ -79,10 +76,8 @@ export default function App() {
           <input type="submit" onClick={uploadSong} value="Upload" />
         </form>
       */}
-      </header>
-      <Library />
+      <Library filterText={searchText} />
       <Player />
     </div>
   );
 }
-
