@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { TrackModel } from '../../stores/TracksStore';
-
+import Sound from 'react-sound';
 //   useEffect(() => {
 //     if (window.SC) {
 //       setLoadingState('loaded');
@@ -75,30 +75,14 @@ export function MP3Player(props: MP3PlayerWidgetProps) {
   //   // bind PlayProgress callback
   useEffect(() => {
     if (widgetIframeRef.current) {
-      // console.log(
-      //   widgetIframeRef.current.duration,
-      //   widgetIframeRef.current.currentTime,
-      // );
-      // widgetIframeRef.current.bind((ev: any) => {
-      onPlayProgressChange &&
-        onPlayProgressChange(widgetIframeRef.current.currentTime);
-      // });
     }
-
-    // return () => {
-    //   if (widgetRef.current) {
-    //     widgetRef.current.unbind(
-    //       window.SC.Widget.Events.PLAY_PROGRESS,
-    //     );
-    //   }
-    // };
   }, [ready, onPlayProgressChange, track]);
 
-  // useEffect(() => {
-  //   if (widgetIframeRef.current && ready) {
-  //     widgetIframeRef.current.seekTo(props.position || 0);
-  //   }
-  // }, [props.position, track, ready]);
+  useEffect(() => {
+    if (widgetIframeRef.current && ready) {
+      widgetIframeRef.current.currentTime = props.position || 0;
+    }
+  }, [props.position, track, ready]);
 
   useEffect(() => {
     if (widgetIframeRef.current && ready) {
@@ -107,28 +91,23 @@ export function MP3Player(props: MP3PlayerWidgetProps) {
   }, [volume, track, ready]);
 
   useEffect(() => {
-    if (widgetIframeRef.current) {
-      console.log('aplay', widgetIframeRef, props.playing);
-      if (props.playing) {
-        widgetIframeRef.current.play();
-        // widgetRef.current.bind(
-        //   window.SC.Widget.Events.PLAY_PROGRESS,
-        //   (ev: any) => {
-        //     onPlayProgressChange &&
-        //       onPlayProgressChange(ev.currentPosition);
-        //   },
-        // );
-      } else {
-        widgetIframeRef.current.pause();
-      }
+    if (props.playing) {
+      // widgetIframeRef.current.play();
+    } else {
+      // widgetIframeRef.current.pause();
     }
   }, [props.playing, track]);
 
+  const bro = () => {
+    console.log('bro');
+  };
   return (
     <div style={{ transform: showNative ? 'scale(1)' : 'scale(0)' }}>
-      <audio ref={widgetIframeRef} title={track.title} autoPlay>
-        <source src={track.url} />
-      </audio>
+      <Sound
+        url={track.url}
+        // onPlaying={({ position }) => console.log({ position })}
+        playStatus={props.playing ? 'PLAYING' : 'PAUSED'}
+      />
     </div>
   );
 }
