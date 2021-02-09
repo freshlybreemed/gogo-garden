@@ -25,6 +25,7 @@ export type TrackDTO = {
   // date:  Date;
   key: string;
   Tag: string;
+  artistId: string;
   lastModified: Date;
   size: number;
 };
@@ -44,11 +45,11 @@ export class APIClient {
 }
 
 export type GetTracksDTO = {
-  tracks: TrackDTO[];
+  songs: TrackDTO[];
 };
 
 export type GetArtistsDTO = {
-  artist: ArtistDTO[];
+  artists: ArtistDTO[];
 };
 
 type UpdateEpisodeDTO = {
