@@ -2,7 +2,6 @@
   "name": "gogogarden",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "dependencies": {
     "@apollo/client": "^3.3.7",
     "@aws-amplify/ui-react": "^0.2.34",
