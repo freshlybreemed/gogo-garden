@@ -4,7 +4,8 @@ export function clamp(num: number, min: number, max: number) {
   return Math.min(Math.max(num, min), max);
 }
 
-export function formatTime(timeMillis: number) {
+export function formatTime(millis: number) {
+  const timeMillis = millis * 1000;
   const seconds = Math.floor((timeMillis / 1000) % 60);
   const minutes = Math.floor((timeMillis / (1000 * 60)) % 60);
   const hours = Math.floor((timeMillis / (1000 * 60 * 60)) % 24);
