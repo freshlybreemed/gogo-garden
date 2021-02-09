@@ -1,5 +1,6 @@
 import Amplify, { Storage } from 'aws-amplify';
 import awsExports from '../aws-exports';
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 Amplify.configure(awsExports);
 
 export function createApiClient() {
@@ -31,16 +32,51 @@ export type TrackDTO = {
 };
 export class APIClient {
   get client() {
-    return Storage;
+    return new ApolloClient({
+      uri: 'http://localhost:4000',
+      cache: new InMemoryCache(),
+    });
   }
 
   getTracks(): Promise<TrackDTO[]> {
-    return this.client.list('');
+    return this.client
+      .query({
+        query: gql`
+          {
+            songs {
+              id
+              artistId
+              url
+              duration
+              artist
+              title
+              album
+              date
+              streams
+              lastModified
+              key
+            }
+          }
+        `,
+      })
+      .then((result) => result.data.songs);
   }
 
   getArtists(): Promise<ArtistDTO[]> {
-    // return this.graphql.find('artists')
-    return this.client.list('');
+    return this.client
+      .query({
+        query: gql`
+          {
+            artists {
+              id
+              name
+              shortName
+              useShortName
+            }
+          }
+        `,
+      })
+      .then((result) => result.data.artists);
   }
 }
 
