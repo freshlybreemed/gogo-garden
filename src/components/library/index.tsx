@@ -1,6 +1,6 @@
 import { useLibraryContainer } from './LibraryContainer';
 import React from 'react';
-import { Library } from './Library';
+import { Library } from './SongLibrary';
 import { match } from '../../workers/match';
 import { ArtistLibrary } from './ArtistLibrary';
 
