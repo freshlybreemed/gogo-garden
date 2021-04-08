@@ -222,7 +222,7 @@ function PlayerControls({
               {track.title}
             </div>
             <div className="text-gray-700 text-md">
-              {formatDate(track.lastModified.toString())}
+              {track.album}
             </div>
           </div>
         </div>

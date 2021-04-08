@@ -41,9 +41,7 @@ export function Track(props: TrackProps) {
         </div>
         <div className="ml-2 md:flex md:flex-col md:flex-col-reverse">
           <div className="text-sm md:text-base text-gray-700">
-            <span>{track.artist}</span>
-            <span className="inline-block md:hidden">
-              - {track.album}
+            <span>{track.artist} - {track.album}
             </span>
           </div>
           <div
