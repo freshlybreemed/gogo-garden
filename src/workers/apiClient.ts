@@ -1,6 +1,6 @@
 import Amplify, { Storage } from 'aws-amplify';
 import awsExports from '../aws-exports';
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { ApolloClient, InMemoryCache, gql, createHttpLink } from '@apollo/client';
 Amplify.configure(awsExports);
 
 export function createApiClient() {
@@ -33,7 +33,7 @@ export type TrackDTO = {
 export class APIClient {
   get client() {
     return new ApolloClient({
-      uri: 'http://localhost:4000/graphql',
+  link: createHttpLink({ uri: "/api/graphql" }),
       cache: new InMemoryCache(),
     });
   }
