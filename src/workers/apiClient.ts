@@ -1,7 +1,4 @@
-import Amplify, { Storage } from 'aws-amplify';
-import awsExports from '../aws-exports';
 import { ApolloClient, InMemoryCache, gql, createHttpLink } from '@apollo/client';
-Amplify.configure(awsExports);
 
 export function createApiClient() {
   return new APIClient();
