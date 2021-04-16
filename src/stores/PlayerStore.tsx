@@ -68,12 +68,12 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
   },
   forward(secs: number) {
     set({
-      cuePosition: get().progress + secs * 1000,
+      cuePosition: get().progress + secs ,
     });
   },
   rewind(secs: number) {
     set({
-      cuePosition: get().progress - secs * 1000,
+      cuePosition: get().progress - secs ,
     });
   },
   setVolume(vol: number) {
