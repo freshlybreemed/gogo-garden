@@ -42,9 +42,9 @@ export function Library({
   const beforeListRef = useRef<HTMLDivElement | null>(null);
   const [beforeListHeight, setBeforeListHeight] = useState(-1);
   const isPreContentMeasured = beforeListHeight > 0;
-  const currentTrackIndex = tracks.findIndex(
-    (t) => t.id === focusTrackId,
-  );
+  // const currentTrackIndex =  tracks.findIndex(
+  //   (t) => t.id === focusTrackId,
+  // );
 
   useLayoutEffect(() => {
     if (beforeListRef.current) {

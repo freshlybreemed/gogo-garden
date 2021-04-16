@@ -96,12 +96,11 @@ export default function Player({ filterText = '' }: Props) {
   const currentTrack = currentTrackId
     ? findTrackById(currentTrackId)
     : null;
+
   const showPlayer =
     fetchTracksState !== 'pending' &&
     tracks.length > 0 &&
     currentTrack;
-
-  const [searchText, setSearchText] = useState('');
 
   return (
     <React.Fragment>

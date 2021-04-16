@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import Library from './components/library';
 import Player from './components/player';
 import Navigation from './components/navigation';
-import { createHttpLink, ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
 import { gql, useQuery } from '@apollo/client';
 
 export default function App() {
@@ -24,7 +23,7 @@ export default function App() {
           onSearchClose={() => setSearchText('')}
           />
         <Library filterText={searchText} />
-        <Player />
+        <Player filterText={searchText} />
       </div>
   </React.StrictMode>
   );

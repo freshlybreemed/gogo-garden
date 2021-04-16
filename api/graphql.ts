@@ -1,4 +1,4 @@
-import { ApolloServer, makeExecutableSchema } from 'apollo-server-micro'
+import { ApolloServer } from 'apollo-server-micro'
 import { typeDefs, resolvers  } from '../src/graphql/main';
 
 export default new ApolloServer({

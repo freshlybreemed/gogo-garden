@@ -33,12 +33,6 @@ export default function TrackList({ filterText = '' }: Props) {
             onRandomClick={onRandomClick}
             filterText={filterText}
           />
-          // <ArtistLibrary
-          //   artists={filteredArtists}
-          //   onArtistClick={onArtistClick}
-          //   currentArtistId={currentArtistId}
-          //   filterText={filterText}
-          // />
         ),
       })}
     </React.Fragment>
