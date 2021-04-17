@@ -10,13 +10,10 @@ type BeforeListProps = {
   filterText?: string;
 };
 
-function BeforeList({ numTracks, filterText }: BeforeListProps) {
+function BeforeList() {
   return (
     <div>
-      <div>
-        {filterText ? `Songs matching ${filterText}` : `All songs`}
-      </div>
-      <div>{numTracks} total</div>
+
     </div>
   );
 }
@@ -42,9 +39,9 @@ export function Library({
   const beforeListRef = useRef<HTMLDivElement | null>(null);
   const [beforeListHeight, setBeforeListHeight] = useState(-1);
   const isPreContentMeasured = beforeListHeight > 0;
-  // const currentTrackIndex =  tracks.findIndex(
-  //   (t) => t.id === focusTrackId,
-  // );
+  const currentTrackIndex = tracks.findIndex(
+    (t) => t.id === focusTrackId,
+  );
 
   useLayoutEffect(() => {
     if (beforeListRef.current) {
@@ -60,7 +57,7 @@ export function Library({
   // in order to measure its height and render the right virtualized list
   return !isPreContentMeasured ? (
     <div className="opacity-0 border" ref={beforeListRef}>
-      <BeforeList numTracks={tracks.length} />
+      <BeforeList />
     </div>
   ) : (
     <div className="flex h-full justify-center relative">
@@ -99,9 +96,8 @@ export function Library({
                       style={{
                         ...style,
                         ...(index !== 0 && {
-                          top: `${
-                            parseFloat(top) + beforeListHeight
-                          }px`,
+                          top: `${parseFloat(top) + beforeListHeight
+                            }px`,
                         }),
                         ...(index === 0 && { height: fHeight }),
                       }}
@@ -110,8 +106,7 @@ export function Library({
                         {index === 0 && (
                           <div>
                             <BeforeList
-                              filterText={filterText}
-                              numTracks={tracks.length}
+
                             />
                           </div>
                         )}
