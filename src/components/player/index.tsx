@@ -22,7 +22,18 @@ import {
 } from '../icons';
 import { useMedia } from '../../workers/useMedia';
 import { MP3Player } from './player';
-const Player = () => {
+import { useLibraryContainer } from '../library/LibraryContainer';
+import { usePlayerContainer } from './PlayerContainer';
+
+type Props = {
+  filterText?: string;
+};
+
+type PlayerRef = {
+  seekTo: (position: number) => void;
+}
+
+export default function Player({ filterText = '' }: Props) {
   const playerSelectors = (state: PlayerStore) => ({
     playing: state.playing,
     volume: state.volume,
@@ -72,6 +83,9 @@ const Player = () => {
     lastVol,
     setTrackDuration,
   } = usePlayerStore(playerSelectors, shallow);
+  const {
+    playNextSong
+  } = usePlayerContainer(filterText);
 
   const tracks = useTracksStore((state) => state.tracks);
   const fetchTracksState = useTracksStore(
@@ -82,12 +96,11 @@ const Player = () => {
   const currentTrack = currentTrackId
     ? findTrackById(currentTrackId)
     : null;
+
   const showPlayer =
     fetchTracksState !== 'pending' &&
     tracks.length > 0 &&
     currentTrack;
-
-  const [searchText, setSearchText] = useState('');
 
   return (
     <React.Fragment>
@@ -121,6 +134,7 @@ const Player = () => {
               onRewind={rewind}
               trackDuration={trackDuration}
               setTrackDuration={setTrackDuration}
+              playNextSong={playNextSong}
             />
           </div>
         </React.Fragment>
@@ -147,6 +161,7 @@ type PlayerControlsProps = {
   onRewind: (secs: number) => void;
   trackDuration: number;
   setTrackDuration: (duration: number) => void;
+  playNextSong:() => void;
 };
 
 function PlayerControls({
@@ -167,8 +182,10 @@ function PlayerControls({
   onRewind,
   trackDuration,
   setTrackDuration,
+  playNextSong,
 }: PlayerControlsProps) {
   const [debug] = useState(false);
+  const player = useRef<PlayerRef>(null);
 
   const isMed = useMedia('(min-width: 768px)');
 
@@ -183,6 +200,12 @@ function PlayerControls({
     setPlayerProgress(0);
   }
 
+  useEffect(()=>{
+    if(player && player.current){
+      player.current.seekTo(cuePosition);
+    }
+  }, [cuePosition, player, player.current])
+    
   // TODO: Remove when mobile player done
   const useEmbed = useMemo(() => {
     console.log('debug', debug, 'isMed', isMed);
@@ -190,10 +213,12 @@ function PlayerControls({
   }, [isMed, debug]);
 
   function onAudioProgress(progress: number) {
-    console.log(' playerProgress', playerProgress);
     if (!seeking) {
       setPlayerProgress(progress);
       onProgressChange(progress);
+      if(progress>10){
+        playNextSong();
+      }
     }
   }
 
@@ -222,7 +247,7 @@ function PlayerControls({
               {track.title}
             </div>
             <div className="text-gray-700 text-md">
-              {formatDate(track.lastModified.toString())}
+              {track.album}
             </div>
           </div>
         </div>
@@ -340,17 +365,17 @@ function PlayerControls({
         </div>
       </div>
       <MP3Player
+        player={player}
         key={track.id}
         onReady={onPlayerReady}
-        showNative={useEmbed}
         track={track}
-        position={cuePosition}
         playing={playing}
         volume={volume}
+        position={progress}
         onPlayProgressChange={onAudioProgress}
+        playNextSong={playNextSong}
       />
     </React.Fragment>
   );
 }
 
-export default Player;

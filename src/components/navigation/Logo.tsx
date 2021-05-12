@@ -4,8 +4,7 @@ import { Soulector } from '../icons';
 export default function Logo() {
   return (
     <React.Fragment>
-      {/* <Soulector className="w-8 h-8 mr-2" /> */}
-      <h1 className="text-2xl font-bold">Gogo Garden</h1>
+      <div style={{ fontFamily: 'Fellix' }} className="text-2xl w-40 font-bold">Gogo Garden</div>
     </React.Fragment>
   );
 }

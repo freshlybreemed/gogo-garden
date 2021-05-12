@@ -5,6 +5,7 @@ const apiClient = createApiClient();
 
 export type TrackModel = {
   id: string;
+  artistId: string;
   url: string;
   duration: number;
   artist: string;
@@ -28,6 +29,7 @@ function trackMapper(dto: TrackDTO): TrackModel {
     duration: 2,
     artist,
     title,
+    artistId: dto.artistId,
     album,
     streams: 0,
     date: dto.lastModified,

@@ -1,6 +1,4 @@
-import Amplify, { Storage } from 'aws-amplify';
-import awsExports from '../aws-exports';
-Amplify.configure(awsExports);
+import { ApolloClient, InMemoryCache, gql, createHttpLink } from '@apollo/client';
 
 export function createApiClient() {
   return new APIClient();
@@ -25,30 +23,66 @@ export type TrackDTO = {
   // date:  Date;
   key: string;
   Tag: string;
+  artistId: string;
   lastModified: Date;
   size: number;
 };
 export class APIClient {
   get client() {
-    return Storage;
+    return new ApolloClient({
+  link: createHttpLink({ uri: "/api/graphql" }),
+      cache: new InMemoryCache(),
+    });
   }
 
   getTracks(): Promise<TrackDTO[]> {
-    return this.client.list('');
+    return this.client
+      .query({
+        query: gql`
+          {
+            songs {
+              id
+              artistId
+              url
+              duration
+              artist
+              title
+              album
+              date
+              streams
+              lastModified
+              key
+            }
+          }
+        `,
+      })
+      .then((result) => result.data.songs);
   }
 
   getArtists(): Promise<ArtistDTO[]> {
-    // return this.graphql.find('artists')
-    return this.client.list('');
+    return this.client
+      .query({
+        query: gql`
+          {
+            artists {
+              id
+              name
+              shortName
+              useShortName
+            }
+          }
+        `,
+      })
+      .then((result) => result.data.artists);
   }
 }
 
 export type GetTracksDTO = {
-  tracks: TrackDTO[];
+  songs: TrackDTO[];
 };
 
 export type GetArtistsDTO = {
-  artist: ArtistDTO[];
+  artists: ArtistDTO[];
 };
 
 type UpdateEpisodeDTO = {

@@ -1,6 +1,6 @@
 import { useLibraryContainer } from './LibraryContainer';
 import React from 'react';
-import { Library } from './Library';
+import { Library } from './SongLibrary';
 import { match } from '../../workers/match';
 import { ArtistLibrary } from './ArtistLibrary';
 
@@ -33,12 +33,6 @@ export default function TrackList({ filterText = '' }: Props) {
             onRandomClick={onRandomClick}
             filterText={filterText}
           />
-          // <ArtistLibrary
-          //   artists={filteredArtists}
-          //   onArtistClick={onArtistClick}
-          //   currentArtistId={currentArtistId}
-          //   filterText={filterText}
-          // />
         ),
       })}
     </React.Fragment>

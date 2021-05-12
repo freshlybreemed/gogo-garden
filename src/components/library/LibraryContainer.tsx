@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { sample } from 'lodash-es';
-import { useTracksStore } from '../../stores/TracksStore';
+import { filter, sample } from 'lodash-es';
+import { TrackModel, useTracksStore } from '../../stores/TracksStore';
 import shallow from 'zustand/shallow';
 import ReactGA from 'react-ga';
 import { usePlayerStore } from '../../stores/PlayerStore';
@@ -20,15 +20,24 @@ export function useLibraryContainer(filterText: string) {
 
   const artists = useArtistStore((state) => state.artists);
   const tracks = useTracksStore((state) => state.tracks);
+  const fetchArtists = useArtistStore((state) => state.fetchArtists);
   const fetchTracks = useTracksStore((state) => state.fetchTracks);
   const [fetchTracksState, fetchTracksErr] = useTracksStore(
     (state) => [state.fetchTracksState, state.rejectionReason],
+    shallow,
+  );
+  const [fetchArtistsState, fetchArtistsErr] = useArtistStore(
+    (state) => [state.fetchArtistsState, state.rejectionReason],
     shallow,
   );
 
   useEffect(() => {
     fetchTracks();
   }, [fetchTracks]);
+
+  useEffect(() => {
+    fetchArtists();
+  }, [fetchArtists]);
 
   function onTrackClick(trackId: string) {
     const track = tracks.find((t) => t.id === trackId);
@@ -63,7 +72,7 @@ export function useLibraryContainer(filterText: string) {
     }
   }
 
-  const filteredTracks = React.useMemo(() => {
+  const filteredTracks: TrackModel[] = React.useMemo( () => {
     if (!filterText) {
       return tracks;
     }
