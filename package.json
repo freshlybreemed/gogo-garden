@@ -23,6 +23,7 @@
     "@types/react-virtualized-auto-sizer": "^1.0.0",
     "@types/react-window": "^1.8.2",
     "@vercel/node": "^1.9.1",
+    "algoliasearch": "^4.8.6",
     "apollo-server": "^2.19.2",
     "apollo-server-micro": "^2.22.2",
     "aws-amplify": "^3.3.14",
