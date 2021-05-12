@@ -1,29 +1,11 @@
 import React, { useEffect } from 'react';
 import NavSearch from './NavSearch';
-import create from 'zustand';
 import { cx } from '@emotion/css';
 import { IconSearch } from '../icons';
 import Logo from './Logo';
-
-export type NavbarStore = {
-  searchOpen: boolean;
-  openSearch: () => void;
-  closeSearch: () => void;
-};
-
-export const useNavbarStore = create<NavbarStore>((set, get) => ({
-  searchOpen: false,
-  openSearch() {
-    set({
-      searchOpen: true,
-    });
-  },
-  closeSearch() {
-    set({
-      searchOpen: false,
-    });
-  },
-}));
+import { useNavigationContainer } from './NavigationContainer';
+import { removeCookie } from '../../helpers';
+import { setSeconds } from 'date-fns';
 
 type Props = {
   searchText: string;
@@ -36,15 +18,17 @@ export default function Navbar({
   onSearchChange,
   onSearchClose,
 }: Props) {
-  const searchOpen = useNavbarStore((state) => state.searchOpen);
-  const openSearch = useNavbarStore((state) => state.openSearch);
-  const closeSearch = useNavbarStore((state) => state.closeSearch);
-
+  
+  const { loggedIn, searchOpen, closeSearch, openSearch, setScreen } = useNavigationContainer()
   useEffect(() => {
     if (!searchOpen) {
       onSearchClose();
     }
   }, [searchOpen, onSearchClose]);
+
+  const handleLogout = () => {
+    removeCookie('id_token');
+  };
 
   return (
     <div className="px-4 py-3 shadow-md flex items-center">
@@ -55,6 +39,7 @@ export default function Navbar({
             'items-center',
             searchOpen && 'hidden sm:flex',
           )}
+          onClick={()=>setScreen('home')}
         >
           <Logo />
         </div>
@@ -69,6 +54,7 @@ export default function Navbar({
             <SearchButton onClick={openSearch} />
           )}
         </div>
+        {loggedIn ? <a href="/" onClick={handleLogout}>Logout</a>:<div onClick={()=>setScreen('login')}>Login</div>}
       </React.Fragment>
     </div>
   );
