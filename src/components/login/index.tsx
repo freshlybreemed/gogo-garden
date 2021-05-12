@@ -56,7 +56,6 @@ const Login: React.FunctionComponent = ({}) => {
         //   });
       });
   };
-  console.log(process.env)
   return (
     <React.Fragment>
       <div className={'mt-4 text-center'}>
