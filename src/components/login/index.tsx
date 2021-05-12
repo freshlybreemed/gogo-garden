@@ -2,9 +2,6 @@ import * as React from 'react';
 import { useState } from 'react';
 import Firebase from '../../workers/firebase';
 import { setCookie } from '../../helpers';
-// import axios, { AxiosResponse } from 'axios';
-import Router from 'next/router';
-import { useAppContainer } from '../../AppContainter';
 import { useNavigationContainer } from '../navigation/NavigationContainer';
 import { useSignUpContainer } from '../signup/SignUpContainer';
 

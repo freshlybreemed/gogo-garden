@@ -4,7 +4,6 @@ import Library from './components/library';
 import Player from './components/player';
 import Navigation from './components/navigation';
 import { gql, useQuery } from '@apollo/client';
-import router from 'next/router';
 import { useAppContainer } from './AppContainter';
 import Login from './components/login';
 import SignUp from './components/signup';
