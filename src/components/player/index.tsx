@@ -216,9 +216,6 @@ function PlayerControls({
     if (!seeking) {
       setPlayerProgress(progress);
       onProgressChange(progress);
-      if(progress>10){
-        playNextSong();
-      }
     }
   }
 
