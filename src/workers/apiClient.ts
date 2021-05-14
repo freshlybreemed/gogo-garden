@@ -69,6 +69,7 @@ export class APIClient {
               name
               shortName
               useShortName
+              image
             }
           }
         `,

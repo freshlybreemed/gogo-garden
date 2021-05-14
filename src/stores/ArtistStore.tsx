@@ -19,6 +19,7 @@ function artistMapper(dto: ArtistDTO): ArtistModel {
     id: dto.id,
     name: dto.name,
     shortName: dto.shortName,
+    image:dto.image
   };
 }
 type ArtistStore = {
