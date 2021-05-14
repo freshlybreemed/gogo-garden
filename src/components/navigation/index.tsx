@@ -6,12 +6,21 @@ import Logo from './Logo';
 import { useNavigationContainer } from './NavigationContainer';
 import { removeCookie } from '../../helpers';
 import { setSeconds } from 'date-fns';
+import styled from 'styled-components';
 
 type Props = {
   searchText: string;
   onSearchClose: () => void;
   onSearchChange: (searchText: string) => void;
 };
+
+const SearchBar = styled.div`
+background: #FFFFFF80 0% 0% no-repeat padding-box;
+border: 2px solid #FFFFFF;
+border-radius: 30px;
+opacity: 0.2;
+width:100%;
+`;
 
 export default function Navbar({
   searchText,
@@ -50,8 +59,9 @@ export default function Navbar({
               onCloseClick={closeSearch}
               onSearchChange={onSearchChange}
             />
-          ) : (
-            <SearchButton onClick={openSearch} />
+          ) : (<SearchBar>
+                <SearchButton onClick={openSearch} />
+              </SearchBar>
           )}
         </div>
         {loggedIn ? <a href="/" onClick={handleLogout}>Logout</a>:<div onClick={()=>setScreen('login')}>Login</div>}
@@ -66,7 +76,7 @@ type SearchButtonProps = {
 function SearchButton({ onClick }: SearchButtonProps) {
   return (
     <button
-      className="p-2 hover:bg-gray-200 rounded-full focus:outline-none"
+      className="float-right flex p-2 hover:bg-gray-200 rounded-full focus:outline-none"
       onClick={() => onClick()}
     >
       <IconSearch className="fill-current w-6 h-6"></IconSearch>
