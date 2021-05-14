@@ -20,7 +20,7 @@ export default function App() {
   const [searchText, setSearchText] = useState<string>('');
   return (
   <React.StrictMode>
-      <div className="flex flex-col h-full text-gray-900">
+      <div className="flex flex-col h-full text-white font-semibold">
         <Navigation
           searchText={searchText}
           onSearchChange={setSearchText}

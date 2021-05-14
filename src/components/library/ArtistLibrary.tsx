@@ -14,9 +14,9 @@ function BeforeList({ numTracks, filterText }: BeforeListProps) {
   return (
     <div>
       <div>
-        {filterText ? `Songs matching ${filterText}` : `All songs`}
+        {/* {filterText ? `Songs matching ${filterText}` : `All songs`} */}
       </div>
-      <div>{numTracks} total</div>
+      {/* <div>{numTracks} total</div> */}
     </div>
   );
 }
