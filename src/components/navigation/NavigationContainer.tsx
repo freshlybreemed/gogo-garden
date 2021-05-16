@@ -4,6 +4,7 @@ import { useNavbarStore } from '../../stores/NavigationStore';
 export function useNavigationContainer() {
 
   const searchOpen = useNavbarStore((state) => state.searchOpen);
+  const setSearchText = useNavbarStore((state) => state.setSearchText);
   const setScreen = useAppStore((state) => state.setScreen);
   const openSearch = useNavbarStore((state) => state.openSearch);
   const loggedIn = useAppStore((state) => state.loggedIn);
@@ -16,6 +17,7 @@ export function useNavigationContainer() {
     setScreen,
     loggedIn,
     closeSearch,
+    setSearchText,
     setLoggedIn,
   }
   

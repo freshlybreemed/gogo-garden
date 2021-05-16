@@ -1,8 +1,8 @@
 import { useLibraryContainer } from './LibraryContainer';
 import React from 'react';
-import { Library } from './SongLibrary';
 import { match } from '../../workers/match';
-import { ArtistLibrary } from './ArtistLibrary';
+import { LibraryContent } from './LibraryContent';
+import { ArtistView } from './ArtistView';
 
 type Props = {
   filterText?: string;
@@ -17,7 +17,8 @@ export default function TrackList({ filterText = '' }: Props) {
     filteredTracks,
     filteredArtists,
     onArtistClick,
-    currentArtistId,
+    screen,
+    currentArtist,
   } = useLibraryContainer(filterText);
 
   return (
@@ -25,16 +26,18 @@ export default function TrackList({ filterText = '' }: Props) {
       {match(activate, {
         pending: () => <div>Loading</div>,
         rejected: () => <div>Failure moe</div>,
-        resolved: () => (
-          <Library
-            tracks={filteredTracks}
-            onTrackClick={onTrackClick}
-            currentTrackId={currentTrackId}
-            onRandomClick={onRandomClick}
-            filterText={filterText}
-          />
-        ),
-      })}
+        resolved: () => <LibraryContent
+        tracks={filteredTracks}
+        artists={filteredArtists}
+        screen={screen}
+        onArtistClick={onArtistClick}
+        onTrackClick={onTrackClick}
+        currentTrackId={currentTrackId}
+        onRandomClick={onRandomClick}
+        filterText={filterText}
+      /> 
+      })
+    }
     </React.Fragment>
   );
 }

@@ -1,6 +1,8 @@
 import React from 'react';
 import { ArtistModel } from '../../stores/ArtistStore';
 import { cx } from '@emotion/css';
+import { IconSpeaker, IconPause } from '../icons';
+import { getArtistName } from '../../lib/helpers';
 
 type ArtistProps = {
   onClick: () => void;
@@ -8,7 +10,7 @@ type ArtistProps = {
   selected: boolean;
 };
 export function Artist({ onClick, artist }: ArtistProps) {
-  return    <div
+  return <div
       onClick={onClick}
       className={cx(
         'flex flex-column items-center justify-between text-left cursor-pointer w-full p-3 rounded-lg border border-transparent',
@@ -26,33 +28,28 @@ export function Artist({ onClick, artist }: ArtistProps) {
               backgroundSize:'cover'
               }}
           />
-          {/* {track.key} */}
-          {/* {playing && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="absolute inset-0 bg-indigo-600 opacity-75" />
-              <div className="relative leading-none p-1 bg-white group-hover:bg-white rounded-full text-indigo-600 hover:bg-gray-200 hover:shadow-sm">
-                {/* <IconSpeaker className="relative block group-hover:hidden fill-current w-6 h-6" />
-                <PauseIcon className="fill-current w-6 h-6" /> 
-              </div>
-            </div>
-           */}
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="hidden md:block relative leading-none p-1 bg-white group-hover:bg-white rounded-full text-indigo-600 hover:bg-gray-200 hover:shadow-sm">
+            {/* <IconSpeaker className="relative block group-hover:hidden fill-current w-6 h-6" />
+            <IconPause className="fill-current w-6 h-6" />  */}
+          </div>
         </div>
         <div className="ml-2 pl-2 md:flex md:flex-col md:flex-col-reverse">
           <div className="text-sm md:text-base">
-            <span>{artist.name} 
-            </span>
+            <span>{getArtistName(artist)}</span>
           </div>
-          <div
+          {/* <div
             className={cx('font-bold leading-tight', 'md:text-lg', {
               'text-indigo-600': true,
             })}
           >
-            {/* {track.title} */}
-          </div>
+            got2
+          </div> */}
         </div>
       </div>
       <div className="hidden md:block">
-        {/* <span>{formatTimeSecs(track.duration)}</span> */}
+        <span>wow</span>
       </div>
     </div>
   ;

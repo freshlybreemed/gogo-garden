@@ -1,23 +1,15 @@
 import './App.css';
-import React, { useState } from 'react';
+import React from 'react';
 import Library from './components/library';
 import Player from './components/player';
 import Navigation from './components/navigation';
-import { gql, useQuery } from '@apollo/client';
 import { useAppContainer } from './AppContainter';
 import Login from './components/login';
 import SignUp from './components/signup';
 
 export default function App() {
-  const GET_SONGS = gql`
-  query {
-    songs{ 
-      artist
-    }
-  }`;
-  const {screen, setScreen} = useAppContainer()
-  const { loading, error, data } = useQuery(GET_SONGS);
-  const [searchText, setSearchText] = useState<string>('');
+
+  const {screen, setScreen, setSearchText, searchText} = useAppContainer();
   return (
   <React.StrictMode>
       <div className="flex flex-col h-full text-white font-semibold">
@@ -26,7 +18,7 @@ export default function App() {
           onSearchChange={setSearchText}
           onSearchClose={() => setSearchText('')}
           />
-        {screen === 'home' &&  <Library filterText={searchText} />}
+        {screen !== 'login' && screen !== 'signup' && <Library filterText={searchText} />}
     
         <Player filterText={searchText} />
         {screen === 'login' && <Login />}
