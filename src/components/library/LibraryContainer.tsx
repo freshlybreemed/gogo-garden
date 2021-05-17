@@ -9,6 +9,7 @@ import { ArtistModel, useArtistStore } from '../../stores/ArtistStore';
 import algoliasearch from 'algoliasearch'
 import { useAppStore } from '../../stores/AppStore';
 import { useNavbarStore } from '../../stores/NavigationStore';
+import { getArtistName } from '../../lib/helpers';
 const client = algoliasearch(process.env.ALGOLIA_ID|| 'VUP25M59V9', process.env.ALGOLIA_KEY || '401c3a392393dedd2f1f69e795b84e01');
 const index = client.initIndex('songs');
 
@@ -63,7 +64,7 @@ export function useLibraryContainer(filterText: string) {
 
   function onArtistClick (inputArtist: ArtistModel) {
     const artist = artists.find((t) => t.id === inputArtist.id);
-    setSearchText(inputArtist.name)
+    setSearchText(getArtistName(inputArtist));
     setCurrentArtist(inputArtist);
     setScreen('artist');
     ReactGA.event({
