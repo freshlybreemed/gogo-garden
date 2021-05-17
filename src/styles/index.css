@@ -24,6 +24,13 @@ html,
 }
 
 @font-face {
+  font-family: "Neue Haas Grotesk";
+  src: url("./fonts/NHaasGroteskTXPro-55R.ttf") format("tff");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
   font-family: "Space Grotesk";
   src: url("./fonts/SpaceGrotesk-Regular.woff2") format("woff2"),
     url("./fonts/SpaceGrotesk-Regular.woff") format("woff");

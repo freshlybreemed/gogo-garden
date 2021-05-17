@@ -8,6 +8,8 @@ export type ArtistDTO = {
   id: string;
   name: string;
   shortName: string;
+  useShortName: string;
+  tags?:[ string];
   description?: string;
   image?: string;
   instagram?: string;
@@ -26,6 +28,7 @@ export type TrackDTO = {
   artistId: string;
   lastModified: Date;
   size: number;
+  imageUrl: string;
 };
 export class APIClient {
   get client() {
@@ -69,6 +72,7 @@ export class APIClient {
               name
               shortName
               useShortName
+              image
             }
           }
         `,

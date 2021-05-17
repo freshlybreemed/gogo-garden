@@ -11,6 +11,7 @@ export type TrackModel = {
   artist: string;
   title: string;
   album: string;
+  imageUrl: string;
   date: Date;
   streams: number;
   lastModified: Date;
@@ -35,6 +36,7 @@ function trackMapper(dto: TrackDTO): TrackModel {
     date: dto.lastModified,
     lastModified: dto.lastModified,
     key: dto.key,
+    imageUrl: dto.imageUrl
   };
 }
 

@@ -24,9 +24,12 @@ export function Track(props: TrackProps) {
       <div className="flex items-center justify-start text-left">
         <div className="flex-shrink-0 h-16 w-16 rounded-lg overflow-hidden relative">
           <div
-            className="w-full h-full bg-gray-200"
-            // src={track.picture_large}
-            // alt={track.name}
+             className="w-full h-full "
+              style={{backgroundImage:`url(${track.imageUrl})`,
+              backgroundRepeat:'no-repeat',
+              backgroundSize:'cover',
+              backgroundColor:'gray'
+              }}
           />
           {/* {track.key} */}
           {playing && (

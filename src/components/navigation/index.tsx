@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import NavSearch from './NavSearch';
 import { cx } from '@emotion/css';
 import { IconSearch } from '../icons';
 import Logo from './Logo';
 import { useNavigationContainer } from './NavigationContainer';
 import { removeCookie } from '../../helpers';
-import { setSeconds } from 'date-fns';
+import styled from 'styled-components';
 
 type Props = {
   searchText: string;
@@ -13,18 +13,29 @@ type Props = {
   onSearchChange: (searchText: string) => void;
 };
 
+const SearchBar = styled.div`
+background: #FFFFFF80 0% 0% no-repeat padding-box;
+border: 2px solid #FFFFFF;
+border-radius: 30px;
+opacity: 0.2;
+width:100%;
+`;
+
+const UserBlock = styled.div`
+background: #FFFFFF26 0% 0% no-repeat padding-box;
+border-radius: 30px;
+opacity: 1;
+`
+const UserImage = styled.div`
+background: transparent url('./images/logo192.png') 0% 0% no-repeat padding-box;
+border-radius: 30px;
+opacity: 1;
+`
 export default function Navbar({
   searchText,
-  onSearchChange,
-  onSearchClose,
-}: Props) {
+  onSearchChange,}: Props) {
   
-  const { loggedIn, searchOpen, closeSearch, openSearch, setScreen } = useNavigationContainer()
-  useEffect(() => {
-    if (!searchOpen) {
-      onSearchClose();
-    }
-  }, [searchOpen, onSearchClose]);
+  const { loggedIn, searchOpen, closeSearch, openSearch, setScreen, setSearchText } = useNavigationContainer()
 
   const handleLogout = () => {
     removeCookie('id_token');
@@ -39,7 +50,10 @@ export default function Navbar({
             'items-center',
             searchOpen && 'hidden sm:flex',
           )}
-          onClick={()=>setScreen('home')}
+          onClick={()=>{
+            setSearchText('')
+            setScreen('home');
+          }}
         >
           <Logo />
         </div>
@@ -49,12 +63,14 @@ export default function Navbar({
               searchText={searchText}
               onCloseClick={closeSearch}
               onSearchChange={onSearchChange}
+              openSearch={openSearch}
             />
-          ) : (
-            <SearchButton onClick={openSearch} />
+          ) : (<SearchBar onClick={openSearch}>
+                <SearchButton onClick={openSearch}/>
+              </SearchBar>
           )}
         </div>
-        {loggedIn ? <a href="/" onClick={handleLogout}>Logout</a>:<div onClick={()=>setScreen('login')}>Login</div>}
+        {loggedIn ? <a href="/" onClick={handleLogout}>Logout</a>:<UserBlock onClick={()=> setScreen('login')}>Login</UserBlock>}
       </React.Fragment>
     </div>
   );
@@ -66,7 +82,7 @@ type SearchButtonProps = {
 function SearchButton({ onClick }: SearchButtonProps) {
   return (
     <button
-      className="p-2 hover:bg-gray-200 rounded-full focus:outline-none"
+      className="float-right flex p-2 hover:bg-gray-200 rounded-full focus:outline-none"
       onClick={() => onClick()}
     >
       <IconSearch className="fill-current w-6 h-6"></IconSearch>

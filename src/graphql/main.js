@@ -4,7 +4,7 @@ const { MongoClient } = require('mongodb');
 const connect = require('./db');
 
 // Construct a schema, using GraphQL schema language
-export const typeDefs = gql`
+const typeDefs = gql`
   type Artist {
     id: String
     name: String
@@ -40,15 +40,21 @@ export const typeDefs = gql`
 `;
 
 // Provide resolver functions for your schema fields
-export const resolvers = {
+const resolvers = {
   Query: {
-    artists: () => artists,
+    artists: async () => {
+      const db = await connect();
+      return await db.collection('artists').find().toArray()
+    },
     songs: async () => {
-       const db = await connect();
+      const db = await connect();
       return await db.collection('garden').find().toArray()
     },
   },
 };
 
-
+module.exports = {
+  typeDefs,
+  resolvers
+}
 

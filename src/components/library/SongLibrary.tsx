@@ -26,7 +26,7 @@ type TrackProps = {
   filterText?: string;
 };
 
-export function Library({
+export function SongLibrary({
   tracks,
   onTrackClick,
   currentTrackId,
@@ -51,16 +51,11 @@ export function Library({
     }
   }, [beforeListHeight]);
 
-  useFocusReactWindowItem(listRef, currentTrackIndex);
+  // useFocusReactWindowItem(listRef, currentTrackIndex);
   console.log(tracks, isPreContentMeasured);
   // Render an invisible version of the BeforeList element
   // in order to measure its height and render the right virtualized list
-  return !isPreContentMeasured ? (
-    <div className="opacity-0 border" ref={beforeListRef}>
-      <BeforeList />
-    </div>
-  ) : (
-    <div className="flex h-full justify-center relative">
+  return (<div className="flex h-full justify-center relative">
       {!filterText && (
         <div className="absolute border-blue-500 right-0 bottom-0 mb-5 mr-5 z-10">
           {/* <ShuffleButton onClick={onRandomClick} /> */}

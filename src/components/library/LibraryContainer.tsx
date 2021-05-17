@@ -5,22 +5,31 @@ import shallow from 'zustand/shallow';
 import ReactGA from 'react-ga';
 import { usePlayerStore } from '../../stores/PlayerStore';
 import { IconPause } from '../icons';
-import { useArtistStore } from '../../stores/ArtistStore';
+import { ArtistModel, useArtistStore } from '../../stores/ArtistStore';
+import algoliasearch from 'algoliasearch'
+import { useAppStore } from '../../stores/AppStore';
+import { useNavbarStore } from '../../stores/NavigationStore';
+import { getArtistName } from '../../lib/helpers';
+const client = algoliasearch(process.env.ALGOLIA_ID|| 'VUP25M59V9', process.env.ALGOLIA_KEY || '401c3a392393dedd2f1f69e795b84e01');
+const index = client.initIndex('songs');
+
 
 export function useLibraryContainer(filterText: string) {
   const currentTrackId = usePlayerStore(
     (state) => state.currentTrackId,
   );
-  const currentArtistId = useArtistStore(
-    (state) => state.currentArtistId,
+  const currentArtist = useArtistStore(
+    (state) => state.currentArtist,
   );
   const play = usePlayerStore((state) => state.play);
   const playing = usePlayerStore((state) => state.playing);
+  const screen = useAppStore((state) => state.screen);
   const pause = usePlayerStore((state) => state.pause);
-
+  const setScreen = useAppStore((state)=> state.setScreen);
   const artists = useArtistStore((state) => state.artists);
   const tracks = useTracksStore((state) => state.tracks);
   const fetchArtists = useArtistStore((state) => state.fetchArtists);
+  const setCurrentArtist = useArtistStore((state) => state.setCurrentArtist);
   const fetchTracks = useTracksStore((state) => state.fetchTracks);
   const [fetchTracksState, fetchTracksErr] = useTracksStore(
     (state) => [state.fetchTracksState, state.rejectionReason],
@@ -30,7 +39,8 @@ export function useLibraryContainer(filterText: string) {
     (state) => [state.fetchArtistsState, state.rejectionReason],
     shallow,
   );
-
+  const searchText = useNavbarStore((state) => state.searchText);
+  const setSearchText = useNavbarStore((state) => state.setSearchText);
   useEffect(() => {
     fetchTracks();
   }, [fetchTracks]);
@@ -52,13 +62,17 @@ export function useLibraryContainer(filterText: string) {
     play(trackId);
   }
 
-  function onArtistClick(artistId: string) {
-    const artist = artists.find((t) => t.id === artistId);
+  function onArtistClick (inputArtist: ArtistModel) {
+    const artist = artists.find((t) => t.id === inputArtist.id);
+    setSearchText(getArtistName(inputArtist));
+    setCurrentArtist(inputArtist);
+    setScreen('artist');
     ReactGA.event({
       category: 'User',
       action: 'Artist Click',
-      label: artist && artist.name ? artist.name : artistId,
+      label: artist && artist.name ? artist.name : inputArtist.id,
     });
+    console.log(screen, 'curr',inputArtist, 'text', searchText);
   }
 
   function onRandomClick() {
@@ -110,11 +124,15 @@ export function useLibraryContainer(filterText: string) {
 
   return {
     currentTrackId,
-    currentArtistId,
+    currentArtist,
     onTrackClick,
     onRandomClick,
     onArtistClick,
     filteredTracks,
+    setScreen,
+    screen,
+    searchText,
+    setSearchText,
     filteredArtists,
     activate: fetchTracksState,
     fetchTracksErr,
