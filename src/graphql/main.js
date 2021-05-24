@@ -19,6 +19,12 @@ const typeDefs = gql`
     founded: String
   }
 
+  type Album {
+    name: String
+    date: String
+    artist: String
+    artistId: String
+  }
   type Song {
     id: String
     artistId: String
@@ -36,6 +42,7 @@ const typeDefs = gql`
   type Query {
     artists: [Artist]
     songs: [Song]
+    albums: [Song]
   }
 `;
 

@@ -6,6 +6,7 @@ import useFocusReactWindowItem from './useFocusReactWindowItem';
 import { ArtistModel } from '../../stores/ArtistStore';
 import { Artist } from './ArtistRow';
 import { getArtistName } from '../../lib/helpers';
+import { useLibraryContainer } from './LibraryContainer';
 
 type BeforeListProps = {
   numTracks: number;
@@ -18,16 +19,15 @@ border: 1px solid #FFFFFF26;
 border-radius: 20px;
 opacity: 1;
 `;
-
 function BeforeList({ numTracks, filterText }: BeforeListProps) {
   return (
     <div>
-      {numTracks===0 && <div>No results found</div>}
+      {numTracks === 0 && <div>No results found</div>}
     </div>
   );
 }
 type ArtistProps = {
-  currentArtist?: ArtistModel;
+  // currentArtist?: ArtistModel;
   onArtistClick: (artist: ArtistModel) => void;
   focusArtistId?: string;
   filterText?: string;
@@ -35,10 +35,11 @@ type ArtistProps = {
 
 export function ArtistView({
   onArtistClick,
-  currentArtist,
+  // currentArtist,
   focusArtistId,
   filterText,
 }: ArtistProps) {
+  const { currentArtist } = useLibraryContainer('')
   const listRef = useRef<List>(null);
 
   const beforeListRef = useRef<HTMLDivElement | null>(null);
@@ -62,11 +63,11 @@ export function ArtistView({
     <React.Fragment>
       <h2>Artists</h2>
       <div className="opacity-0 border" ref={beforeListRef}>
-        <BeforeList numTracks={0}/>
+        <BeforeList numTracks={0} />
       </div>
     </React.Fragment>
   ) : (
-     <React.Fragment>
+    <React.Fragment>
       <h2>Artists</h2>
       <LibraryContainer className="flex h-full justify-center relative mx-4">
         {!filterText && (
@@ -86,7 +87,18 @@ export function ArtistView({
               }) => (
                 <React.Fragment>
                   <h2>{getArtistName(currentArtist)}</h2>
-                </React.Fragment> )}
+                  <div className="flex-shrink-0 h-16 w-16 rounded-lg overflow-hidden relative">
+
+                    <div
+                      className="w-full h-full "
+                      style={{
+                        backgroundImage: `url(${currentArtist.image})`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: 'cover'
+                      }}
+                    />
+                  </div>
+                </React.Fragment>)}
             </AutoSizer>
           </div>
         )}

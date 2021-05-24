@@ -21,7 +21,7 @@ opacity: 1;
 function BeforeList({ numTracks, filterText }: BeforeListProps) {
   return (
     <div>
-      {numTracks===0 && <div>No results found</div>}
+      {numTracks === 0 && <div>No results found</div>}
     </div>
   );
 }
@@ -100,9 +100,8 @@ export function ArtistLibrary({
                         style={{
                           ...style,
                           ...(index !== 0 && {
-                            top: `${
-                              parseFloat(top) + beforeListHeight
-                            }px`,
+                            top: `${parseFloat(top) + beforeListHeight
+                              }px`,
                           }),
                           ...(index === 0 && { height: fHeight }),
                         }}
@@ -117,10 +116,7 @@ export function ArtistLibrary({
                             </div>
                           )}
                           <Artist
-                            onClick={() => {
-                              console.log('artist',artist); 
-                              onArtistClick(artist);
-                            }}
+                            onClick={() => onArtistClick(artist)}
                             artist={artist}
                             selected={artist.id === currentArtist?.id}
                           />

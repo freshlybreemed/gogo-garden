@@ -6,12 +6,12 @@ import ReactGA from 'react-ga';
 import { usePlayerStore } from '../../stores/PlayerStore';
 import { IconPause } from '../icons';
 import { ArtistModel, useArtistStore } from '../../stores/ArtistStore';
-import algoliasearch from 'algoliasearch'
+// import algoliasearch from 'algoliasearch'
 import { useAppStore } from '../../stores/AppStore';
 import { useNavbarStore } from '../../stores/NavigationStore';
 import { getArtistName } from '../../lib/helpers';
-const client = algoliasearch(process.env.ALGOLIA_ID|| 'VUP25M59V9', process.env.ALGOLIA_KEY || '401c3a392393dedd2f1f69e795b84e01');
-const index = client.initIndex('songs');
+// const client = algoliasearch(process.env.ALGOLIA_ID|| 'VUP25M59V9', process.env.ALGOLIA_KEY || '401c3a392393dedd2f1f69e795b84e01');
+// const index = client.initIndex('songs');
 
 
 export function useLibraryContainer(filterText: string) {
@@ -25,7 +25,7 @@ export function useLibraryContainer(filterText: string) {
   const playing = usePlayerStore((state) => state.playing);
   const screen = useAppStore((state) => state.screen);
   const pause = usePlayerStore((state) => state.pause);
-  const setScreen = useAppStore((state)=> state.setScreen);
+  const setScreen = useAppStore((state) => state.setScreen);
   const artists = useArtistStore((state) => state.artists);
   const tracks = useTracksStore((state) => state.tracks);
   const fetchArtists = useArtistStore((state) => state.fetchArtists);
@@ -62,7 +62,8 @@ export function useLibraryContainer(filterText: string) {
     play(trackId);
   }
 
-  function onArtistClick (inputArtist: ArtistModel) {
+  function onArtistClick(inputArtist: ArtistModel) {
+    console.log(inputArtist, 'idk')
     const artist = artists.find((t) => t.id === inputArtist.id);
     setSearchText(getArtistName(inputArtist));
     setCurrentArtist(inputArtist);
@@ -72,7 +73,7 @@ export function useLibraryContainer(filterText: string) {
       action: 'Artist Click',
       label: artist && artist.name ? artist.name : inputArtist.id,
     });
-    console.log(screen, 'curr',inputArtist, 'text', searchText);
+    console.log(screen, 'curr', inputArtist, 'text', searchText);
   }
 
   function onRandomClick() {
@@ -86,7 +87,7 @@ export function useLibraryContainer(filterText: string) {
     }
   }
 
-  const filteredTracks: TrackModel[] = React.useMemo( () => {
+  const filteredTracks: TrackModel[] = React.useMemo(() => {
     if (!filterText) {
       return tracks;
     }
