@@ -1,8 +1,8 @@
 import React from 'react';
-import { ArtistModel } from '../../stores/ArtistStore';
+import { ArtistModel } from '../../../stores/ArtistStore';
 import { cx } from '@emotion/css';
-import { IconSpeaker, IconPause } from '../icons';
-import { getArtistName } from '../../lib/helpers';
+import { IconSpeaker, IconPause } from '../../icons';
+import { getArtistName } from '../../../lib/helpers';
 
 type ArtistProps = {
   onClick: () => void;

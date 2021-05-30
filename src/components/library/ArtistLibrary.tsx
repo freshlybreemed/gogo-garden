@@ -4,7 +4,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import styled from 'styled-components'
 import useFocusReactWindowItem from './useFocusReactWindowItem';
 import { ArtistModel } from '../../stores/ArtistStore';
-import { Artist } from './ArtistRow';
+import { Artist } from './rows/artist';
 
 type BeforeListProps = {
   numTracks: number;
@@ -21,7 +21,7 @@ opacity: 1;
 function BeforeList({ numTracks, filterText }: BeforeListProps) {
   return (
     <div>
-      {numTracks===0 && <div>No results found</div>}
+      {numTracks === 0 && <div>No results found</div>}
     </div>
   );
 }
@@ -100,9 +100,8 @@ export function ArtistLibrary({
                         style={{
                           ...style,
                           ...(index !== 0 && {
-                            top: `${
-                              parseFloat(top) + beforeListHeight
-                            }px`,
+                            top: `${parseFloat(top) + beforeListHeight
+                              }px`,
                           }),
                           ...(index === 0 && { height: fHeight }),
                         }}
@@ -117,10 +116,7 @@ export function ArtistLibrary({
                             </div>
                           )}
                           <Artist
-                            onClick={() => {
-                              console.log('artist',artist); 
-                              onArtistClick(artist);
-                            }}
+                            onClick={() => onArtistClick(artist)}
                             artist={artist}
                             selected={artist.id === currentArtist?.id}
                           />

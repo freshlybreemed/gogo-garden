@@ -4,7 +4,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import styled from 'styled-components'
 import useFocusReactWindowItem from './useFocusReactWindowItem';
 import { ArtistModel } from '../../stores/ArtistStore';
-import { Artist } from './ArtistRow';
+import { Artist } from './rows/artist';
 import { TrackModel } from '../../stores/TracksStore';
 import { ArtistView } from './ArtistView';
 import { useLibraryContainer } from './LibraryContainer';
@@ -26,7 +26,7 @@ opacity: 1;
 function BeforeList({ numTracks, filterText }: BeforeListProps) {
   return (
     <div>
-      {numTracks===0 && <div>No results found</div>}
+      {numTracks === 0 && <div>No results found</div>}
     </div>
   );
 }
@@ -75,7 +75,7 @@ export function LibraryContent({
   }, [beforeListHeight]);
 
   useFocusReactWindowItem(listRef, currentTrackIndex);
-  console.log(artists, isPreContentMeasured);
+  console.log(artists, currentArtist, isPreContentMeasured);
   // Render an invisible version of the BeforeList element
   // in order to measure its height and render the right virtualized list
   return !isPreContentMeasured ? (
@@ -85,26 +85,27 @@ export function LibraryContent({
         <BeforeList numTracks={artists.length} />
       </div>
     </React.Fragment>
-) : 
-  (<React.Fragment>
-      { screen === 'artist' ? 
-      // <ArtistView
-      //   onArtistClick={onArtistClick}
-      //   filterText={filterText}
-      // />
-      <SongLibrary 
-        tracks={tracks}
-        onTrackClick={onTrackClick}
-        currentTrackId={currentTrackId}
-        filterText={filterText}
-        onRandomClick={onRandomClick}
-      />
-        : 
-        <ArtistLibrary 
+  ) :
+    (<React.Fragment>
+      { screen === 'artist' ?
+        // <ArtistView
+        //   onArtistClick={onArtistClick}
+        //   filterText={filterText}
+        // currentArtist={currentArtist}
+        // />
+        <SongLibrary 
+          tracks={tracks}
+          onTrackClick={onTrackClick}
+          currentTrackId={currentTrackId}
+          filterText={filterText}
+          onRandomClick={onRandomClick}
+        />
+        :
+        <ArtistLibrary
           artists={artists}
           onArtistClick={onArtistClick}
-          filterText={filterText} 
+          filterText={filterText}
         />}
     </React.Fragment>
-  );
+    );
 }

@@ -12,6 +12,7 @@ export type TrackModel = {
   title: string;
   album: string;
   imageUrl: string;
+  trackNumber:  number; 
   date: Date;
   streams: number;
   lastModified: Date;
@@ -19,24 +20,21 @@ export type TrackModel = {
 };
 
 function trackMapper(dto: TrackDTO): TrackModel {
-  const song = dto.key.split('/');
-  const album = song[1];
-  const artist = song[0];
-  const title = song[2].split('.')[0];
-  const url = `https://gogogarden191046-dev.s3.amazonaws.com/public/${dto.key}`;
+  const { title, streams, album, artistId, trackNumber, artist, duration, imageUrl, url, key } = dto
   return {
     id: dto.key,
     url,
-    duration: 2,
+    duration,
+    trackNumber,
     artist,
     title,
-    artistId: dto.artistId,
+    artistId,
     album,
-    streams: 0,
+    streams,
     date: dto.lastModified,
     lastModified: dto.lastModified,
-    key: dto.key,
-    imageUrl: dto.imageUrl
+    key,
+    imageUrl
   };
 }
 
