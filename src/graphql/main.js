@@ -1,6 +1,7 @@
+
 require('dotenv').config();
 const {  gql } = require('apollo-server-micro');
-const { MongoClient } = require('mongodb');
+const { defaults } = require('lodash');
 const connect = require('./db');
 
 // Construct a schema, using GraphQL schema language
@@ -26,7 +27,7 @@ const typeDefs = gql`
     artistId: String
   }
   type Song {
-    id: String
+    _id: String
     artistId: String
     url: String
     duration: Float
@@ -51,11 +52,11 @@ const resolvers = {
   Query: {
     artists: async () => {
       const db = await connect();
-      return await db.collection('artists').find().toArray()
+      return await db.collection('bands').find().toArray()
     },
     songs: async () => {
       const db = await connect();
-      return await db.collection('garden').find().toArray()
+      return await db.collection('music').find().toArray()
     },
   },
 };

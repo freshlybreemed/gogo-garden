@@ -17,14 +17,16 @@ export type ArtistDTO = {
   youtube?: string;
 };
 export type TrackDTO = {
-  //  _id: string;
-  // duration: number;
-  // artist: string;
-  // title: string;
-  // album: string;
-  // date:  Date;
+   _id: string;
+  duration: number;
+  artist: string;
+  title: string;
+  album: string;
+  date:  Date;
+  streams:  number;
+  trackNumber:  number;
+  url:  string;
   key: string;
-  Tag: string;
   artistId: string;
   lastModified: Date;
   size: number;
@@ -44,7 +46,7 @@ export class APIClient {
         query: gql`
           {
             songs {
-              id
+              _id
               artistId
               url
               duration

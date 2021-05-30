@@ -88,18 +88,18 @@ export function LibraryContent({
   ) :
     (<React.Fragment>
       { screen === 'artist' ?
-        <ArtistView
-          onArtistClick={onArtistClick}
-          filterText={filterText}
-        // currentArtist={currentArtist}
-        />
-        // <SongLibrary 
-        //   tracks={tracks}
-        //   onTrackClick={onTrackClick}
-        //   currentTrackId={currentTrackId}
+        // <ArtistView
+        //   onArtistClick={onArtistClick}
         //   filterText={filterText}
-        //   onRandomClick={onRandomClick}
+        // currentArtist={currentArtist}
         // />
+        <SongLibrary 
+          tracks={tracks}
+          onTrackClick={onTrackClick}
+          currentTrackId={currentTrackId}
+          filterText={filterText}
+          onRandomClick={onRandomClick}
+        />
         :
         <ArtistLibrary
           artists={artists}
