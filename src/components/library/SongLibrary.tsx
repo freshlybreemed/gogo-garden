@@ -1,7 +1,7 @@
 import React, { useRef, useState, useLayoutEffect } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { Track } from './track';
+import { Track } from './rows/track';
 import useFocusReactWindowItem from './useFocusReactWindowItem';
 import { TrackModel } from '../../stores/TracksStore';
 

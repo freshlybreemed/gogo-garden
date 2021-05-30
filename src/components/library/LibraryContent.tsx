@@ -4,7 +4,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import styled from 'styled-components'
 import useFocusReactWindowItem from './useFocusReactWindowItem';
 import { ArtistModel } from '../../stores/ArtistStore';
-import { Artist } from './ArtistRow';
+import { Artist } from './rows/artist';
 import { TrackModel } from '../../stores/TracksStore';
 import { ArtistView } from './ArtistView';
 import { useLibraryContainer } from './LibraryContainer';
