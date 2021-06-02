@@ -4,18 +4,25 @@ export function createApiClient() {
   return new APIClient();
 }
 
+export type AlbumDTO = {
+  id: string;
+  name: string;
+  artistId: string;
+};
+
 export type ArtistDTO = {
   id: string;
   name: string;
   shortName: string;
   useShortName: string;
-  tags?:[ string];
+  tags?: [string];
   description?: string;
   image?: string;
   instagram?: string;
   twitter?: string;
   youtube?: string;
 };
+
 export type TrackDTO = {
    _id: string;
   duration: number;
@@ -64,6 +71,21 @@ export class APIClient {
       .then((result) => result.data.songs);
   }
 
+  // getAlbums(artistId): Promise<TrackDTO[]> {
+  //   return this.client
+  //     .query({
+  //       query: gql`
+  //         {
+  //           albums(artistId: String) {
+  //             id
+  //             name
+  //           }
+  //         }
+  //       `,
+  //     })
+  //     .then((result) => result.data.songs);
+  // }
+
   getArtists(): Promise<ArtistDTO[]> {
     return this.client
       .query({
@@ -85,6 +107,10 @@ export class APIClient {
 
 export type GetTracksDTO = {
   songs: TrackDTO[];
+};
+
+export type GetAlbumsDTO = {
+  albums: AlbumDTO[];
 };
 
 export type GetArtistsDTO = {

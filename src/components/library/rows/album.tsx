@@ -31,21 +31,12 @@ export function Artist({ onClick, artist }: ArtistProps) {
         </div>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="hidden md:block relative leading-none p-1 bg-white group-hover:bg-white rounded-full text-indigo-600 hover:bg-gray-200 hover:shadow-sm">
-            {/* <IconSpeaker className="relative block group-hover:hidden fill-current w-6 h-6" />
-            <IconPause className="fill-current w-6 h-6" />  */}
           </div>
         </div>
         <div className="ml-2 pl-2 md:flex md:flex-col md:flex-col-reverse">
           <div className="text-sm md:text-base">
-            <span>{getArtistName(artist)}</span>
+            <span>{`album name`}</span>
           </div>
-          {/* <div
-            className={cx('font-bold leading-tight', 'md:text-lg', {
-              'text-indigo-600': true,
-            })}
-          >
-            got2
-          </div> */}
         </div>
       </div>
       <div className="hidden md:block">
