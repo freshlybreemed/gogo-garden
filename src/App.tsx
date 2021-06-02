@@ -8,14 +8,13 @@ import Login from './components/login';
 import SignUp from './components/signup';
 
 export default function App() {
-
   const {screen, setScreen, setSearchText, searchText} = useAppContainer();
   return (
   <React.StrictMode>
       <div className="flex flex-col h-full text-white font-semibold">
         <Navigation
           searchText={searchText}
-          onSearchChange={setSearchText}
+          setSearchText={setSearchText}
           onSearchClose={() => setSearchText('')}
           />
         {screen !== 'login' && screen !== 'signup' && <Library filterText={searchText} />}
