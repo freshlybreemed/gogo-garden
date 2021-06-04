@@ -24,8 +24,9 @@ export function Artist({ onClick, artist }: ArtistProps) {
              className="w-full h-full "
               style={{
                 backgroundImage:`url(${artist.image})`,
-              backgroundRepeat:'no-repeat',
-              backgroundSize:'cover'
+                backgroundRepeat:'no-repeat',
+                backgroundSize:'cover',
+                backgroundPosition: 'center'
               }}
           />
         </div>

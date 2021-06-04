@@ -13,14 +13,14 @@ const SearchBar = styled.input`
 
 type Props = {
   searchText: string;
-  onSearchChange: (searchText: string) => void;
+  setSearchText: (searchText: string) => void;
   onCloseClick: () => void;
   openSearch: () => void;
 };
 
 export default function NavbarSearch({
   searchText,
-  onSearchChange,
+  setSearchText,
   onCloseClick,
   openSearch,
 }: Props) {
@@ -51,7 +51,7 @@ export default function NavbarSearch({
             ref={searchRef}
             onKeyDown={handleKeydown}
             value={searchText}
-            onChange={(e) => onSearchChange(e.target.value)}
+            onChange={(e) => setSearchText(e.target.value)}
             type="text"
             className="w-full py-2 pl-12 pl-3 rounded-lg bg-gray-200 text-white outline-none focus:bg-gray-300 focus:border-gray-400"
             placeholder="Search..."

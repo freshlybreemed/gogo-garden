@@ -10,7 +10,7 @@ import styled from 'styled-components';
 type Props = {
   searchText: string;
   onSearchClose: () => void;
-  onSearchChange: (searchText: string) => void;
+  setSearchText: (searchText: string) => void;
 };
 
 const SearchBar = styled.div`
@@ -33,7 +33,7 @@ opacity: 1;
 `
 export default function Navbar({
   searchText,
-  onSearchChange,}: Props) {
+  }: Props) {
   
   const { loggedIn, searchOpen, closeSearch, openSearch, setScreen, setSearchText } = useNavigationContainer()
 
@@ -62,7 +62,7 @@ export default function Navbar({
             <NavSearch
               searchText={searchText}
               onCloseClick={closeSearch}
-              onSearchChange={onSearchChange}
+              setSearchText={setSearchText}
               openSearch={openSearch}
             />
           ) : (<SearchBar onClick={openSearch}>
