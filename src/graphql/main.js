@@ -2,6 +2,7 @@
 require('dotenv').config();
 const {  gql } = require('apollo-server-micro');
 const { defaults } = require('lodash');
+const { default: db } = require('./db');
 const connect = require('./db');
 
 // Construct a schema, using GraphQL schema language
@@ -22,10 +23,9 @@ const typeDefs = gql`
 
   type Album {
     name: String
-    date: String
     artist: String
-    artistId: String
   }
+
   type Song {
     _id: String
     artistId: String
@@ -43,7 +43,7 @@ const typeDefs = gql`
   type Query {
     artists: [Artist]
     songs: [Song]
-    albums: [Song]
+    albums(artistId:String): [Album]
   }
 
   input User {
@@ -67,19 +67,26 @@ const resolvers = {
       const db = await connect();
       return await db.collection('music').find().toArray()
     },
-    albums: async (artistId) => {
+
+    albums: async (root, args) => {
       const db = await connect();
-      const music =  await db.collection('music').find().toArray()
-      // const artistSongs = music.filter((song)=> song.artistId === artistId)
-      // const albums = {}
-      // artistSongs.forEach(song=>{
-      //   if(!albums[song.album]){
-      //     albums[song.album] = ''
-      //   }
-      //   return Object.keys(albums)
-      // })
-      // return albums
-    },
+      const music =  await db.collection('music').find().toArray();
+      const artistSongs = music.filter((song) => {
+        return `${song.artistId}` === args.artistId
+      });
+      const albums = {};
+      artistSongs.forEach(song => {
+        if(!albums[song.album]){
+          let albumObj = {
+            name: song.album,
+            artist: song.artist
+          }
+          albums[song.album] = albumObj
+        }
+      })
+      let albumsResult = Object.values(albums);
+      return albumsResult;
+    }
   },
   Mutation:{
     login: async (user) => {
