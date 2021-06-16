@@ -1,4 +1,5 @@
 import { ApolloClient, InMemoryCache, gql, createHttpLink } from '@apollo/client';
+import { query } from 'express';
 
 export function createApiClient() {
   return new APIClient();
@@ -71,16 +72,20 @@ export class APIClient {
   }
 
   getAlbums($artistId: string): Promise<AlbumDTO[]> {
+    const albumQuery = gql`
+      query albums($artistId: String) {
+        albums(artistId: $artistId){
+          artist
+          name
+        }
+      }
+    `;
     return this.client
       .query({
-        query: gql`
-          {
-            albums(artistId: $artistId) {
-              artist
-              name
-            }
-          }
-        `,
+        query: albumQuery,
+        variables: {
+          artistId: $artistId
+        }
       })
       .then((result) => {
         console.log('getAlbums result',result)
