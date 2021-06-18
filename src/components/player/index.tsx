@@ -232,15 +232,13 @@ function PlayerControls({
         })}
       >
         <div className="xl:col-span-2 flex items-center space-x-3 ">
-          <div className="flex-shrink-0 h-16 w-16 rounded-lg overflow-hidden relative">
+          <div className="text-black flex-shrink-0 h-16 w-16 rounded-lg overflow-hidden relative">
             <div
               className="w-full h-full bg-gray-200"
-              // src={track.picture_large}
-              // alt={track.title}
             />
           </div>
-          <div className="flex flex-col justify-center">
-            <div className="text-md font-bold leading-tight">
+          <div className="text-left flex flex-col justify-center">
+            <div className="text-md font-bold text-black leading-tight">
               {track.title}
             </div>
             <div className="text-gray-700 text-md">
@@ -294,11 +292,12 @@ function PlayerControls({
           <div className="max-w-3xl w-full">
             <>
               <div className="flex justify-center items-center">
-                <div className="text-xs w-10 text-right">
+                <div className="text-xs w-10 text-black text-right">
                   {formatTime(Math.ceil(playerProgress))}
                 </div>
                 <div className="flex flex-1 flex-col justify-center max-w-xl mx-3 relative w-full">
                   <Slider
+                    style={{color:'black'}}
                     max={trackDuration}
                     value={playerProgress}
                     onMouseDown={() => setSeeking(true)}
@@ -312,7 +311,7 @@ function PlayerControls({
                     }}
                   />
                 </div>
-                <div className="text-xs w-10">
+                <div className="text-xs text-black w-10">
                   {formatTime(Math.ceil(trackDuration))}
                 </div>
               </div>

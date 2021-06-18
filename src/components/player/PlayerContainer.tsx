@@ -27,7 +27,7 @@ export function usePlayerContainer(filterText: string) {
   const playNextSong = () =>{
     const index = filteredTracks.findIndex((val)=>val.id === currentTrackId);
     if(index >= 0 && filteredTracks.length > index){
-      play(filteredTracks[index+1].id);
+      play(filteredTracks[index+1]?.id);
     }
   };
 
