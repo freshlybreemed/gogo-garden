@@ -124,7 +124,9 @@ export function useLibraryContainer(filterText: string) {
         .toLocaleLowerCase()
         .includes(filterText.toLocaleLowerCase());
     });
-    return title.concat(artist, album);
+    return title.concat(artist, album).sort((a: TrackModel,b: TrackModel)=>{
+      return a.trackNumber - b.trackNumber
+    })
   }, [filterText, tracks]);
 
   const filteredArtists = React.useMemo(() => {
