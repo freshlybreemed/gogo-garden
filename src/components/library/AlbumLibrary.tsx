@@ -5,6 +5,8 @@ import styled from 'styled-components'
 import useFocusReactWindowItem from './useFocusReactWindowItem';
 import { ArtistModel } from '../../stores/ArtistStore';
 import { Artist } from './rows/artist';
+import { AlbumModel } from '../../stores/AlbumStore';
+import { Album } from './rows/album';
 
 type BeforeListProps = {
   numTracks: number;
@@ -25,28 +27,28 @@ function BeforeList({ numTracks, filterText }: BeforeListProps) {
     </div>
   );
 }
-type ArtistProps = {
-  artists: ArtistModel[];
-  currentArtist?: ArtistModel;
-  onArtistClick: (artist: ArtistModel) => void;
+type AlbumProps = {
+  albums: AlbumModel[];
+  currentAlbum?: AlbumModel;
+  onAlbumClick: (albums: AlbumModel) => void;
   focusArtistId?: string;
   filterText?: string;
 };
 
-export function ArtistLibrary({
-  artists,
-  currentArtist,
-  onArtistClick,
+export function AlbumLibrary({
+  albums,
+  currentAlbum,
+  onAlbumClick,
   focusArtistId,
   filterText,
-}: ArtistProps) {
+}: AlbumProps) {
   const listRef = useRef<List>(null);
 
   const beforeListRef = useRef<HTMLDivElement | null>(null);
   const [beforeListHeight, setBeforeListHeight] = useState(-1);
   const isPreContentMeasured = beforeListHeight > 0;
-  const currentTrackIndex = artists.findIndex(
-    (t) => t.id === focusArtistId,
+  const currentAlbumIndex = albums.findIndex(
+    (t) => t.artistId === focusArtistId,
   );
 
   useLayoutEffect(() => {
@@ -57,8 +59,8 @@ export function ArtistLibrary({
     }
   }, [beforeListHeight]);
 
-  useFocusReactWindowItem(listRef, currentTrackIndex);
-  console.log(artists, isPreContentMeasured);
+  useFocusReactWindowItem(listRef, currentAlbumIndex);
+  console.log(albums, isPreContentMeasured);
   // Render an invisible version of the BeforeList element
   // in order to measure its height and render the right virtualized list
   return (
@@ -70,7 +72,7 @@ export function ArtistLibrary({
             {/* <ShuffleButton onClick={onRandomClick} /> */}
           </div>
         )}
-        {artists.length > 0 && (
+        {albums.length > 0 && (
           <div className="flex-auto">
             <AutoSizer>
               {({
@@ -83,14 +85,14 @@ export function ArtistLibrary({
                 <List
                   ref={listRef}
                   className="px-4 md:px-4"
-                  itemCount={artists.length}
+                  itemCount={albums.length}
                   itemSize={90}
                   width={width}
                   height={height}
                   key={beforeListHeight}
                 >
                   {({ index, style }: any) => {
-                    const artist: ArtistModel = artists[index];
+                    const album: AlbumModel = albums[index];
                     const top = style.top;
                     const fHeight =
                       parseFloat(style.height) + beforeListHeight;
@@ -112,17 +114,17 @@ export function ArtistLibrary({
                             <div>
                               <BeforeList
                                 filterText={filterText}
-                                numTracks={artists.length}
+                                numTracks={albums.length}
                               />
                             </div>
                           )}
-                          <Artist
+                          <Album
                             onClick={() => {
-                              console.log('artist',artist); 
-                              onArtistClick(artist);
+                              console.log('albums',albums); 
+                              onAlbumClick(album);
                             }}
-                            artist={artist}
-                            selected={artist.id === currentArtist?.id}
+                            album={album}
+                            selected={album.name === currentAlbum?.name}
                           />
                         </div>
                       </div>

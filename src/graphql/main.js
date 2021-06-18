@@ -24,6 +24,7 @@ const typeDefs = gql`
   type Album {
     name: String
     artist: String
+    artistId: String
   }
 
   type Song {
@@ -79,7 +80,8 @@ const resolvers = {
         if(!albums[song.album]){
           let albumObj = {
             name: song.album,
-            artist: song.artist
+            artist: song.artist,
+            artistId: song.artistId
           }
           albums[song.album] = albumObj
         }
@@ -94,7 +96,7 @@ const resolvers = {
       return await db.collection('user').updateOne(
         { id: user.id },
         {
-          $set: { ...user, updatedAt: new Date() },
+          $set: { updatedAt: new Date() },
         },
         );
       },

@@ -6,13 +6,15 @@ const apiClient = createApiClient();
 export type AlbumModel = {
   name: string;
   artist: string;
+  artistId: string;
 };
 
 function albumMapper(dto: AlbumDTO): AlbumModel {
-  const {name, artist} = dto;
+  const {name, artist, artistId} = dto;
   return {
     name,
-    artist
+    artist,
+    artistId
   };
 }
 
@@ -20,7 +22,10 @@ type AlbumStore = {
   albums: AlbumModel[];
   fetchAlbumsState: 'pending' | 'resolved' | 'rejected';
   rejectionReason?: string;
+  currentAlbum?: AlbumModel;
   fetchAlbumsByArtist: (artistId: string) => Promise<void>;
+  setCurrentAlbum: (album: AlbumModel) => void;
+
 };
 
 export const useAlbumStore = create<AlbumStore>((set, get) => ({
@@ -39,4 +44,6 @@ export const useAlbumStore = create<AlbumStore>((set, get) => ({
       console.log('error in your useAlbumStore block')
     }
   },
+    setCurrentAlbum:(album: AlbumModel) => set({currentAlbum:album}),
+
 }));
