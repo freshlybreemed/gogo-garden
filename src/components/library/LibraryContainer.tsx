@@ -6,6 +6,7 @@ import ReactGA from 'react-ga';
 import { usePlayerStore } from '../../stores/PlayerStore';
 import { IconPause } from '../icons';
 import { ArtistModel, useArtistStore } from '../../stores/ArtistStore';
+import { AlbumModel, useAlbumStore } from '../../stores/AlbumStore';
 // import algoliasearch from 'algoliasearch'
 import { useAppStore } from '../../stores/AppStore';
 import { useNavbarStore } from '../../stores/NavigationStore';
@@ -29,6 +30,7 @@ export function useLibraryContainer(filterText: string) {
   const artists = useArtistStore((state) => state.artists);
   const tracks = useTracksStore((state) => state.tracks);
   const fetchArtists = useArtistStore((state) => state.fetchArtists);
+  const fetchAlbumsByArtist = useAlbumStore((state) => state.fetchAlbumsByArtist);
   const setCurrentArtist = useArtistStore((state) => state.setCurrentArtist);
   const fetchTracks = useTracksStore((state) => state.fetchTracks);
   const [fetchTracksState, fetchTracksErr] = useTracksStore(
@@ -73,6 +75,7 @@ export function useLibraryContainer(filterText: string) {
       action: 'Artist Click',
       label: artist && artist.name ? artist.name : inputArtist.id,
     });
+    fetchAlbumsByArtist(inputArtist.id);
     console.log(screen, 'curr', inputArtist, 'text', searchText);
   }
 
