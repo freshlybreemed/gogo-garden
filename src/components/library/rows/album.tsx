@@ -1,15 +1,15 @@
 import React from 'react';
-import { ArtistModel } from '../../../stores/ArtistStore';
+import { AlbumModel } from '../../../stores/AlbumStore';
 import { cx } from '@emotion/css';
 import { IconSpeaker, IconPause } from '../../icons';
 import { getArtistName } from '../../../lib/helpers';
 
-type ArtistProps = {
+type AlbumProps = {
   onClick: () => void;
-  artist: ArtistModel;
+  album: AlbumModel;
   selected: boolean;
 };
-export function Artist({ onClick, artist }: ArtistProps) {
+export function Album({ onClick, album }: AlbumProps) {
   return <div
       onClick={onClick}
       className={cx(
@@ -23,7 +23,7 @@ export function Artist({ onClick, artist }: ArtistProps) {
           <div
              className="w-full h-full "
               style={{
-                backgroundImage:`url(${artist.image})`,
+                // backgroundImage:`url(${album.image})`,
               backgroundRepeat:'no-repeat',
               backgroundSize:'cover'
               }}
@@ -35,7 +35,7 @@ export function Artist({ onClick, artist }: ArtistProps) {
         </div>
         <div className="ml-2 pl-2 md:flex md:flex-col md:flex-col-reverse">
           <div className="text-sm md:text-base">
-            <span>{`album name`}</span>
+            <span>{album.name}</span>
           </div>
         </div>
       </div>

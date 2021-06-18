@@ -14,7 +14,9 @@ export default function TrackList({ filterText = '' }: Props) {
     currentTrackId,
     onTrackClick,
     onRandomClick,
+    onAlbumClick,
     filteredTracks,
+    filteredAlbums,
     filteredArtists,
     onArtistClick,
     screen,
@@ -27,14 +29,16 @@ export default function TrackList({ filterText = '' }: Props) {
         pending: () => <div>Loading</div>,
         rejected: () => <div>Failure moe</div>,
         resolved: () => <LibraryContent
-        tracks={filteredTracks}
-        artists={filteredArtists}
-        screen={screen}
-        onArtistClick={onArtistClick}
-        onTrackClick={onTrackClick}
-        currentTrackId={currentTrackId}
-        onRandomClick={onRandomClick}
-        filterText={filterText}
+          tracks={filteredTracks}
+          artists={filteredArtists}
+          screen={screen}
+          albums={filteredAlbums}
+          onAlbumClick={onAlbumClick}
+          onArtistClick={onArtistClick}
+          onTrackClick={onTrackClick}
+          currentTrackId={currentTrackId}
+          onRandomClick={onRandomClick}
+          filterText={filterText}
       /> 
       })
     }

@@ -8,6 +8,7 @@ export function createApiClient() {
 export type AlbumDTO = {
   name: string;
   artist: string;
+  artistId: string;
 };
 
 export type ArtistDTO = {
@@ -77,6 +78,7 @@ export class APIClient {
         albums(artistId: $artistId){
           artist
           name
+          artistId
         }
       }
     `;

@@ -6,11 +6,11 @@ import ReactGA from 'react-ga';
 import { usePlayerStore } from '../../stores/PlayerStore';
 import { IconPause } from '../icons';
 import { ArtistModel, useArtistStore } from '../../stores/ArtistStore';
-import { AlbumModel, useAlbumStore } from '../../stores/AlbumStore';
 // import algoliasearch from 'algoliasearch'
 import { useAppStore } from '../../stores/AppStore';
 import { useNavbarStore } from '../../stores/NavigationStore';
 import { getArtistName } from '../../lib/helpers';
+import { AlbumModel, useAlbumStore } from '../../stores/AlbumStore';
 // const client = algoliasearch(process.env.ALGOLIA_ID|| 'VUP25M59V9', process.env.ALGOLIA_KEY || '401c3a392393dedd2f1f69e795b84e01');
 // const index = client.initIndex('songs');
 
@@ -28,10 +28,12 @@ export function useLibraryContainer(filterText: string) {
   const pause = usePlayerStore((state) => state.pause);
   const setScreen = useAppStore((state) => state.setScreen);
   const artists = useArtistStore((state) => state.artists);
+  const albums = useAlbumStore((state) => state.albums);
   const tracks = useTracksStore((state) => state.tracks);
   const fetchArtists = useArtistStore((state) => state.fetchArtists);
-  const fetchAlbumsByArtist = useAlbumStore((state) => state.fetchAlbumsByArtist);
   const setCurrentArtist = useArtistStore((state) => state.setCurrentArtist);
+  const setCurrentAlbum = useAlbumStore((state) => state.setCurrentAlbum);
+  const fetchAlbumsByArtist = useAlbumStore((state) => state.fetchAlbumsByArtist);
   const fetchTracks = useTracksStore((state) => state.fetchTracks);
   const [fetchTracksState, fetchTracksErr] = useTracksStore(
     (state) => [state.fetchTracksState, state.rejectionReason],
@@ -65,18 +67,29 @@ export function useLibraryContainer(filterText: string) {
   }
 
   function onArtistClick(inputArtist: ArtistModel) {
-    console.log(inputArtist, 'idk')
     const artist = artists.find((t) => t.id === inputArtist.id);
-    setSearchText(getArtistName(inputArtist));
+    // setSearchText(getArtistName(inputArtist));
     setCurrentArtist(inputArtist);
-    setScreen('artist');
+    fetchAlbumsByArtist(inputArtist.id);
+    setScreen('album');
     ReactGA.event({
       category: 'User',
       action: 'Artist Click',
       label: artist && artist.name ? artist.name : inputArtist.id,
     });
-    fetchAlbumsByArtist(inputArtist.id);
     console.log(screen, 'curr', inputArtist, 'text', searchText);
+  }
+
+  function onAlbumClick(inputAlbum: AlbumModel) {
+    const artist = artists.find((t) => t.id === inputAlbum.name);
+    setSearchText(inputAlbum.name);
+    setCurrentAlbum(inputAlbum);
+    setScreen('songs');
+    ReactGA.event({
+      category: 'User',
+      action: 'Artist Click',
+      label: artist && artist.name ? artist.name : inputAlbum.name,
+    });
   }
 
   function onRandomClick() {
@@ -126,13 +139,22 @@ export function useLibraryContainer(filterText: string) {
     });
   }, [filterText, tracks]);
 
+  const filteredAlbums = React.useMemo(() => {
+    if (!filterText) {
+      return albums;
+    }
+    return albums;
+  }, [filterText, albums]);
+
   return {
     currentTrackId,
     currentArtist,
     onTrackClick,
     onRandomClick,
     onArtistClick,
+    onAlbumClick,
     filteredTracks,
+    filteredAlbums,
     setScreen,
     screen,
     searchText,

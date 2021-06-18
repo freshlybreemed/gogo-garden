@@ -10,6 +10,8 @@ import { ArtistView } from './ArtistView';
 import { useLibraryContainer } from './LibraryContainer';
 import { ArtistLibrary } from './ArtistLibrary';
 import { SongLibrary } from './SongLibrary';
+import { AlbumLibrary } from './AlbumLibrary';
+import { AlbumModel } from '../../stores/AlbumStore';
 
 type BeforeListProps = {
   numTracks: number;
@@ -32,13 +34,16 @@ function BeforeList({ numTracks, filterText }: BeforeListProps) {
 }
 type LibraryProps = {
   artists: ArtistModel[];
+  albums: AlbumModel[];
   currentArtist?: ArtistModel;
   onArtistClick: (artist: ArtistModel) => void;
+  onAlbumClick: (album: AlbumModel) => void;
   focusArtistId?: string;
   filterText?: string;
   screen?: string;
   tracks: TrackModel[];
   currentTrackId?: string;
+  currentAlbumId?: string;
   onTrackClick: (trackId: string) => void;
   onRandomClick: () => void;
   focusTrackId?: string;
@@ -47,8 +52,11 @@ type LibraryProps = {
 export function LibraryContent({
   artists,
   tracks,
+  albums,
+  onAlbumClick,
   currentArtist,
   currentTrackId,
+  currentAlbumId,
   onArtistClick,
   onTrackClick,
   focusArtistId,
@@ -87,12 +95,21 @@ export function LibraryContent({
     </React.Fragment>
   ) :
     (<React.Fragment>
-      { screen === 'artist' ?
-        // <ArtistView
-        //   albums={albums}
-        //   onArtistClick={onArtistClick}
-        //   filterText={filterText}
-        // />
+      {screen === 'album' && ( <AlbumLibrary 
+          albums={albums}
+          onAlbumClick={onAlbumClick}
+          // currentAlbumId={currentAlbumId}
+          filterText={filterText}
+          // onRandomClick={onRandomClick}
+        />)}
+
+      { screen === 'home' &&
+        <ArtistLibrary
+        artists={artists}
+        onArtistClick={onArtistClick}
+        filterText={filterText}
+        />}
+        {screen === 'songs' && (
         <SongLibrary 
           tracks={tracks}
           onTrackClick={onTrackClick}
@@ -100,12 +117,20 @@ export function LibraryContent({
           filterText={filterText}
           onRandomClick={onRandomClick}
         />
-        :
-        <ArtistLibrary
-          artists={artists}
-          onArtistClick={onArtistClick}
+        )}
+        {/* // <ArtistView
+        //   albums={albums}
+        //   onArtistClick={onArtistClick}
+        //   filterText={filterText}
+        // />
+        <AlbumLibrary 
+          albums={albums}
+          onAlbumClick={onAlbumClick}
+          // currentAlbumId={currentAlbumId}
           filterText={filterText}
-        />}
+          // onRandomClick={onRandomClick}
+        />
+        : */}
     </React.Fragment>
     );
 }
