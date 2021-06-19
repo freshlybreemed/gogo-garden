@@ -9,6 +9,7 @@ export type AlbumDTO = {
   name: string;
   artist: string;
   artistId: string;
+  imageUrl: string;
 };
 
 export type ArtistDTO = {
@@ -62,6 +63,7 @@ export class APIClient {
               title
               album
               date
+              imageUrl
               streams
               lastModified
               key

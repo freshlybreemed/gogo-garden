@@ -7,14 +7,16 @@ export type AlbumModel = {
   name: string;
   artist: string;
   artistId: string;
+  imageUrl: string;
 };
 
 function albumMapper(dto: AlbumDTO): AlbumModel {
-  const {name, artist, artistId} = dto;
+  const {name, artist, artistId,imageUrl} = dto;
   return {
     name,
     artist,
-    artistId
+    artistId,
+    imageUrl
   };
 }
 

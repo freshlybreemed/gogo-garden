@@ -25,6 +25,7 @@ const typeDefs = gql`
     name: String
     artist: String
     artistId: String
+    imageUrl: String
   }
 
   type Song {
@@ -35,6 +36,7 @@ const typeDefs = gql`
     artist: String
     title: String
     album: String
+    imageUrl: String
     date: String
     streams: Float
     lastModified: String
@@ -81,7 +83,8 @@ const resolvers = {
           let albumObj = {
             name: song.album,
             artist: song.artist,
-            artistId: song.artistId
+            artistId: song.artistId,
+            imageUrl: song.imageUrl
           }
           albums[song.album] = albumObj
         }

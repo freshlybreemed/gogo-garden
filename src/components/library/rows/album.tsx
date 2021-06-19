@@ -23,7 +23,7 @@ export function Album({ onClick, album }: AlbumProps) {
           <div
              className="w-full h-full "
               style={{
-                // backgroundImage:`url(${album.image})`,
+                backgroundImage:`url(${album.imageUrl})`,
               backgroundRepeat:'no-repeat',
               backgroundSize:'cover'
               }}
