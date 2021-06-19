@@ -2,7 +2,6 @@ import { useLibraryContainer } from './LibraryContainer';
 import React from 'react';
 import { match } from '../../workers/match';
 import { LibraryContent } from './LibraryContent';
-import { ArtistView } from './ArtistView';
 
 type Props = {
   filterText?: string;

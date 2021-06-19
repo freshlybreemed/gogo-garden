@@ -25,6 +25,7 @@ const typeDefs = gql`
     name: String
     artist: String
     artistId: String
+    imageUrl: String
   }
 
   type Song {
@@ -35,10 +36,11 @@ const typeDefs = gql`
     artist: String
     title: String
     album: String
+    imageUrl: String
+    trackNumber: String
     date: String
     streams: Float
     lastModified: String
-    key: String
   }
 
   type Query {
@@ -47,13 +49,22 @@ const typeDefs = gql`
     albums(artistId:String): [Album]
   }
 
-  input User {
+  type Playlist {
+    songs: [Song]!
+    name: String
+    likes: Float
+    lastModified: String
+  }
+
+  type User {
     email: String
     id: String
+    playlists: [Playlist]!
   }
   type Mutation {
     login: [Artist]
     signup: [Song]
+    streamUp: String
   }
 `;
 
@@ -81,7 +92,8 @@ const resolvers = {
           let albumObj = {
             name: song.album,
             artist: song.artist,
-            artistId: song.artistId
+            artistId: song.artistId,
+            imageUrl: song.imageUrl
           }
           albums[song.album] = albumObj
         }
@@ -91,27 +103,39 @@ const resolvers = {
     }
   },
   Mutation:{
+    streamUp: async (id) => {
+      const db = await connect();
+      return await db.collection('music').updateOne(
+        { _id: id},
+        {
+          $inc: { streams: 1 },
+          $set: { 
+            lastModified: new Date()
+        },
+      });
+    },
     login: async (user) => {
       const db = await connect();
       return await db.collection('user').updateOne(
         { id: user.id },
         {
-          $set: { updatedAt: new Date() },
-        },
-        );
-      },
-      signup: async (user) => {
+          $set: { lastModified: new Date() },
+        }
+      );
+    },
+    signup: async (user) => {
       const db = await connect();
       return await db.collection('user').updateOne(
         { _id: user.id },
         {
-          $set: { ...user, updatedAt: new Date() },
+          $set: { ...user, lastModified: new Date() },
         },
         { upsert: true, returnOriginal: false },
-      );
+      )
     },
   },
 };
+
 
 module.exports = {
   typeDefs,

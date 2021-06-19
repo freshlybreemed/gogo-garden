@@ -7,14 +7,16 @@ export type AlbumModel = {
   name: string;
   artist: string;
   artistId: string;
+  imageUrl: string;
 };
 
 function albumMapper(dto: AlbumDTO): AlbumModel {
-  const {name, artist, artistId} = dto;
+  const {name, artist, artistId,imageUrl} = dto;
   return {
     name,
     artist,
-    artistId
+    artistId,
+    imageUrl
   };
 }
 
@@ -33,6 +35,9 @@ export const useAlbumStore = create<AlbumStore>((set, get) => ({
   fetchAlbumsState: 'pending',
   fetchAlbumsByArtist: async (artistId: string) => {
     try {
+      set({
+        fetchAlbumsState: 'pending',
+      });
       const albumDtos = await apiClient.getAlbums(artistId);
       const albumModels = await albumDtos.map(albumMapper);
       console.log(albumModels, '****album dto**')

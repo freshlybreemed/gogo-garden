@@ -1,6 +1,5 @@
 import React from 'react';
 import { cx } from '@emotion/css';
-import { formatDate, formatTimeSecs } from '../../../helpers';
 import { IconSpeaker } from '../../icons';
 import { TrackModel } from '../../../stores/TracksStore';
 
