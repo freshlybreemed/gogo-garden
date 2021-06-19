@@ -56,6 +56,7 @@ const typeDefs = gql`
   type Mutation {
     login: [Artist]
     signup: [Song]
+    streamUp: String
   }
 `;
 
@@ -94,6 +95,17 @@ const resolvers = {
     }
   },
   Mutation:{
+    streamUp: async (id) => {
+      const db = await connect();
+      return await db.collection('music').updateOne(
+        { _id: id},
+        {
+          $inc: { streams: 1 },
+          $set: { 
+            lastModified: new Date()
+        },
+      });
+    },
     login: async (user) => {
       const db = await connect();
       return await db.collection('user').updateOne(
