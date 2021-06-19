@@ -49,9 +49,17 @@ const typeDefs = gql`
     albums(artistId:String): [Album]
   }
 
-  input User {
+  type Playlist {
+    songs: [Song]!
+    name: String
+    likes: Float
+    lastModified: String
+  }
+
+  type User {
     email: String
     id: String
+    playlists: [Playlist]!
   }
   type Mutation {
     login: [Artist]
