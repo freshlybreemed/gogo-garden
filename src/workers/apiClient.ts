@@ -26,16 +26,15 @@ export type ArtistDTO = {
 };
 
 export type TrackDTO = {
-   _id: string;
+  _id: string;
   duration: number;
   artist: string;
   title: string;
   album: string;
   date:  Date;
   streams:  number;
-  trackNumber:  number;
+  trackNumber:  string;
   url:  string;
-  key: string;
   artistId: string;
   lastModified: Date;
   size: number;
@@ -67,7 +66,6 @@ export class APIClient {
               streams
               trackNumber
               lastModified
-              key
             }
           }
         `,

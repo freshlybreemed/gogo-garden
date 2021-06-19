@@ -16,16 +16,15 @@ export type TrackModel = {
   date: Date;
   streams: number;
   lastModified: Date;
-  key: number | string;
 };
 
 function trackMapper(dto: TrackDTO): TrackModel {
-  const { title, streams, album, artistId, trackNumber, artist, duration, imageUrl, url, key } = dto
+  const { title, streams, album, artistId, trackNumber, artist, duration, imageUrl, url, _id } = dto
   return {
-    id: dto.key,
+    id: _id,
     url,
     duration,
-    trackNumber,
+    trackNumber: parseInt(trackNumber),
     artist,
     title,
     artistId,
@@ -33,7 +32,6 @@ function trackMapper(dto: TrackDTO): TrackModel {
     streams,
     date: dto.lastModified,
     lastModified: dto.lastModified,
-    key,
     imageUrl
   };
 }

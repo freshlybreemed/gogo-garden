@@ -41,7 +41,6 @@ const typeDefs = gql`
     date: String
     streams: Float
     lastModified: String
-    key: String
   }
 
   type Query {
@@ -100,7 +99,7 @@ const resolvers = {
       return await db.collection('user').updateOne(
         { id: user.id },
         {
-          $set: { updatedAt: new Date() },
+          $set: { lastModified: new Date() },
         },
         );
       },
@@ -109,7 +108,7 @@ const resolvers = {
       return await db.collection('user').updateOne(
         { _id: user.id },
         {
-          $set: { ...user, updatedAt: new Date() },
+          $set: { ...user, lastModified: new Date() },
         },
         { upsert: true, returnOriginal: false },
       );
