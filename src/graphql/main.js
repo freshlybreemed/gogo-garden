@@ -37,6 +37,7 @@ const typeDefs = gql`
     title: String
     album: String
     imageUrl: String
+    trackNumber: String
     date: String
     streams: Float
     lastModified: String

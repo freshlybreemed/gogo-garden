@@ -65,6 +65,7 @@ export class APIClient {
               date
               imageUrl
               streams
+              trackNumber
               lastModified
               key
             }
