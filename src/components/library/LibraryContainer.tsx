@@ -35,6 +35,10 @@ export function useLibraryContainer(filterText: string) {
   const setCurrentAlbum = useAlbumStore((state) => state.setCurrentAlbum);
   const fetchAlbumsByArtist = useAlbumStore((state) => state.fetchAlbumsByArtist);
   const fetchTracks = useTracksStore((state) => state.fetchTracks);
+  const [fetchAlbumsState, fetchAlbumsErr] = useAlbumStore(
+    (state) => [state.fetchAlbumsState, state.rejectionReason],
+    shallow,
+  );
   const [fetchTracksState, fetchTracksErr] = useTracksStore(
     (state) => [state.fetchTracksState, state.rejectionReason],
     shallow,
@@ -148,6 +152,18 @@ export function useLibraryContainer(filterText: string) {
     return albums;
   }, [filterText, albums]);
 
+  const activate = () => {
+    switch(screen){
+      case "home":
+        return fetchArtistsState;
+      case "songs":
+        return fetchTracksState;
+      case "album":
+        return fetchAlbumsState;
+      default:
+        return 'resolved'
+    }
+  }
   return {
     currentTrackId,
     currentArtist,
@@ -162,7 +178,7 @@ export function useLibraryContainer(filterText: string) {
     searchText,
     setSearchText,
     filteredArtists,
-    activate: fetchTracksState,
+    activate: activate(),
     fetchTracksErr,
   };
 }

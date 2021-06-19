@@ -33,6 +33,9 @@ export const useAlbumStore = create<AlbumStore>((set, get) => ({
   fetchAlbumsState: 'pending',
   fetchAlbumsByArtist: async (artistId: string) => {
     try {
+      set({
+        fetchAlbumsState: 'pending',
+      });
       const albumDtos = await apiClient.getAlbums(artistId);
       const albumModels = await albumDtos.map(albumMapper);
       console.log(albumModels, '****album dto**')
