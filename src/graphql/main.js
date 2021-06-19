@@ -100,10 +100,10 @@ const resolvers = {
         { id: user.id },
         {
           $set: { lastModified: new Date() },
-        },
-        );
-      },
-      signup: async (user) => {
+        }
+      );
+    },
+    signup: async (user) => {
       const db = await connect();
       return await db.collection('user').updateOne(
         { _id: user.id },
@@ -111,10 +111,11 @@ const resolvers = {
           $set: { ...user, lastModified: new Date() },
         },
         { upsert: true, returnOriginal: false },
-      );
+      )
     },
   },
 };
+
 
 module.exports = {
   typeDefs,
