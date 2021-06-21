@@ -73,6 +73,27 @@ export class APIClient {
       .then((result) => result.data.songs);
   }
 
+  postStreamUp($songId: string): Promise<TrackDTO> {
+    const mutation = gql`
+      mutation PostStreamUp($songId: String!) {
+        streamUp(songId: $songId){
+          songId
+          streams
+          artist
+          title
+        }
+      }
+    `;
+    return this.client.mutate({
+      mutation,
+      variables: {
+        songId: $songId
+      }
+    }).then(res=>{
+      console.log(res);
+      return res.data 
+    })
+  }
   getAlbums($artistId: string): Promise<AlbumDTO[]> {
     const albumQuery = gql`
       query albums($artistId: String) {

@@ -103,10 +103,10 @@ const resolvers = {
     }
   },
   Mutation:{
-    streamUp: async (id) => {
+    streamUp: async (root, args) => {
       const db = await connect();
       return await db.collection('music').updateOne(
-        { _id: id},
+        { _id: args.songId},
         {
           $inc: { streams: 1 },
           $set: { 
