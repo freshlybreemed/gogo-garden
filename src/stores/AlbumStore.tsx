@@ -40,7 +40,6 @@ export const useAlbumStore = create<AlbumStore>((set, get) => ({
       });
       const albumDtos = await apiClient.getAlbums(artistId);
       const albumModels = await albumDtos.map(albumMapper);
-      console.log(albumModels, '****album dto**')
       set({
         albums: albumModels,
         fetchAlbumsState: 'resolved',

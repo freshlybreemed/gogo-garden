@@ -163,7 +163,6 @@ const resolvers = {
       }
     },
     signup: async (root, { input }) => {
-      console.log('*** MAIN.JS ****', input);
       try {
         const db = await connect();
         const response = await db.collection('user').insertOne(input);
