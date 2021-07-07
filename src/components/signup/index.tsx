@@ -47,10 +47,9 @@ const SignUp: React.FunctionComponent = ({}) => {
           return setLoading();
         }
         if (typeof result !== 'undefined') {
-          console.log('firebase result',result.user);
           const { uid, email } = result.user;
           const dateString =  new Date();
-          // **** Not sure where to to find password from firebase result object so I used the password input from the page ***
+
           let user =  {
             _id: uid,
             email: email,
@@ -61,7 +60,6 @@ const SignUp: React.FunctionComponent = ({}) => {
             lastModified: dateString
           }
 
-          console.log('this is your user', user)
           apiClient.userSignup(user);
         }
       });
