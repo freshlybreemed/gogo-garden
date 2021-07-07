@@ -1,5 +1,8 @@
 import create from 'zustand';
 import { clamp } from '../helpers';
+import { createApiClient} from '../workers/apiClient';
+
+const apiClient = createApiClient();
 
 type PlayerStatus = 'idle' | 'playing';
 
@@ -24,6 +27,8 @@ export type PlayerStore = {
   forward: (secs: number) => void;
   rewind: (secs: number) => void;
   lastVol: number;
+  streamUp: (songId: string) => void;
+  streamUpState: string;
   setTrackDuration: (duration: number) => void;
 };
 
@@ -35,6 +40,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
   lastVol: 80,
   currentTrackId: undefined,
   cuePosition: 0,
+  streamUpState: 'resolved',
   play(trackId: string) {
     set({
       playing: true,
@@ -50,6 +56,16 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
     set({
       playing: false,
     });
+  },
+  streamUp: async(songId: string) =>{
+    try {
+      set({
+        streamUpState: 'pending'
+      });
+      const streamUp = await apiClient.postStreamUp(songId);
+    } catch (err){
+        console.log('err in stream up',err);
+    }
   },
   setProgress(progress: number) {
     set({
