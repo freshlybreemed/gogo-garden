@@ -69,6 +69,7 @@ const typeDefs = gql`
   }
 
   input SignupInput {
+    _id: String
     email: String
     firstName: String
     lastName: String
@@ -162,6 +163,7 @@ const resolvers = {
       }
     },
     signup: async (root, { input }) => {
+      console.log('*** MAIN.JS ****', input);
       try {
         const db = await connect();
         const response = await db.collection('user').insertOne(input);

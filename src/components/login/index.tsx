@@ -4,17 +4,20 @@ import Firebase from '../../workers/firebase';
 import { setCookie } from '../../helpers';
 import { useNavigationContainer } from '../navigation/NavigationContainer';
 import { useSignUpContainer } from '../signup/SignUpContainer';
+import { createApiClient } from '../../workers/apiClient';
+
+const apiClient = createApiClient();
 
 const Login: React.FunctionComponent = ({}) => {
- 
-  const { 
-    email, 
+
+  const {
+    email,
     password,
     setEmail,
     setPassword,
-    loading, 
+    loading,
     setLoading,
-    error, 
+    error,
     setError,
     setScreen
   } = useSignUpContainer();
@@ -38,7 +41,7 @@ const Login: React.FunctionComponent = ({}) => {
         setLoading();
         isError = true;
       })
-      .then((result: { message: any; user: { uid: string } }) => {
+      .then((result: { message: any; user: { uid: string, email: string } }) => {
         if (isError) {
           return;
         }
@@ -46,15 +49,9 @@ const Login: React.FunctionComponent = ({}) => {
         setCookie('id_token', result.user.uid);
         setLoggedIn(true);
         setScreen('home');
-        // axios
-        //   .post('/api/user', { data: { firebase: result.user } })
-        //   .then((res: AxiosResponse) => {
-        //     const user = res.data;
-        //     if (user.admin) {
-        //       setCookie('id_token_a', 'true');
-        //     }
-        //   });
+        apiClient.userLogin(result.user.email);
       });
+    // apiClient.userLogin('jdoe@gmail.com')
   };
   console.log('keys',process.env)
   return (
@@ -78,6 +75,7 @@ const Login: React.FunctionComponent = ({}) => {
                 type="email"
                 value={email}
                 onChange={(event) => {
+                  console.log(event)
                   setEmail(event.currentTarget.value);
                   setError('');
                 }}

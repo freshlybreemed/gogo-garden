@@ -40,6 +40,7 @@ export type TrackDTO = {
   size: number;
   imageUrl: string;
 };
+
 export class APIClient {
   get client() {
     return new ApolloClient({
@@ -91,7 +92,7 @@ export class APIClient {
       }
     }).then(res=>{
       console.log(res);
-      return res.data 
+      return res.data
     })
   }
   getAlbums($artistId: string): Promise<AlbumDTO[]> {
@@ -134,7 +135,46 @@ export class APIClient {
       })
       .then((result) => result.data.artists);
   }
+
+    userSignup(user:any) {
+      const input = user;
+      const userSignupMutation = gql`
+        mutation signup($input:SignupInput) {
+        signup(input: $input){
+          result
+        }
+      }
+    `;
+      return this.client
+        .mutate({
+          mutation: userSignupMutation,
+          variables: {
+            input: input
+          }
+        })
+    }
+
+    userLogin($email:string) {
+      const userLoginMutation = gql`
+        mutation($email: String){
+          login(email: $email){
+            result
+          }
+        }
+      `;
+      return this.client
+        .mutate({
+          mutation: userLoginMutation,
+          variables: {
+            email: $email
+          }
+        })
+    }
+
 }
+
+
+
 
 export type GetTracksDTO = {
   songs: TrackDTO[];

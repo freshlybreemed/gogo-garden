@@ -1,25 +1,28 @@
 import * as React from 'react';
 import Firebase from '../../workers/firebase';
 import { setCookie } from '../../helpers';
-import axios from 'axios';
 import { useSignUpContainer } from './SignUpContainer';
+import { createApiClient } from '../../workers/apiClient';
+
+const apiClient = createApiClient();
+
 
 const SignUp: React.FunctionComponent = ({}) => {
-  const { 
-    email, 
+  const {
+    email,
     setEmail,
-    firstName, 
+    firstName,
     setFirstName,
-    lastName, 
+    lastName,
     setLastName,
-    password, 
+    password,
     phoneNumber,
     setPhoneNumber,
     setPassword,
-    loading, 
+    loading,
     setLoading,
-    error, 
-    setError 
+    error,
+    setError
   } = useSignUpContainer();
 
   const handleSignUp = async (event: React.FormEvent<HTMLElement>) => {
@@ -30,6 +33,7 @@ const SignUp: React.FunctionComponent = ({}) => {
       return;
     }
     let isError = false;
+
     Firebase.signup({ email, password })
       .catch((result) => {
         const message =
@@ -43,20 +47,22 @@ const SignUp: React.FunctionComponent = ({}) => {
           return setLoading();
         }
         if (typeof result !== 'undefined') {
-          console.log(result);
-          axios
-            .post('/api/user', {
-              user: {
-                firebase: result.user,
-                email: result?.user?.email,
-                new: true,
-                info: { firstName, lastName },
-              },
-            })
-            .then(() => {
-              setCookie('id_token', result.user.uid);
-              // Router.push('/user');
-            });
+          console.log('firebase result',result.user);
+          const { uid, email } = result.user;
+          const dateString =  new Date();
+          // **** Not sure where to to find password from firebase result object so I used the password input from the page ***
+          let user =  {
+            _id: uid,
+            email: email,
+            firstName: firstName,
+            lastName: lastName,
+            phoneNumber: phoneNumber,
+            password: password,
+            lastModified: dateString
+          }
+
+          console.log('this is your user', user)
+          apiClient.userSignup(user);
         }
       });
   };
@@ -170,3 +176,4 @@ const SignUp: React.FunctionComponent = ({}) => {
 };
 
 export default SignUp;
+
