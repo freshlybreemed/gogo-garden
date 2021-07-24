@@ -2,13 +2,15 @@ import React, { useEffect, useRef } from 'react';
 import { IconSearch, IconTimes } from '../../components/icons';
 import { KEYS } from '../../helpers';
 import styled from 'styled-components';
+import { useAppContainer } from '../../AppContainter';
+
 
 const SearchBar = styled.input`
   background: #FFFFFF80 0% 0% no-repeat padding-box;
   border: 2px solid #FFFFFF;
   border-radius: 30px;
   opacity: 0.2;
-  color: white; 
+  color: white;
 `;
 
 type Props = {
@@ -25,6 +27,8 @@ export default function NavbarSearch({
   openSearch,
 }: Props) {
   let searchRef = useRef<HTMLInputElement>(null);
+
+  const {setScreen} = useAppContainer();
 
   useEffect(() => {
     if (searchRef.current) {
@@ -51,7 +55,10 @@ export default function NavbarSearch({
             ref={searchRef}
             onKeyDown={handleKeydown}
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(e) => {
+              setSearchText(e.target.value)
+              setScreen('songs');
+            }}
             type="text"
             className="w-full py-2 pl-12 pl-3 rounded-lg bg-gray-200 text-white outline-none focus:bg-gray-300 focus:border-gray-400"
             placeholder="Search..."
