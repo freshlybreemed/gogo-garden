@@ -50,7 +50,7 @@ export function Artist({ onClick, artist }: ArtistProps) {
         </div>
       </div>
       <div className="hidden md:block">
-        <span>wow</span>
+        <span></span>
       </div>
     </div>
   ;
