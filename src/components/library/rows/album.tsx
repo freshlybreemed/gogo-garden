@@ -40,7 +40,7 @@ export function Album({ onClick, album }: AlbumProps) {
         </div>
       </div>
       <div className="hidden md:block">
-        <span>wow</span>
+        <span></span>
       </div>
     </div>
   ;
