@@ -8,7 +8,8 @@ export type ArtistModel = {
   image?: string;
 };
 
-export type TrackModel = {
+/** Raw song document, lightly normalized (see queries.ts). */
+export type SongDoc = {
   id: string;
   artistId: string;
   url: string;
@@ -19,14 +20,100 @@ export type TrackModel = {
   imageUrl: string;
   trackNumber: number;
   streams: number;
-  /** ISO string (the old mapper also aliased `date` to lastModified). */
-  date: string | null;
-  lastModified: string | null;
+  /** Show date from the import (`YYYY-MM-DD`), if present. */
+  showDate: string | null;
+  venue: string | null;
+  venueSlug: string | null;
+  /** When the document was added (ObjectId timestamp, ISO). */
+  addedAt: string;
 };
 
-export type AlbumModel = {
+/** A song as the UI sees it: resolved band and show. */
+export type TrackModel = {
+  id: string;
+  url: string;
+  duration: number;
+  title: string;
+  /** Part number when the title is a placeholder like "Track 7"; else null. */
+  part: number | null;
+  trackNumber: number;
+  streams: number;
+  bandId: string;
+  bandName: string;
+  palette: number;
+  showHref: string;
+  /** Venue for live shows, title for tapes. */
+  showName: string;
+  showDate: string | null;
+  venueSlug: string | null;
+};
+
+export type BandModel = {
+  id: string;
   name: string;
-  artist: string;
-  artistId: string;
-  imageUrl: string;
+  /** Long name when the display name is a short one ("RE" -> "Reaction Band"). */
+  fullName: string | null;
+  image: string | null;
+  palette: number;
+  showCount: number;
+  trackCount: number;
+  firstDate: string | null;
+  lastDate: string | null;
+};
+
+export type ShowModel = {
+  key: string;
+  href: string;
+  bandId: string;
+  bandName: string;
+  palette: number;
+  album: string;
+  kind: 'live' | 'tape';
+  date: string | null;
+  venue: string | null;
+  venueSlug: string | null;
+  title: string;
+  note: string | null;
+  disc: number | null;
+  trackCount: number;
+  duration: number;
+  streams: number;
+  addedAt: string;
+};
+
+/** Normalized `venues` document (the researched write-up). */
+export type VenueDoc = {
+  slug: string;
+  name: string;
+  aka: string[];
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  lat: number | null;
+  lng: number | null;
+  yearsActive: string | null;
+  status: string | null;
+  now: string | null;
+  summary: string | null;
+  history: string | null;
+  gogoImpact: string | null;
+  notableBands: string[];
+  memories: { quote: string; author: string | null; sourceUrl: string | null; date: string | null }[];
+  photos: { url: string; credit: string | null; sourceUrl: string | null; caption: string | null; kind: string | null }[];
+  sources: { title: string | null; url: string }[];
+};
+
+export type VenueModel = {
+  slug: string;
+  name: string;
+  city: string | null;
+  state: string | null;
+  status: string | null;
+  yearsActive: string | null;
+  showCount: number;
+  trackCount: number;
+  bandCount: number;
+  firstDate: string | null;
+  lastDate: string | null;
+  photo: string | null;
 };

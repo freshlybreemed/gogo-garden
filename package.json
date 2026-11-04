@@ -20,8 +20,6 @@
     "next": "^15.5.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-virtualized-auto-sizer": "^1.0.26",
-    "react-window": "^1.8.11",
     "server-only": "^0.0.1",
     "zustand": "^5.0.8"
   },
@@ -32,7 +30,6 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
-    "@types/react-window": "^1.8.8",
     "eslint": "^9.30.0",
     "eslint-config-next": "^15.5.0",
     "prettier": "^3.6.0",

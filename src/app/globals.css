@@ -1,24 +1,67 @@
-@import url('https://fonts.googleapis.com/css?family=Righteous');
 @import 'tailwindcss';
 
 /*
- * Ported from the old prebuilt src/styles.min.css (custom rules + Tailwind 1.x
- * build) and src/styles/index.css. Visual parity only; a redesign is planned.
+ * Tha Garden: an underground go-go player.
+ * Tar-black room, newsprint text, one crank-orange accent for "live" things
+ * (playing, primary actions, focus). The loud color lives in the band art:
+ * split-fountain gradients after Globe Poster's go-go show cards.
  */
 
-@theme {
-  --font-body: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+@theme inline {
+  --color-tar: #14120e;
+  --color-tape: #1c1915;
+  --color-tape-2: #25211b;
+  --color-rule: #36312a;
+  --color-paper: #eee7d7;
+  --color-dust: #a89f8c;
+  --color-ink: #0d0c0a;
+  --color-crank: #ff5a1f;
+  --color-crank-hot: #ff7a45;
+
+  --font-display: var(--font-poster), 'Arial Narrow', Impact, sans-serif;
+  --font-body: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-marker: var(--font-scrawl), 'Comic Sans MS', cursive;
+
+  --animate-eq: eq 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes eq {
+  0% {
+    transform: scaleY(0.25);
+  }
+  100% {
+    transform: scaleY(1);
+  }
 }
 
 @layer base {
-  /* Tailwind 1/2 defaulted borders to gray-200/300; v4 uses currentColor. */
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
+  html {
+    background: var(--color-tar);
+    color: var(--color-paper);
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    min-height: 100dvh;
+    background: var(--color-tar);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    font-feature-settings: 'tnum' 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Photocopy grain over everything; never intercepts input. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.11;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.4 -.25'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   button:not(:disabled),
@@ -26,124 +69,105 @@
     cursor: pointer;
   }
 
-  body,
-  html,
-  #root {
-    height: 100%;
+  :focus-visible {
+    outline: 2px solid var(--color-crank);
+    outline-offset: 2px;
   }
 
-  body {
-    background-color: black;
-    text-align: center;
+  ::selection {
+    background: var(--color-crank);
+    color: var(--color-ink);
   }
+}
 
-  /* font-size/margin were overridden by preflight in the old build too. */
-  h1 {
-    text-align: center;
-    font-family: 'Righteous', serif;
-    letter-spacing: 0.15rem;
+@layer components {
+  /* Poster wood-type: the display face set tight and uppercase. */
+  .poster {
+    font-family: var(--font-display);
+    font-weight: 900;
     text-transform: uppercase;
-    color: #fff;
-    text-shadow:
-      -4px 4px 1px #ef3550,
-      -8px 8px 1px #f48fb1,
-      -12px 12px 1px #7e57c2,
-      -16px 16px 1px #2196f3,
-      -20px 20px 1px #26c6da,
-      -24px 24px 1px #43a047,
-      -28px 28px 1px #eeff41,
-      -32px 32px 1px #f9a825,
-      -36px 36px 1px #ff5722;
+    line-height: 0.86;
+    letter-spacing: -0.005em;
   }
 
-  audio {
-    display: block;
-    margin: 20px auto;
+  .tnum {
+    font-variant-numeric: tabular-nums;
   }
 
-  input[type='submit'] {
-    background-color: #26c6da;
-    border: none;
-    padding: 10px;
-    margin: 10px;
-    border-radius: 4px;
-    font-family: sans-serif;
-    font-size: 20px;
+  /* Newsprint J-card face with its own paper tooth. */
+  .paper {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .3 0 0 0 0 .2 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+  }
+
+  /* Photo run through the copier onto colored stock. */
+  .xerox {
+    filter: grayscale(1) contrast(1.45) brightness(1.08);
+    mix-blend-mode: multiply;
+  }
+
+  /* Range inputs: seek + volume. --pct is set inline. */
+  input[data-slider] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 20px;
+    background: transparent;
     cursor: pointer;
-    box-shadow: -4px 4px 1px #eeff41;
+    --track: var(--color-rule);
+    --fill: var(--color-paper);
   }
-}
-
-@font-face {
-  font-family: 'Fellix';
-  src: url('/fonts/Fellix-Bold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Space Grotesk';
-  src:
-    url('/fonts/SpaceGrotesk-SemiBold.woff2') format('woff2'),
-    url('/fonts/SpaceGrotesk-SemiBold.woff') format('woff');
-  font-weight: 600;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Space Grotesk';
-  src:
-    url('/fonts/SpaceGrotesk-Regular.woff2') format('woff2'),
-    url('/fonts/SpaceGrotesk-Regular.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Space Grotesk';
-  src:
-    url('/fonts/SpaceGrotesk-Light.woff2') format('woff2'),
-    url('/fonts/SpaceGrotesk-Light.woff') format('woff');
-  font-weight: 300;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Space Grotesk';
-  src:
-    url('/fonts/SpaceGrotesk-Medium.woff2') format('woff2'),
-    url('/fonts/SpaceGrotesk-Medium.woff') format('woff');
-  font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Space Grotesk';
-  src:
-    url('/fonts/SpaceGrotesk-Bold.woff2') format('woff2'),
-    url('/fonts/SpaceGrotesk-Bold.woff') format('woff');
-  font-weight: bold;
-  font-style: normal;
-}
-
-@keyframes fadeInOutAniomation {
-  from {
+  input[data-slider]:hover,
+  input[data-slider]:focus-visible {
+    --fill: var(--color-crank);
+  }
+  input[data-slider]:focus-visible {
+    outline-offset: 0;
+  }
+  input[data-slider]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: linear-gradient(to right, var(--fill) var(--pct, 0%), var(--track) var(--pct, 0%));
+  }
+  input[data-slider]::-moz-range-track {
+    height: 4px;
+    background: linear-gradient(to right, var(--fill) var(--pct, 0%), var(--track) var(--pct, 0%));
+  }
+  input[data-slider]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    margin-top: -4px;
+    background: var(--color-paper);
+    border: 0;
+    border-radius: 0;
     opacity: 0;
   }
+  input[data-slider]::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: var(--color-paper);
+    border: 0;
+    border-radius: 0;
+    opacity: 0;
+  }
+  input[data-slider]:hover::-webkit-slider-thumb,
+  input[data-slider]:focus-visible::-webkit-slider-thumb {
+    opacity: 1;
+  }
+  input[data-slider]:hover::-moz-range-thumb,
+  input[data-slider]:focus-visible::-moz-range-thumb {
+    opacity: 1;
+  }
 }
 
-.animate-fade-loop {
-  animation: fadeInOutAniomation 1.6s infinite alternate;
-  animation-delay: -1.3s;
-}
-
-/* Native range input standing in for @reach/slider. */
-input[data-slider] {
-  width: 100%;
-  padding: 1rem 0;
-  cursor: pointer;
-  accent-color: var(--color-indigo-600);
-}
-input[data-slider]:focus {
-  outline: none;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
