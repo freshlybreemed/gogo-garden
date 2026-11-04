@@ -7,6 +7,7 @@ import { usePlayerStore } from '@/stores/PlayerStore';
 import { formatDuration, plural, shortDate, trackTitle, venueHref } from '@/lib/shows';
 import type { TrackModel } from '@/lib/types';
 import { Equalizer } from './art/Equalizer';
+import { LikeButton } from './LikeButton';
 import { IconPause, IconPlay } from './icons';
 
 type Props = {
@@ -88,7 +89,7 @@ export function TrackList({ tracks, variant, source, className }: Props) {
                 ) : null}
               </span>
             </button>
-            <span className="flex items-center gap-4 pr-3 text-[13px] text-dust tnum">
+            <span className="flex items-center gap-3 pr-1 text-[13px] text-dust tnum sm:gap-4">
               {variant !== 'show' ? (
                 <Link
                   href={track.venueSlug ? venueHref(track.venueSlug) : track.showHref}
@@ -101,6 +102,7 @@ export function TrackList({ tracks, variant, source, className }: Props) {
                 <span className="hidden w-20 text-right sm:block">{plural(track.streams, 'play')}</span>
               ) : null}
               <span className="w-12 text-right">{formatDuration(track.duration)}</span>
+              <LikeButton url={track.url} title={title} />
             </span>
           </li>
         );

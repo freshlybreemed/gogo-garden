@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { useAppStore } from '@/stores/AppStore';
 import { usePlayerStore } from '@/stores/PlayerStore';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { useLikesStore } from '@/stores/LikesStore';
 import { fountain } from '@/lib/shows';
 import { Equalizer } from '../art/Equalizer';
 import { IconBands, IconHome, IconPin, IconSearch, IconUser } from '../icons';
@@ -32,6 +33,7 @@ function useAuth(initialLoggedIn: boolean) {
   const loggedIn = stored ?? initialLoggedIn;
   const signOut = async () => {
     await supabaseBrowser().auth.signOut().catch(() => undefined);
+    useLikesStore.getState().reset();
     setLoggedIn(false);
     router.refresh();
   };
@@ -129,9 +131,14 @@ export function Sidebar({ bands, initialLoggedIn }: { bands: NavBand[]; initialL
 
       <div className="border-t border-rule px-5 py-3 text-[14px]">
         {loggedIn ? (
-          <button type="button" onClick={signOut} className="font-semibold text-dust hover:text-paper">
-            Log out
-          </button>
+          <span className="flex gap-4">
+            <Link href="/liked" className="font-semibold text-paper hover:text-crank">
+              Liked songs
+            </Link>
+            <button type="button" onClick={signOut} className="font-semibold text-dust hover:text-paper">
+              Log out
+            </button>
+          </span>
         ) : (
           <span className="flex gap-4">
             <Link href="/login" className="font-semibold text-paper hover:text-crank">
@@ -154,9 +161,14 @@ export function MobileTop({ initialLoggedIn }: { initialLoggedIn: boolean }) {
     <header className="flex items-center justify-between px-4 pt-3 md:hidden">
       <Wordmark className="scale-90 origin-left" />
       {loggedIn ? (
-        <button type="button" onClick={signOut} className="h-11 px-1 text-[14px] font-semibold text-dust hover:text-paper">
-          Log out
-        </button>
+        <span className="flex items-center gap-3">
+          <Link href="/liked" className="inline-flex h-11 items-center px-1 text-[14px] font-semibold text-paper">
+            Liked
+          </Link>
+          <button type="button" onClick={signOut} className="h-11 px-1 text-[14px] font-semibold text-dust hover:text-paper">
+            Log out
+          </button>
+        </span>
       ) : (
         <Link href="/login" className="inline-flex h-11 items-center gap-2 px-1 text-[14px] font-semibold text-paper">
           <IconUser className="h-5 w-5" />

@@ -155,3 +155,13 @@ export const IconPin = (p: P) => (
     <path d="M12 2a7.5 7.5 0 0 0-7.5 7.5C4.5 15 12 22 12 22s7.5-7 7.5-12.5A7.5 7.5 0 0 0 12 2z" fill="currentColor" />
   </Icon>
 );
+
+export const IconHeart = ({ filled, ...p }: P & { filled?: boolean }) => (
+  <Icon {...p}>
+    <path
+      d="M12 20.5 3.8 12.6A4.9 4.9 0 0 1 12 6.4a4.9 4.9 0 0 1 8.2 6.2z"
+      fill={filled ? 'currentColor' : 'none'}
+      strokeLinecap="butt"
+    />
+  </Icon>
+);
