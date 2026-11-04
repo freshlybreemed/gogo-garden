@@ -1,6 +1,7 @@
+'use client';
+
 import { useLibraryContainer } from './LibraryContainer';
-import React from 'react';
-import { match } from '../../workers/match';
+import { match } from '@/lib/match';
 import { LibraryContent } from './LibraryContent';
 
 type Props = {
@@ -19,28 +20,24 @@ export default function TrackList({ filterText = '' }: Props) {
     filteredArtists,
     onArtistClick,
     screen,
-    currentArtist,
   } = useLibraryContainer(filterText);
 
-  return (
-    <React.Fragment>
-      {match(activate, {
-        pending: () => <div>Loading</div>,
-        rejected: () => <div>Failure moe</div>,
-        resolved: () => <LibraryContent
-          tracks={filteredTracks}
-          artists={filteredArtists}
-          screen={screen}
-          albums={filteredAlbums}
-          onAlbumClick={onAlbumClick}
-          onArtistClick={onArtistClick}
-          onTrackClick={onTrackClick}
-          currentTrackId={currentTrackId}
-          onRandomClick={onRandomClick}
-          filterText={filterText}
-      /> 
-      })
-    }
-    </React.Fragment>
-  );
+  return match(activate, {
+    // Initial load is server-side now; app/loading.tsx renders "Loading".
+    rejected: () => <div>Failure moe</div>,
+    resolved: () => (
+      <LibraryContent
+        tracks={filteredTracks}
+        artists={filteredArtists}
+        screen={screen}
+        albums={filteredAlbums}
+        onAlbumClick={onAlbumClick}
+        onArtistClick={onArtistClick}
+        onTrackClick={onTrackClick}
+        currentTrackId={currentTrackId}
+        onRandomClick={onRandomClick}
+        filterText={filterText}
+      />
+    ),
+  });
 }

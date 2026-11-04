@@ -1,11 +1,12 @@
-import React from 'react';
+'use client';
+
+import clsx from 'clsx';
 import NavSearch from './NavSearch';
-import { cx } from '@emotion/css';
 import { IconSearch } from '../icons';
 import Logo from './Logo';
 import { useNavigationContainer } from './NavigationContainer';
-import { removeCookie } from '../../helpers';
-import styled from 'styled-components';
+import { AUTH_COOKIE, removeCookie } from '@/lib/helpers';
+import { logout } from '@/lib/firebase';
 
 type Props = {
   searchText: string;
@@ -13,65 +14,66 @@ type Props = {
   setSearchText: (searchText: string) => void;
 };
 
-const SearchBar = styled.div`
-background: #FFFFFF80 0% 0% no-repeat padding-box;
-border: 2px solid #FFFFFF;
-border-radius: 30px;
-opacity: 0.2;
-width:100%;
-`;
+// Were styled-components `SearchBar` / `UserBlock` divs.
+const searchBarStyle: React.CSSProperties = {
+  background: '#FFFFFF80 0% 0% no-repeat padding-box',
+  border: '2px solid #FFFFFF',
+  borderRadius: '30px',
+  opacity: 0.2,
+  width: '100%',
+};
 
-const UserBlock = styled.div`
-background: #FFFFFF26 0% 0% no-repeat padding-box;
-border-radius: 30px;
-opacity: 1;
-`
-const UserImage = styled.div`
-background: transparent url('./images/logo192.png') 0% 0% no-repeat padding-box;
-border-radius: 30px;
-opacity: 1;
-`
-export default function Navbar({
-  searchText,
-  }: Props) {
-  
-  const { loggedIn, searchOpen, closeSearch, openSearch, setScreen, setSearchText } = useNavigationContainer()
+const userBlockStyle: React.CSSProperties = {
+  background: '#FFFFFF26 0% 0% no-repeat padding-box',
+  borderRadius: '30px',
+  opacity: 1,
+};
+
+export default function Navbar({ searchText }: Props) {
+  const { loggedIn, searchOpen, closeSearch, openSearch, setScreen, setSearchText } =
+    useNavigationContainer();
 
   const handleLogout = () => {
-    removeCookie('id_token');
+    removeCookie(AUTH_COOKIE);
+    void logout();
   };
 
   return (
     <div className="px-4 py-3 shadow-md flex items-center">
-      <React.Fragment>
-        <div
-          className={cx(
-            'flex',
-            'items-center',
-            searchOpen && 'hidden sm:flex',
-          )}
-          onClick={()=>{
-            setSearchText('')
-            setScreen('home');
-          }}
-        >
-          <Logo />
+      <div
+        className={clsx('flex', 'items-center', searchOpen && 'hidden sm:flex')}
+        onClick={() => {
+          setSearchText('');
+          setScreen('home');
+        }}
+      >
+        <Logo />
+      </div>
+      <div className="flex items-center sm:ml-6 w-full justify-end">
+        {searchOpen ? (
+          <NavSearch
+            searchText={searchText}
+            onCloseClick={closeSearch}
+            setSearchText={setSearchText}
+            openSearch={openSearch}
+          />
+        ) : (
+          <div style={searchBarStyle} onClick={openSearch}>
+            <SearchButton onClick={openSearch} />
+          </div>
+        )}
+      </div>
+      {loggedIn ? (
+        // Full reload back to "/", as before.
+        // eslint-disable-next-line @next/next/no-html-link-for-pages
+        <a href="/" onClick={handleLogout}>
+          Logout
+        </a>
+      ) : (
+        <div style={userBlockStyle} onClick={() => setScreen('login')}>
+          Login
         </div>
-        <div className="flex items-center ml:auto sm:ml-6 w-full justify-end">
-          {searchOpen ? (
-            <NavSearch
-              searchText={searchText}
-              onCloseClick={closeSearch}
-              setSearchText={setSearchText}
-              openSearch={openSearch}
-            />
-          ) : (<SearchBar onClick={openSearch}>
-                <SearchButton onClick={openSearch}/>
-              </SearchBar>
-          )}
-        </div>
-        {loggedIn ? <a href="/" onClick={handleLogout}>Logout</a>:<UserBlock onClick={()=> setScreen('login')}>Login</UserBlock>}
-      </React.Fragment>
+      )}
     </div>
   );
 }

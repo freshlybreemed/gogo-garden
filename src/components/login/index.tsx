@@ -1,125 +1,97 @@
-import * as React from 'react';
-import { useState } from 'react';
-import Firebase from '../../workers/firebase';
-import { setCookie } from '../../helpers';
+'use client';
+
+import { login } from '@/lib/firebase';
+import { AUTH_COOKIE, setCookie } from '@/lib/helpers';
+import { recordLogin } from '@/app/actions';
 import { useNavigationContainer } from '../navigation/NavigationContainer';
 import { useSignUpContainer } from '../signup/SignUpContainer';
-import { createApiClient } from '../../workers/apiClient';
 
-const apiClient = createApiClient();
+export default function Login() {
+  const { email, password, setEmail, setPassword, loading, setLoading, error, setError, setScreen } =
+    useSignUpContainer();
+  const { setLoggedIn } = useNavigationContainer();
 
-const Login: React.FunctionComponent = ({}) => {
-
-  const {
-    email,
-    password,
-    setEmail,
-    setPassword,
-    loading,
-    setLoading,
-    error,
-    setError,
-    setScreen
-  } = useSignUpContainer();
-
-  const { setLoggedIn } = useNavigationContainer()
-  const handleLogin = async (event: React.FormEvent<HTMLElement>) => {
+  const handleLogin = async (event: React.SyntheticEvent) => {
     event.preventDefault();
-    // setSignInText('Signing In...');
-    setLoading();
     if (!(email && password)) {
       setError('Please fill in email and password');
-      // setSignInText('Sign In');
-      // setLoading(false);
       return;
     }
-
-    let isError = false;
-    Firebase.login(Firebase.EMAIL, { email, password })
-      .catch((result:any) => {
-        setError(result.message);
-        setLoading();
-        isError = true;
-      })
-      .then((result: { message: any; user: { uid: string, email: string } }) => {
-        if (isError) {
-          return;
-        }
-        console.log(result);
-        setCookie('id_token', result.user.uid);
-        setLoggedIn(true);
-        setScreen('home');
-        apiClient.userLogin(result.user.email);
-      });
-    // apiClient.userLogin('jdoe@gmail.com')
+    setLoading(true);
+    try {
+      const result = await login({ email, password });
+      setCookie(AUTH_COOKIE, result.user.uid);
+      setLoggedIn(true);
+      setScreen('home');
+      if (result.user.email) void recordLogin(result.user.email);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+    }
   };
-  console.log('keys',process.env)
+
   return (
-    <React.Fragment>
-      <div className={'mt-4 text-center'}>
-        <h1 className="mb0 mt3 pt3">Login</h1>
-        <h4 className="gray mt0">
-          Don't have an account?{' '}
-          <span>
-            <div onClick={()=>setScreen('signup')} className="white">
-              Sign up
-            </div>
-          </span>
-        </h4>
-        <form className="mw6 center mv5">
-          <div className="mv3">
-            <div className="mv3 tl ba-hover  ">
-              <small className=" db pl2 pt2 pb1"> Email Address</small>
-              <input
-                className="pl2 pb2 input-reset bn  w-90"
-                type="email"
-                value={email}
-                onChange={(event) => {
-                  console.log(event)
-                  setEmail(event.currentTarget.value);
-                  setError('');
-                }}
-              />
-            </div>
+    <div className={'mt-4 text-center'}>
+      <h1 className="mb0 mt3 pt3">Login</h1>
+      <h4 className="gray mt0">
+        Don&apos;t have an account?{' '}
+        <span>
+          <div onClick={() => setScreen('signup')} className="white">
+            Sign up
           </div>
+        </span>
+      </h4>
+      <form className="mw6 center mv5" onSubmit={handleLogin}>
+        <div className="mv3">
           <div className="mv3 tl ba-hover  ">
-            <small className=" db pl2 pt2 pb1"> Password</small>
+            <small className=" db pl2 pt2 pb1"> Email Address</small>
             <input
               className="pl2 pb2 input-reset bn  w-90"
-              type="password"
-              value={password}
+              type="email"
+              value={email}
               onChange={(event) => {
+                setEmail(event.currentTarget.value);
                 setError('');
-                setPassword(event.currentTarget.value);
               }}
             />
           </div>
-          <small id="name-desc" className="hljs-strong f6 db mv3">
-            {error}
-          </small>
-          <div className="mv3 tl pv2">
-            <input type="checkbox" />
-            <label className="pl2">
-              Subscribe to Social Ticketing Newsletter
-            </label>
-          </div>
-          <a
-            onClick={handleLogin}
-            className="b--white dib dim noselect fl br-100 b--solid pa2 ph4 f4 fw5"
-          >
-            {loading && <i className="fa fa-spinner fa-spin mr2" />}
-            {loading ? 'Logging in...' : 'Login'}
+        </div>
+        <div className="mv3 tl ba-hover  ">
+          <small className=" db pl2 pt2 pb1"> Password</small>
+          <input
+            className="pl2 pb2 input-reset bn  w-90"
+            type="password"
+            value={password}
+            onChange={(event) => {
+              setError('');
+              setPassword(event.currentTarget.value);
+            }}
+          />
+        </div>
+        <small id="name-desc" className="hljs-strong f6 db mv3">
+          {error}
+        </small>
+        <div className="mv3 tl pv2">
+          <input type="checkbox" />
+          <label className="pl2">Subscribe to Social Ticketing Newsletter</label>
+        </div>
+        <a
+          onClick={handleLogin}
+          className="b--white dib dim noselect fl br-100 b--solid pa2 ph4 f4 fw5"
+        >
+          {loading && <i className="fa fa-spinner fa-spin mr2" />}
+          {loading ? 'Logging in...' : 'Login'}
+        </a>
+
+        <div className="mt4 tl dib pt3">
+          <a className="white b" href="">
+            Forgot password?
           </a>
-
-          <div className="mt4 tl dib pt3">
-            <a className="white b" href="">
-              Forgot password?
-            </a>
-          </div>
-        </form>
-      </div>
-    </React.Fragment>
+        </div>
+        {/* Lets Enter submit the form like a real login form. */}
+        <button type="submit" hidden />
+      </form>
+    </div>
   );
-};
-
-export default Login;
+}

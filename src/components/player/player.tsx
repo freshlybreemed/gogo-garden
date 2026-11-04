@@ -1,46 +1,66 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { TrackModel } from '../../stores/TracksStore';
-import ReactPlayer from 'react-player/file'
+'use client';
+
+import { useEffect, useImperativeHandle, useRef } from 'react';
+import type { TrackModel } from '@/lib/types';
+
+export type PlayerHandle = {
+  seekTo: (position: number) => void;
+};
 
 export interface MP3PlayerWidgetProps {
+  player: React.Ref<PlayerHandle>;
   playing?: boolean;
-  position?: number;
-  player: any;
   volume?: number;
   onReady?: (trackDuration: number) => void;
   onPlayProgressChange?: (position: number) => void;
-  onPause?: () => void;
-  onPlay?: () => void;
-  onPlaying?: ({ position }:{ position: any }) => void;
-  onLoading?: ({ bytesLoaded, bytesTotal }:{ bytesLoaded: any, bytesTotal: any }) => void;
-  playNextSong:() => void;
-  showNative?: boolean;
+  playNextSong: () => void;
   track: TrackModel;
 }
 
-export function MP3Player(props: MP3PlayerWidgetProps) {
-  const {
-    onPlayProgressChange,
-    onReady,
-    track,
-    playing,
-    player,
-    volume = 80,
-    showNative,
-    playNextSong,
-  } = props;
+/** Hidden <audio> element (replaces react-player/file). */
+export function MP3Player({
+  player,
+  onPlayProgressChange,
+  onReady,
+  track,
+  playing,
+  volume = 80,
+  playNextSong,
+}: MP3PlayerWidgetProps) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useImperativeHandle(player, () => ({
+    seekTo(position: number) {
+      const audio = audioRef.current;
+      if (audio && Number.isFinite(position)) {
+        audio.currentTime = Math.max(0, position);
+      }
+    },
+  }));
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playing) {
+      audio.play().catch((err) => console.log('play() failed', err));
+    } else {
+      audio.pause();
+    }
+  }, [playing, track.url]);
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.volume = volume / 100;
+  }, [volume]);
 
   return (
-    <div style={{ transform: showNative ? 'scale(1)' : 'scale(0)' }}>
-      <ReactPlayer
-        ref={player} 
-        onEnded={playNextSong}
-        onProgress={({playedSeconds})=>onPlayProgressChange && onPlayProgressChange(playedSeconds)} 
-        style={{display:'none'}} 
-        url={track.url} 
-        onDuration={(duration)=>onReady && onReady(duration)}
-        playing={playing} 
-      />
-    </div>
+    <audio
+      ref={audioRef}
+      src={track.url}
+      preload="auto"
+      style={{ display: 'none' }}
+      onLoadedMetadata={(e) => onReady?.(e.currentTarget.duration)}
+      onTimeUpdate={(e) => onPlayProgressChange?.(e.currentTarget.currentTime)}
+      onEnded={playNextSong}
+    />
   );
 }

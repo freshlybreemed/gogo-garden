@@ -1,13 +1,12 @@
-import * as React from 'react';
-import Firebase from '../../workers/firebase';
-import { setCookie } from '../../helpers';
+'use client';
+
+import { signup } from '@/lib/firebase';
+import { AUTH_COOKIE, setCookie } from '@/lib/helpers';
+import { recordSignup } from '@/app/actions';
+import { useNavigationContainer } from '../navigation/NavigationContainer';
 import { useSignUpContainer } from './SignUpContainer';
-import { createApiClient } from '../../workers/apiClient';
 
-const apiClient = createApiClient();
-
-
-const SignUp: React.FunctionComponent = ({}) => {
+export default function SignUp() {
   const {
     email,
     setEmail,
@@ -22,47 +21,38 @@ const SignUp: React.FunctionComponent = ({}) => {
     loading,
     setLoading,
     error,
-    setError
+    setError,
+    setScreen,
   } = useSignUpContainer();
+  const { setLoggedIn } = useNavigationContainer();
 
-  const handleSignUp = async (event: React.FormEvent<HTMLElement>) => {
+  const handleSignUp = async (event: React.SyntheticEvent) => {
     event.preventDefault();
-    setLoading();
     if (!(email && password)) {
       setError('Please fill in email and password');
       return;
     }
-    let isError = false;
-
-    Firebase.signup({ email, password })
-      .catch((result) => {
-        const message =
-          result && result.message ? result.message : 'Sorry Some error occurs';
-        isError = true;
-        setLoading();
-        setError(message);
-      })
-      .then((result: any) => {
-        if (isError) {
-          return setLoading();
-        }
-        if (typeof result !== 'undefined') {
-          const { uid, email } = result.user;
-          const dateString =  new Date();
-
-          let user =  {
-            _id: uid,
-            email: email,
-            firstName: firstName,
-            lastName: lastName,
-            phoneNumber: phoneNumber,
-            password: password,
-            lastModified: dateString
-          }
-
-          apiClient.userSignup(user);
-        }
+    setLoading(true);
+    try {
+      const result = await signup({ email, password });
+      const { uid } = result.user;
+      await recordSignup({
+        _id: uid,
+        email: result.user.email ?? email,
+        firstName,
+        lastName,
+        phoneNumber,
       });
+      // Firebase signs the new user in; reflect that like Login does.
+      setCookie(AUTH_COOKIE, uid);
+      setLoggedIn(true);
+      setScreen('home');
+    } catch (err) {
+      const message = err instanceof Error && err.message ? err.message : 'Sorry Some error occurs';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -71,12 +61,19 @@ const SignUp: React.FunctionComponent = ({}) => {
       <h4 className="gray mt0">
         Already have an account?{' '}
         <span>
-          <a href="/login" className="white">
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              setScreen('login');
+            }}
+            className="white"
+          >
             Sign in
           </a>
         </span>
       </h4>
-      <form className="mw6 center mv5">
+      <form className="mw6 center mv5" onSubmit={handleSignUp}>
         <div className="mv3 w-100">
           <div className="dib w-50 pr2">
             <div className="tl ba-hover overflow-visible">
@@ -147,9 +144,7 @@ const SignUp: React.FunctionComponent = ({}) => {
         </small>
         <div className="mv3 tl pv2">
           <input type="checkbox" />
-          <label className="pl2">
-            Subscribe to Social Ticketing Newsletter
-          </label>
+          <label className="pl2">Subscribe to Social Ticketing Newsletter</label>
         </div>
         <a
           onClick={handleSignUp}
@@ -168,10 +163,8 @@ const SignUp: React.FunctionComponent = ({}) => {
             Terms and Conditions.
           </a>
         </div>
+        <button type="submit" hidden />
       </form>
     </div>
   );
-};
-
-export default SignUp;
-
+}

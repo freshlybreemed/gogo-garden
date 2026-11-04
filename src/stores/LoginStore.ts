@@ -1,4 +1,4 @@
-import create from 'zustand';
+import { create } from 'zustand';
 
 export type LoginStore = {
   email: string;
@@ -13,11 +13,11 @@ export type LoginStore = {
   setLastName: (text: string) => void;
   setEmail: (text: string) => void;
   setPassword: (text: string) => void;
-  setLoading: () => void;
+  setLoading: (loading: boolean) => void;
   setError: (text: string) => void;
-}
+};
 
-export const useLoginStore = create<LoginStore>((set,get) => ({
+export const useLoginStore = create<LoginStore>((set) => ({
   email: '',
   firstName: '',
   lastName: '',
@@ -25,11 +25,11 @@ export const useLoginStore = create<LoginStore>((set,get) => ({
   loading: false,
   password: '',
   error: '',
-  setFirstName: (text: string) => set({firstName: text}),
-  setEmail: (text: string) => set({email: text}),
-  setPhoneNumber: (text: string) => set({phoneNumber: text}),
-  setLastName: (text: string) => set({lastName: text}),
-  setPassword: (text: string) => set({password: text}),
-  setLoading: () => set({loading: !get().loading}),
-  setError: (text: string) => set({error: text}),
-}))
+  setFirstName: (text) => set({ firstName: text }),
+  setEmail: (text) => set({ email: text }),
+  setPhoneNumber: (text) => set({ phoneNumber: text }),
+  setLastName: (text) => set({ lastName: text }),
+  setPassword: (text) => set({ password: text }),
+  setLoading: (loading) => set({ loading }),
+  setError: (text) => set({ error: text }),
+}));
