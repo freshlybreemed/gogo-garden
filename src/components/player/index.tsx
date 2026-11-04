@@ -335,7 +335,10 @@ function PlayerBar({ track, onExpand }: { track: TrackModel; onExpand: () => voi
             <span className="min-w-0">
               <span className="block truncate text-[15px] font-semibold text-paper">{title}</span>
               <span className="block truncate text-[13px] text-dust">
-                <Link href={`/bands/${encodeURIComponent(track.bandId)}`} className="hover:text-paper hover:underline">
+                <Link
+                  href={`/bands/${encodeURIComponent(track.bandId)}`}
+                  className="font-semibold text-paper/85 underline decoration-paper/30 underline-offset-4 hover:text-paper hover:decoration-paper"
+                >
                   {track.bandName}
                 </Link>
                 <span aria-hidden="true"> / </span>
@@ -443,7 +446,13 @@ function NowPlayingSheet({ track, onClose }: { track: TrackModel; onClose: () =>
         <button ref={closeRef} type="button" onClick={onClose} className={clsx(ctl, 'h-11 w-11')} aria-label="Close player">
           <IconChevronDown className="h-6 w-6" />
         </button>
-        <span className="truncate px-2 text-[13px] text-dust">{track.bandName}</span>
+        <Link
+          href={`/bands/${encodeURIComponent(track.bandId)}`}
+          onClick={onClose}
+          className="truncate px-2 text-[13px] font-semibold text-dust underline underline-offset-4 hover:text-paper"
+        >
+          {track.bandName}
+        </Link>
         <button
           type="button"
           onClick={() => {
@@ -484,6 +493,13 @@ function NowPlayingSheet({ track, onClose }: { track: TrackModel; onClose: () =>
 
       <div className="mt-auto">
         <h2 className="truncate text-[22px] font-bold">{title}</h2>
+        <Link
+          href={`/bands/${encodeURIComponent(track.bandId)}`}
+          onClick={onClose}
+          className="mt-0.5 block truncate text-[17px] font-semibold text-paper underline-offset-4 hover:underline"
+        >
+          {track.bandName}
+        </Link>
         <p className="truncate text-[14px] text-dust">
           {shortDate(track.showDate)}{' '}
           {track.venueSlug ? (
