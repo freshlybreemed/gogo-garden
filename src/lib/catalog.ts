@@ -165,7 +165,13 @@ async function load(): Promise<Catalog> {
     for (const [album, albumSongs] of byAlbum) {
       albumSongs.sort(trackOrder);
       const first = albumSongs[0];
-      const info = parseAlbum(album, { date: first.showDate, venue: first.venue, aliases });
+      // "Singles" is a bucket of loose tracks: one song's date or venue isn't the bucket's.
+      const loose = /^singles$/i.test(album.trim());
+      const info = parseAlbum(album, {
+        date: loose ? null : first.showDate,
+        venue: loose ? null : first.venue,
+        aliases,
+      });
       const showImage = mostCommon(albumSongs.map((s) => s.imageUrl)) ?? image;
       const slugBase = slugify([info.date, info.venue ?? info.title].filter(Boolean).join(' ')) || 'tape';
       const href = `/shows/${encodeURIComponent(acc.id)}/${slugBase}-${shortHash(album)}`;
@@ -298,8 +304,8 @@ async function load(): Promise<Catalog> {
 }
 
 export function recentlyAdded(c: Catalog, limit: number) {
+  // Every kind of tape counts: singles and undated PAs are new growth too.
   return [...c.shows]
-    .filter((s) => s.kind === 'live')
     .sort((a, b) => b.addedAt.localeCompare(a.addedAt) || byDateDesc(a, b))
     .slice(0, limit);
 }
