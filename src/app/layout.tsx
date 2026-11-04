@@ -61,7 +61,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <a
           href="#main"
-          className="fixed top-2 left-2 z-[60] -translate-y-20 bg-crank px-3 py-2 font-semibold text-ink focus:translate-y-0"
+          className="sr-only bg-crank px-3 py-2 font-semibold text-ink focus:not-sr-only focus:fixed focus:top-[max(8px,env(safe-area-inset-top))] focus:left-2 focus:z-[60]"
         >
           Skip to content
         </a>

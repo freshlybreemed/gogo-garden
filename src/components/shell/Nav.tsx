@@ -173,7 +173,12 @@ export function TabBar() {
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-rule bg-tar pb-[env(safe-area-inset-bottom)] md:hidden"
+      className={clsx(
+        'fixed inset-x-0 bottom-0 z-40 border-t border-rule bg-tar pb-[env(safe-area-inset-bottom)] md:hidden',
+        // iOS 26 Safari draws the page behind its floating toolbar, below the layout viewport:
+        // extend the bar's background down so scrolled content doesn't show under the tabs.
+        'after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-[120px] after:bg-tar',
+      )}
     >
       <ul className="grid h-14 grid-cols-4">
         {LINKS.map(({ href, label, icon: Icon }) => {
