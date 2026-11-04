@@ -1,11 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useShallow } from 'zustand/react/shallow';
-import { firebaseConfigured, login, signup } from '@/lib/firebase';
-import { AUTH_COOKIE, setCookie } from '@/lib/helpers';
-import { recordLogin, recordSignup } from '@/app/actions';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { useAppStore } from '@/stores/AppStore';
 import { useLoginStore } from '@/stores/LoginStore';
 
@@ -31,10 +30,11 @@ function Field({
 
 function friendly(err: unknown) {
   const msg = err instanceof Error ? err.message : String(err);
-  if (/not configured/i.test(msg)) return 'Accounts are switched off on this server (no Firebase key). You can still listen.';
-  if (/invalid-credential|wrong-password|user-not-found/.test(msg)) return 'That email and password don’t match an account.';
-  if (/email-already-in-use/.test(msg)) return 'There’s already an account with that email. Log in instead.';
-  if (/weak-password/.test(msg)) return 'Use a password with at least 6 characters.';
+  if (/invalid login credentials/i.test(msg)) return 'That email and password don’t match an account.';
+  if (/already registered|already been registered/i.test(msg)) return 'There’s already an account with that email. Log in instead.';
+  if (/password should be|weak/i.test(msg)) return 'Use a password with at least 6 characters.';
+  if (/email not confirmed/i.test(msg)) return 'Confirm your email first: check your inbox for the link.';
+  if (/rate limit/i.test(msg)) return 'Too many tries. Wait a minute and try again.';
   return msg || 'Something went wrong. Try again.';
 }
 
@@ -43,6 +43,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   const setLoggedIn = useAppStore((s) => s.setLoggedIn);
   const f = useLoginStore(useShallow((s) => s));
   const isSignup = mode === 'signup';
+  const [sent, setSent] = useState(false);
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -53,21 +54,28 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
     f.setLoading(true);
     f.setError('');
     try {
+      const supabase = supabaseBrowser();
       if (isSignup) {
-        const result = await signup({ email: f.email, password: f.password });
-        const { uid } = result.user;
-        await recordSignup({
-          _id: uid,
-          email: result.user.email ?? f.email,
-          firstName: f.firstName,
-          lastName: f.lastName,
-          phoneNumber: f.phoneNumber,
+        const fullName = [f.firstName, f.lastName].map((s) => s.trim()).filter(Boolean).join(' ');
+        const { data, error } = await supabase.auth.signUp({
+          email: f.email,
+          password: f.password,
+          options: {
+            data: { full_name: fullName || undefined, phone: f.phoneNumber || undefined },
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          },
         });
-        setCookie(AUTH_COOKIE, uid);
+        if (error) throw error;
+        if (!data.session) {
+          // Email confirmation is on: no session until they click the link.
+          f.setPassword('');
+          f.setError('');
+          setSent(true);
+          return;
+        }
       } else {
-        const result = await login({ email: f.email, password: f.password });
-        setCookie(AUTH_COOKIE, result.user.uid);
-        if (result.user.email) void recordLogin(result.user.email);
+        const { error } = await supabase.auth.signInWithPassword({ email: f.email, password: f.password });
+        if (error) throw error;
       }
       setLoggedIn(true);
       f.setPassword('');
@@ -91,9 +99,9 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
           {isSignup ? 'Log in' : 'Create an account'}
         </Link>
       </p>
-      {!firebaseConfigured ? (
-        <p className="mt-6 border-l-[3px] border-rule pl-3 text-[14px] text-paper/85">
-          Accounts are switched off on this server. Listening works without one.
+      {sent ? (
+        <p role="status" className="mt-6 border-l-[3px] border-crank pl-3 text-[15px] text-paper">
+          Check {f.email || 'your email'} for a confirmation link. Click it and you’re in.
         </p>
       ) : null}
 

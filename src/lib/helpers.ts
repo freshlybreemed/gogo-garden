@@ -1,17 +1,5 @@
-import cookie from 'js-cookie';
 import type { ArtistModel } from './types';
 
-export const AUTH_COOKIE = 'id_token';
-
-export const setCookie = (key: string, value: string) => {
-  cookie.set(key, value, { expires: 1, path: '/' });
-};
-
-export const removeCookie = (key: string) => {
-  cookie.remove(key, { path: '/' });
-};
-
-export const getCookieFromBrowser = (key: string) => cookie.get(key);
 
 export function clamp(num: number, min: number, max: number) {
   return Math.min(Math.max(num, min), max);

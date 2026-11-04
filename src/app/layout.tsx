@@ -1,10 +1,9 @@
 import type { Metadata, Viewport } from 'next';
-import { cookies } from 'next/headers';
 import { Archivo, Big_Shoulders, Permanent_Marker } from 'next/font/google';
 import './globals.css';
 import Player from '@/components/player';
 import { MainPad, MobileTop, Sidebar, TabBar, type NavBand } from '@/components/shell/Nav';
-import { AUTH_COOKIE } from '@/lib/helpers';
+import { currentUser } from '@/lib/supabase/server';
 import { getCatalog } from '@/lib/catalog';
 
 const poster = Big_Shoulders({
@@ -45,7 +44,7 @@ export const viewport: Viewport = {
 export const dynamic = 'force-dynamic';
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const loggedIn = Boolean((await cookies()).get(AUTH_COOKIE)?.value);
+  const loggedIn = Boolean(await currentUser().catch(() => null));
   let bands: NavBand[] = [];
   try {
     const catalog = await getCatalog();

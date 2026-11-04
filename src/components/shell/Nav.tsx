@@ -5,8 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import { useAppStore } from '@/stores/AppStore';
 import { usePlayerStore } from '@/stores/PlayerStore';
-import { AUTH_COOKIE, removeCookie } from '@/lib/helpers';
-import { logout } from '@/lib/firebase';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { fountain } from '@/lib/shows';
 import { Equalizer } from '../art/Equalizer';
 import { IconBands, IconHome, IconPin, IconSearch, IconUser } from '../icons';
@@ -32,8 +31,7 @@ function useAuth(initialLoggedIn: boolean) {
   const router = useRouter();
   const loggedIn = stored ?? initialLoggedIn;
   const signOut = async () => {
-    removeCookie(AUTH_COOKIE);
-    await logout().catch(() => undefined);
+    await supabaseBrowser().auth.signOut().catch(() => undefined);
     setLoggedIn(false);
     router.refresh();
   };
