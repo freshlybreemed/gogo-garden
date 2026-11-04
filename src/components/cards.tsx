@@ -25,7 +25,11 @@ export function ShowCard({ show, hideBand = false }: { show: ShowModel; hideBand
         style={{ backgroundImage: fountain(show.palette) }}
         aria-hidden={hideBand ? true : undefined}
       >
-        <span className="poster max-h-full truncate text-[17px] [writing-mode:vertical-rl] rotate-180">
+        <span
+          className="poster max-h-full overflow-hidden whitespace-nowrap [writing-mode:vertical-rl] rotate-180"
+          // The spine is ~140px tall: step the size down so long names fit whole.
+          style={{ fontSize: show.bandName.length > 16 ? 12 : show.bandName.length > 11 ? 14 : 17 }}
+        >
           {show.bandName}
         </span>
       </span>

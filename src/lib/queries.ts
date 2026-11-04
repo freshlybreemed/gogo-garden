@@ -107,7 +107,7 @@ export async function getVenueDocs(): Promise<VenueDoc[]> {
         .filter((m) => m.quote),
       photos: objs(d.photos)
         .map((ph) => ({
-          url: str(ph.url).trim(),
+          url: (str(ph.url).trim() || str(ph.image_url).trim()),
           credit: opt(ph.credit),
           sourceUrl: opt(ph.source_url),
           caption: opt(ph.caption),
@@ -123,5 +123,8 @@ export async function getVenueDocs(): Promise<VenueDoc[]> {
               : null,
         )
         .filter((src): src is { title: string | null; url: string } => Boolean(src && (src.url || src.title))),
+      related: strs(d.related),
+      confidence: d.confidence === 'high' || d.confidence === 'medium' || d.confidence === 'low' ? d.confidence : null,
+      notes: opt(d.notes),
     }));
 }

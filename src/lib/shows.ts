@@ -299,12 +299,21 @@ export function trackTitle(t: { title: string; part: number | null }) {
 
 export const venueHref = (slug: string) => `/venues/${encodeURIComponent(slug)}`;
 
-/** "Open", "Closed", "Demolished"... normalized for the status stamp. */
+/**
+ * Statuses are researcher prose ("closed (padlocked by ... police, Sept 16,
+ * 2011)"). The stamp takes only the leading verdict; the full text is shown
+ * on the venue page. Unknown -> no stamp.
+ */
 export function venueStatus(status: string | null): { label: string; open: boolean } | null {
   if (!status) return null;
-  const s = status.trim();
-  const open = /^(open|active|operating|still open)/i.test(s);
-  return { label: s.charAt(0).toUpperCase() + s.slice(1), open };
+  const m = status
+    .trim()
+    .match(/^(still open|likely open|open|closed|renamed|demolished|destroyed by fire|torn down)/i);
+  if (!m) return null;
+  const word = m[1].toLowerCase();
+  const open = word.includes('open');
+  const label = word === 'destroyed by fire' ? 'Burned down' : word.charAt(0).toUpperCase() + word.slice(1);
+  return { label, open };
 }
 
 export function place(city: string | null, state: string | null) {

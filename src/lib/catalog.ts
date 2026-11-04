@@ -244,16 +244,17 @@ async function load(): Promise<Catalog> {
     venues.push({
       slug,
       name: doc?.name || list[0].venue || slug,
-      city: doc?.city ?? null,
-      state: doc?.state ?? null,
-      status: doc?.status ?? null,
-      yearsActive: doc?.yearsActive ?? null,
+      city: doc && doc.confidence !== 'low' ? doc.city : null,
+      state: doc && doc.confidence !== 'low' ? doc.state : null,
+      // A low-confidence write-up only vouches for the name.
+      status: doc && doc.confidence !== 'low' ? doc.status : null,
+      confidence: doc?.confidence ?? null,
       showCount: nights.size,
       trackCount: list.reduce((n, s) => n + s.trackCount, 0),
       bandCount: new Set(list.map((s) => s.bandId)).size,
       firstDate: dates[0] ?? null,
       lastDate: dates[dates.length - 1] ?? null,
-      photo: doc?.photos[0]?.url ?? null,
+      photo: doc && doc.confidence !== 'low' ? (doc.photos[0]?.url ?? null) : null,
     });
   }
   venues.sort((a, b) => b.showCount - a.showCount || b.trackCount - a.trackCount || a.name.localeCompare(b.name));

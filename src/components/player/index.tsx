@@ -253,12 +253,24 @@ function Transport({ size = 'md' }: { size?: 'md' | 'lg' }) {
 function TrackChip({ track, className }: { track: TrackModel; className?: string }) {
   return (
     <span
-      className={clsx('flex shrink-0 flex-col justify-between p-1.5 text-ink', className)}
+      className={clsx('flex shrink-0 flex-col justify-between overflow-hidden p-1.5 text-ink', className)}
       style={{ backgroundImage: fountain(track.palette) }}
       aria-hidden="true"
     >
-      <span className="poster block truncate text-[11px] leading-none">{track.bandName}</span>
-      <span className="poster block truncate text-[14px] leading-none">{shortDate(track.showDate) ?? 'Tape'}</span>
+      {/* The band name sits next to the chip; the chip carries the date. */}
+      {(() => {
+        const d = shortDate(track.showDate);
+        const m = d?.match(/^(\d+-\d+)-(\d{2})$/);
+        if (m) {
+          return (
+            <>
+              <span className="poster block text-[15px] leading-[0.9] whitespace-nowrap md:text-[19px]">{m[1]}</span>
+              <span className="poster block text-[13px] leading-none md:text-[16px]">&rsquo;{m[2]}</span>
+            </>
+          );
+        }
+        return <span className="poster mt-auto block text-[13px] leading-[0.9] md:text-[16px]">{d ?? 'Tape'}</span>;
+      })()}
     </span>
   );
 }

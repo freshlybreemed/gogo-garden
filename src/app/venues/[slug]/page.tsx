@@ -7,7 +7,7 @@ import { SectionHead } from '@/components/cards';
 import { Markdown } from '@/components/Markdown';
 import { PlayButton } from '@/components/PlayButton';
 import { TrackList } from '@/components/TrackList';
-import { getCatalog } from '@/lib/catalog';
+import { getCatalog, type Catalog } from '@/lib/catalog';
 import {
   fountain,
   longDate,
@@ -15,6 +15,7 @@ import {
   place,
   plural,
   shortDate,
+  venueHref,
   venueStatus,
   yearSpan,
 } from '@/lib/shows';
@@ -51,7 +52,13 @@ function byNight(shows: ShowModel[]) {
   return nights;
 }
 
+function findBand(catalog: Catalog, name: string) {
+  const n = normalizeName(name);
+  return catalog.bands.find((b) => normalizeName(b.name) === n || normalizeName(b.fullName ?? '') === n);
+}
+
 const OPEN_NIGHTS = 3;
+const ext = { target: '_blank', rel: 'noopener noreferrer' } as const;
 
 export default async function VenuePage({ params }: Params) {
   const { slug } = await params;
@@ -60,43 +67,79 @@ export default async function VenuePage({ params }: Params) {
   if (!venue) notFound();
 
   const doc = catalog.venueDocs.get(venue.slug);
+  // Low-confidence write-ups only vouch for the name: show the tapes, nothing else.
+  const trusted = doc && doc.confidence !== 'low' ? doc : null;
   const shows = catalog.showsByVenue.get(venue.slug) ?? [];
   const nights = byNight(shows);
   const status = venueStatus(venue.status);
-  const years = venue.yearsActive ?? yearSpan(venue.firstDate, venue.lastDate);
+  const tapeYears = yearSpan(venue.firstDate, venue.lastDate);
   const where = place(venue.city, venue.state);
-  const hero = doc?.photos[0];
-  const strip = doc?.photos.slice(hero ? 1 : 0) ?? [];
+  const photos = trusted?.photos ?? [];
+  const hero = photos[0];
+  const strip = photos.slice(1);
   const allTracks = shows.flatMap((s) => catalog.tracksByShow.get(s.href) ?? []);
+  const bandsHere = [...new Map(shows.map((s) => [s.bandId, s])).values()];
+  const related = (doc?.related ?? [])
+    .map((r) => catalog.venueBySlug.get(r))
+    .filter((v): v is NonNullable<typeof v> => Boolean(v) && v!.slug !== venue.slug);
+  const hasStory = Boolean(trusted && (trusted.summary || trusted.history || trusted.gogoImpact));
+
+  const facts: { label: string; value: React.ReactNode }[] = [];
+  if (trusted?.address) facts.push({ label: 'Address', value: [trusted.address, where].filter(Boolean).join(', ') });
+  else if (where) facts.push({ label: 'Where', value: where });
+  if (trusted?.yearsActive) facts.push({ label: 'Years', value: trusted.yearsActive });
+  if (trusted?.status && !/^unknown$/i.test(trusted.status)) facts.push({ label: 'Status', value: trusted.status });
+  if (trusted?.now) facts.push({ label: 'There now', value: trusted.now });
+  if (trusted?.notableBands.length) {
+    facts.push({
+      label: 'Bands that played here',
+      value: trusted.notableBands.map((name, i) => {
+        const band = findBand(catalog, name);
+        return (
+          <span key={name}>
+            {i ? ', ' : ''}
+            {band ? (
+              <Link href={`/bands/${encodeURIComponent(band.id)}`} className="underline underline-offset-2 hover:text-crank">
+                {name}
+              </Link>
+            ) : (
+              name
+            )}
+          </span>
+        );
+      }),
+    });
+  }
 
   return (
     <div>
-      {/* Hero: the room itself if we have a photo, else the flyer stock. */}
+      {/* Hero: the room itself if there's a photo, else flyer stock. */}
       <header className="relative overflow-hidden border-b-[3px] border-paper">
         {hero ? (
           <Photo
             src={hero.url}
-            alt={hero.caption ?? `${venue.name}`}
+            alt={hero.caption ?? venue.name}
             priority
             className="absolute inset-0"
             imgClassName="[filter:grayscale(.55)_contrast(1.15)_brightness(.6)]"
           />
         ) : (
-          <div className="absolute inset-0 opacity-90" style={{ backgroundImage: fountain(3, 165) }} aria-hidden="true" />
+          <div className="absolute inset-0" style={{ backgroundImage: fountain(3, 165) }} aria-hidden="true" />
         )}
         <div
           className={clsx(
-            'relative px-4 pt-14 pb-6 md:px-8 md:pt-28 md:pb-8',
+            'relative px-4 pt-14 pb-6 md:px-8 md:pt-24 md:pb-8',
             hero ? 'bg-gradient-to-t from-tar via-tar/70 to-transparent text-paper' : 'text-ink',
           )}
         >
           <p className="font-display text-[18px] font-extrabold uppercase sm:text-[22px]">
-            {where ?? 'Venue'}
-            {years ? `, ${years}` : ''}
+            {[where, tapeYears ? `On tape ${tapeYears}` : null].filter(Boolean).join(', ') || 'Venue'}
           </p>
-          <h1 className="poster mt-1 text-[clamp(60px,11vw,160px)] leading-[0.8] break-words">{venue.name}</h1>
-          {doc?.aka.length ? (
-            <p className="mt-2 text-[14px] font-medium opacity-80">Also known as {doc.aka.join(', ')}</p>
+          <h1 className="poster mt-1 text-[clamp(56px,10vw,150px)] leading-[0.82] break-words">{venue.name}</h1>
+          {trusted?.aka.length ? (
+            <p className="mt-2 text-[14px] font-medium opacity-80">
+              Also known as {trusted.aka.filter((a) => a !== venue.name).join(', ')}
+            </p>
           ) : null}
           <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 border-t-[3px] border-current pt-3 font-display text-[20px] font-extrabold uppercase sm:text-[24px]">
             <span className="tnum">{plural(venue.showCount, 'night')} on tape</span>
@@ -106,7 +149,7 @@ export default async function VenuePage({ params }: Params) {
               <span
                 className={clsx(
                   '-rotate-3 border-[3px] px-2 py-0.5 text-[22px] leading-none',
-                  status.open ? 'border-current' : 'border-crank text-crank',
+                  status.open ? 'border-current' : hero ? 'border-crank text-crank' : 'border-ink',
                 )}
               >
                 {status.label}
@@ -114,8 +157,16 @@ export default async function VenuePage({ params }: Params) {
             ) : null}
           </div>
           {hero?.credit ? (
-            <p className="mt-3 text-[11.5px] opacity-70">
-              Photo: {hero.sourceUrl ? <a href={hero.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{hero.credit}</a> : hero.credit}
+            <p className="mt-3 text-[11.5px] opacity-75">
+              Photo:{' '}
+              {hero.sourceUrl ? (
+                <a href={hero.sourceUrl} {...ext} className="underline underline-offset-2">
+                  {hero.credit}
+                </a>
+              ) : (
+                hero.credit
+              )}
+              {hero.caption ? `. ${hero.caption}` : ''}
             </p>
           ) : null}
         </div>
@@ -127,80 +178,85 @@ export default async function VenuePage({ params }: Params) {
           <p className="text-[13px] text-dust">{plural(allTracks.length, 'track')}, newest night first.</p>
         </div>
 
-        {doc && (doc.summary || doc.now || doc.address) ? (
-          <section aria-label="About" className="grid gap-6 border-t border-rule pt-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-            {doc.summary ? <p className="max-w-[62ch] text-[18px] leading-[1.5] text-paper">{doc.summary}</p> : <span />}
-            <dl className="space-y-3 text-[14px]">
-              {doc.address ? (
-                <div>
-                  <dt className="text-dust">Address</dt>
-                  <dd>{doc.address}</dd>
-                </div>
+        {hasStory || facts.length ? (
+          <div className="grid gap-x-12 gap-y-10 border-t border-rule pt-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
+            <div className="min-w-0">
+              {trusted?.summary ? (
+                <p className="max-w-[60ch] font-display text-[22px] leading-[1.1] font-extrabold uppercase sm:text-[30px]">
+                  {trusted.summary}
+                </p>
               ) : null}
-              {doc.now ? (
-                <div>
-                  <dt className="text-dust">There now</dt>
-                  <dd>{doc.now}</dd>
-                </div>
+              {trusted?.history ? (
+                <section aria-labelledby="history" className="mt-10 first:mt-0">
+                  <SectionHead id="history" title="History" />
+                  <Markdown source={trusted.history} className="max-w-[66ch] text-[16px] leading-[1.65] text-paper/90" />
+                </section>
               ) : null}
-              {doc.notableBands.length ? (
-                <div>
-                  <dt className="text-dust">Regulars</dt>
-                  <dd>
-                    {doc.notableBands.map((name, i) => {
-                      const band = catalog.bands.find(
-                        (b) => normalizeName(b.name) === normalizeName(name) || normalizeName(b.fullName ?? '') === normalizeName(name),
-                      );
-                      return (
-                        <span key={name}>
-                          {i ? ', ' : ''}
-                          {band ? (
-                            <Link href={`/bands/${encodeURIComponent(band.id)}`} className="underline underline-offset-2 hover:text-crank">
-                              {name}
-                            </Link>
-                          ) : (
-                            name
-                          )}
-                        </span>
-                      );
-                    })}
-                  </dd>
-                </div>
+            </div>
+            <aside className="space-y-8">
+              {facts.length ? (
+                <dl className="space-y-4 border-l-[3px] border-crank pl-4 text-[14px] leading-[1.5]">
+                  {facts.map((f) => (
+                    <div key={f.label}>
+                      <dt className="font-semibold text-dust">{f.label}</dt>
+                      <dd className="mt-0.5 text-paper">{f.value}</dd>
+                    </div>
+                  ))}
+                </dl>
               ) : null}
-            </dl>
-          </section>
-        ) : null}
-
-        {doc?.history || doc?.gogoImpact ? (
-          <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
-            {doc.history ? (
-              <section aria-labelledby="history">
-                <SectionHead id="history" title="History" />
-                <Markdown source={doc.history} className="max-w-[66ch] text-[16px] leading-[1.65] text-paper/90" />
-              </section>
-            ) : null}
-            {doc.gogoImpact ? (
-              <section aria-labelledby="impact" className="lg:pt-0">
-                <SectionHead id="impact" title="What it meant to go-go" />
-                <div className="paper p-5 text-[17px] leading-[1.55] font-medium">
-                  <Markdown source={doc.gogoImpact} />
-                </div>
-              </section>
-            ) : null}
+              {trusted?.gogoImpact ? (
+                <section aria-labelledby="impact">
+                  <h2 id="impact" className="poster mb-3 text-[30px]">
+                    What it meant to go-go
+                  </h2>
+                  <div className="paper p-5 text-[16.5px] leading-[1.55] font-medium">
+                    <Markdown source={trusted.gogoImpact} />
+                  </div>
+                </section>
+              ) : null}
+              {trusted?.confidence === 'medium' ? (
+                <p className="text-[12.5px] text-dust">
+                  Partly verified. Some details here rest on a single source; see the notes at the bottom.
+                </p>
+              ) : null}
+            </aside>
           </div>
-        ) : null}
+        ) : (
+          /* Empty state: the tapes are the only record. Say what we do know. */
+          <section aria-label="What we know" className="border-t border-rule pt-8">
+            <div className="paper relative max-w-[44rem] px-6 pt-6 pb-5">
+              <span className="absolute -top-2 left-8 h-4 w-24 -rotate-2 bg-[#d9cfae]/85" aria-hidden="true" />
+              <p className="font-marker text-[22px] leading-[1.3]">
+                Only known from the tapes.
+              </p>
+              <p className="mt-3 text-[15px] leading-[1.6]">
+                {plural(venue.showCount, 'night')} recorded here
+                {tapeYears ? `, ${tapeYears}` : ''}, by{' '}
+                {bandsHere.map((s, i) => (
+                  <span key={s.bandId}>
+                    {i ? (i === bandsHere.length - 1 ? ' and ' : ', ') : ''}
+                    <Link href={`/bands/${encodeURIComponent(s.bandId)}`} className="font-semibold underline underline-offset-2">
+                      {s.bandName}
+                    </Link>
+                  </span>
+                ))}
+                . Where it stood and what happened to it haven&rsquo;t been confirmed, so this page sticks to the
+                recordings.
+              </p>
+            </div>
+          </section>
+        )}
 
-        {doc?.memories.length ? (
-          <section aria-labelledby="memories" className="mt-12">
+        {trusted?.memories.length ? (
+          <section aria-labelledby="memories" className="mt-14">
             <SectionHead id="memories" title="Memories" />
-            <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {doc.memories.map((m, i) => (
+            <ul className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {trusted.memories.map((m, i) => (
                 <li
                   key={i}
-                  className={clsx('paper relative px-5 pt-6 pb-4', i % 3 === 0 ? '-rotate-1' : i % 3 === 1 ? 'rotate-[0.8deg]' : 'rotate-0')}
+                  className={clsx('paper relative px-5 pt-6 pb-4', i % 3 === 0 ? '-rotate-1' : i % 3 === 1 ? 'rotate-[0.8deg]' : '')}
                 >
-                  {/* masking tape */}
-                  <span className="absolute -top-2 left-1/2 h-4 w-20 -translate-x-1/2 rotate-2 bg-[#d9cfae]/80" aria-hidden="true" />
+                  <span className="absolute -top-2 left-1/2 h-4 w-20 -translate-x-1/2 rotate-2 bg-[#d9cfae]/85" aria-hidden="true" />
                   <blockquote className="font-marker text-[19px] leading-[1.35]">&ldquo;{m.quote}&rdquo;</blockquote>
                   <p className="mt-3 text-[12.5px] font-semibold">
                     {m.author ?? 'Anonymous'}
@@ -208,7 +264,7 @@ export default async function VenuePage({ params }: Params) {
                     {m.sourceUrl ? (
                       <>
                         {' '}
-                        <a href={m.sourceUrl} target="_blank" rel="noopener noreferrer" className="font-normal underline underline-offset-2">
+                        <a href={m.sourceUrl} {...ext} className="font-normal underline underline-offset-2">
                           via {hostOf(m.sourceUrl)}
                         </a>
                       </>
@@ -221,18 +277,18 @@ export default async function VenuePage({ params }: Params) {
         ) : null}
 
         {strip.length ? (
-          <section aria-labelledby="photos" className="mt-12">
+          <section aria-labelledby="photos" className="mt-14">
             <SectionHead id="photos" title="Photos" />
             <ul className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-3 md:-mx-8 md:px-8">
               {strip.map((ph) => (
                 <li key={ph.url} className="w-[260px] shrink-0 snap-start sm:w-[320px]">
-                  <Photo src={ph.url} alt={ph.caption ?? `${venue.name}`} className="relative" imgClassName="aspect-[4/3] h-auto! bg-tape">
+                  <Photo src={ph.url} alt={ph.caption ?? venue.name} className="relative" imgClassName="aspect-[4/3] h-auto! bg-tape">
                     <figcaption className="mt-2 text-[12.5px] text-dust">
                       {ph.caption ? <span className="block text-paper/85">{ph.caption}</span> : null}
                       {ph.credit ? (
                         <span className="block">
                           {ph.sourceUrl ? (
-                            <a href={ph.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-paper">
+                            <a href={ph.sourceUrl} {...ext} className="underline underline-offset-2 hover:text-paper">
                               {ph.credit}
                             </a>
                           ) : (
@@ -248,7 +304,26 @@ export default async function VenuePage({ params }: Params) {
           </section>
         ) : null}
 
-        <section aria-labelledby="nights" className="mt-12">
+        {related.length ? (
+          <section aria-labelledby="related" className="mt-14">
+            <SectionHead id="related" title="Same room, other names" />
+            <ul className="flex flex-wrap gap-2">
+              {related.map((r) => (
+                <li key={r.slug}>
+                  <Link href={venueHref(r.slug)} className="inline-flex h-12 items-center gap-3 border border-rule px-4 hover:border-paper">
+                    <span className="poster text-[24px] leading-none">{r.name}</span>
+                    <span className="text-[12px] text-dust tnum">
+                      {plural(r.showCount, 'night')}
+                      {yearSpan(r.firstDate, r.lastDate) ? `, ${yearSpan(r.firstDate, r.lastDate)}` : ''}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        <section aria-labelledby="nights" className="mt-14">
           <SectionHead id="nights" title="Every night on tape" />
           <ol>
             {nights.map((night, i) => {
@@ -256,7 +331,7 @@ export default async function VenuePage({ params }: Params) {
               const tracks = night.shows.reduce((n, s) => n + s.trackCount, 0);
               return (
                 <li key={night.key}>
-                  <details open={i < OPEN_NIGHTS} className="group border-b border-rule">
+                  <details open={i < OPEN_NIGHTS || nights.length <= 4} className="group border-b border-rule">
                     <summary className="flex cursor-pointer list-none items-baseline gap-4 py-3 outline-offset-[-2px] [&::-webkit-details-marker]:hidden">
                       <span className="poster w-[8.5rem] shrink-0 text-[36px] leading-none whitespace-nowrap tnum sm:w-[11rem] sm:text-[48px]">
                         {shortDate(night.date) ?? 'Undated'}
@@ -304,29 +379,33 @@ export default async function VenuePage({ params }: Params) {
           </ol>
         </section>
 
-        {doc?.sources.length ? (
-          <footer className="mt-14 border-t border-rule pt-4">
-            <h2 className="text-[13px] font-semibold text-dust">Sources</h2>
-            <ol className="mt-2 list-decimal space-y-1 pl-5 text-[12.5px] text-dust marker:tnum">
-              {doc.sources.map((src, i) => (
-                <li key={i}>
-                  {src.url ? (
-                    <a href={src.url} target="_blank" rel="noopener noreferrer" className="break-words underline underline-offset-2 hover:text-paper">
-                      {src.title ?? hostOf(src.url)}
-                    </a>
-                  ) : (
-                    src.title
-                  )}
-                </li>
-              ))}
-            </ol>
+        {trusted && (trusted.sources.length || trusted.notes) ? (
+          <footer className="mt-14 border-t border-rule pt-4 text-[12.5px] text-dust">
+            {trusted.sources.length ? (
+              <>
+                <h2 className="font-semibold">Sources</h2>
+                <ol className="mt-2 list-decimal space-y-1 pl-5">
+                  {trusted.sources.map((src, i) => (
+                    <li key={i}>
+                      {src.url ? (
+                        <a href={src.url} {...ext} className="break-words underline underline-offset-2 hover:text-paper">
+                          {src.title ?? hostOf(src.url)}
+                        </a>
+                      ) : (
+                        src.title
+                      )}
+                    </li>
+                  ))}
+                </ol>
+              </>
+            ) : null}
+            {trusted.notes ? (
+              <p className="mt-4 max-w-[80ch]">
+                <span className="font-semibold">Research notes: </span>
+                {trusted.notes}
+              </p>
+            ) : null}
           </footer>
-        ) : null}
-
-        {!doc ? (
-          <p className="mt-10 max-w-[60ch] text-[13px] text-dust">
-            The history of {venue.name} hasn&rsquo;t been written up yet. Everything above comes from the tapes.
-          </p>
         ) : null}
       </div>
     </div>

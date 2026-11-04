@@ -27,7 +27,7 @@ export default async function VenuesPage() {
         <ol className="grid border-t border-rule xl:grid-cols-2 xl:gap-x-10">
           {venues.map((v, i) => {
             const status = venueStatus(v.status);
-            const years = v.yearsActive ?? yearSpan(v.firstDate, v.lastDate);
+            const years = yearSpan(v.firstDate, v.lastDate);
             const where = place(v.city, v.state);
             return (
               <li key={v.slug} className="border-b border-rule">

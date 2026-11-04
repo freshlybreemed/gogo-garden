@@ -101,6 +101,12 @@ export type VenueDoc = {
   memories: { quote: string; author: string | null; sourceUrl: string | null; date: string | null }[];
   photos: { url: string; credit: string | null; sourceUrl: string | null; caption: string | null; kind: string | null }[];
   sources: { title: string | null; url: string }[];
+  /** Other slugs for the same room or its successors (le-pearl <-> msg). */
+  related: string[];
+  /** How well-sourced the write-up is; `low` means only the name is trusted. */
+  confidence: 'high' | 'medium' | 'low' | null;
+  /** Researcher's notes on sourcing. */
+  notes: string | null;
 };
 
 export type VenueModel = {
@@ -109,7 +115,7 @@ export type VenueModel = {
   city: string | null;
   state: string | null;
   status: string | null;
-  yearsActive: string | null;
+  confidence: 'high' | 'medium' | 'low' | null;
   showCount: number;
   trackCount: number;
   bandCount: number;
