@@ -1,70 +1,30 @@
-# Getting Started with Create React App
+# Go-go Garden
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Go-go music streaming app. Next.js 15 (App Router) + React 19 + TypeScript 5,
+Tailwind CSS 4, zustand 5, MongoDB (official driver), Firebase Auth.
 
-## Available Scripts
+## Setup
 
-In the project directory, you can run:
+```sh
+nvm use            # Node 22 (.nvmrc); Next 15 needs >= 18.18, ESLint config needs >= 20.11
+yarn install
+cp .env.example .env.local   # fill in MONGODB_URI and NEXT_PUBLIC_FIREBASE_API_KEY
+yarn dev           # http://localhost:3002
+```
 
-### `yarn start`
+| Task | Command |
+| --- | --- |
+| Dev server | `yarn dev` (port 3002) |
+| Production build | `yarn build` then `yarn start` |
+| Lint | `yarn lint` |
+| Typecheck | `yarn typecheck` |
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Layout
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- `src/app/page.tsx` — Server Component; reads artists (`bands`) and songs (`music`) from Mongo.
+- `src/app/actions.ts` — Server Actions: `streamUp`, `recordLogin`, `recordSignup` (were GraphQL mutations).
+- `src/lib/db.ts` — cached `MongoClient` (`MONGODB_URI`, db `music`).
+- `src/lib/firebase.ts` — Firebase Auth (modular SDK, `NEXT_PUBLIC_FIREBASE_*`).
+- `src/components/AppData.tsx` — context carrying the server-fetched library data.
+- `src/stores/` — zustand stores for UI, navigation, login form and player state.
+- `src/components/` — library (artists → albums → songs), navigation/search, player, login, signup.

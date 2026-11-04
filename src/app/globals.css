@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css?family=Righteous');
+@import 'tailwindcss';
+
+/*
+ * Ported from the old prebuilt src/styles.min.css (custom rules + Tailwind 1.x
+ * build) and src/styles/index.css. Visual parity only; a redesign is planned.
+ */
+
+@theme {
+  --font-body: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+@layer base {
+  /* Tailwind 1/2 defaulted borders to gray-200/300; v4 uses currentColor. */
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  body,
+  html,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    background-color: black;
+    text-align: center;
+  }
+
+  /* font-size/margin were overridden by preflight in the old build too. */
+  h1 {
+    text-align: center;
+    font-family: 'Righteous', serif;
+    letter-spacing: 0.15rem;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow:
+      -4px 4px 1px #ef3550,
+      -8px 8px 1px #f48fb1,
+      -12px 12px 1px #7e57c2,
+      -16px 16px 1px #2196f3,
+      -20px 20px 1px #26c6da,
+      -24px 24px 1px #43a047,
+      -28px 28px 1px #eeff41,
+      -32px 32px 1px #f9a825,
+      -36px 36px 1px #ff5722;
+  }
+
+  audio {
+    display: block;
+    margin: 20px auto;
+  }
+
+  input[type='submit'] {
+    background-color: #26c6da;
+    border: none;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 4px;
+    font-family: sans-serif;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: -4px 4px 1px #eeff41;
+  }
+}
+
+@font-face {
+  font-family: 'Fellix';
+  src: url('/fonts/Fellix-Bold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src:
+    url('/fonts/SpaceGrotesk-SemiBold.woff2') format('woff2'),
+    url('/fonts/SpaceGrotesk-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src:
+    url('/fonts/SpaceGrotesk-Regular.woff2') format('woff2'),
+    url('/fonts/SpaceGrotesk-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src:
+    url('/fonts/SpaceGrotesk-Light.woff2') format('woff2'),
+    url('/fonts/SpaceGrotesk-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src:
+    url('/fonts/SpaceGrotesk-Medium.woff2') format('woff2'),
+    url('/fonts/SpaceGrotesk-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src:
+    url('/fonts/SpaceGrotesk-Bold.woff2') format('woff2'),
+    url('/fonts/SpaceGrotesk-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@keyframes fadeInOutAniomation {
+  from {
+    opacity: 0;
+  }
+}
+
+.animate-fade-loop {
+  animation: fadeInOutAniomation 1.6s infinite alternate;
+  animation-delay: -1.3s;
+}
+
+/* Native range input standing in for @reach/slider. */
+input[data-slider] {
+  width: 100%;
+  padding: 1rem 0;
+  cursor: pointer;
+  accent-color: var(--color-indigo-600);
+}
+input[data-slider]:focus {
+  outline: none;
+}
