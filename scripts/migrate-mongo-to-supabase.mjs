@@ -20,12 +20,22 @@ if (!DRY && !SUPABASE_DB_URL?.startsWith('postgres')) {
 
 const mongo = await MongoClient.connect(MONGODB_URI);
 const mdb = mongo.db('music');
-const [bands, venues, songs] = await Promise.all([
+const [bands, venues, allSongs] = await Promise.all([
   mdb.collection('bands').find({}).toArray(),
   mdb.collection('venues').find({}).toArray(),
-  mdb.collection('music').find({}).toArray(),
+  mdb.collection('music').find({}).sort({ _id: 1 }).toArray(),
 ]);
 await mongo.close();
+
+// The 2021 import inserted some files 2-4 times. One track per audio file: keep the oldest doc, sum streams.
+const byUrl = new Map();
+for (const s of allSongs) {
+  const kept = byUrl.get(s.url);
+  if (kept) kept.streams = (Number(kept.streams) || 0) + (Number(s.streams) || 0);
+  else byUrl.set(s.url, { ...s });
+}
+const songs = [...byUrl.values()];
+console.log('duplicate song docs merged:', allSongs.length - songs.length);
 
 const str = (v) => (v === undefined || v === null || v === '' ? null : String(v));
 const mostCommon = (vals) => {
@@ -119,7 +129,8 @@ try {
     title: str(s.title) ?? 'Untitled', position: Number.isFinite(Number(s.trackNumber)) ? Number(s.trackNumber) || null : null,
     duration: Math.round(Number(s.duration) || 0), audio_url: s.url, image_url: str(s.imageUrl),
     streams: Number(s.streams) || 0, source: str(s.source),
-    created_at: s.lastModified ? new Date(s.lastModified) : new Date(),
+    // ObjectId timestamp = when the song was added (lastModified also moves on every play).
+    created_at: typeof s._id?.getTimestamp === 'function' ? s._id.getTimestamp() : new Date(),
   })));
   // streams: keep whichever is higher so a rerun never loses plays counted in Supabase
   await upsert('tracks', trackRows, ['audio_url'], Object.keys(trackRows[0]),
