@@ -136,12 +136,12 @@ export function ShowRows({ shows }: { shows: ShowModel[] }) {
         return (
           <li
             key={show.key}
-            className="group relative grid grid-cols-[6.5rem_minmax(0,1fr)_auto] items-center gap-x-4 border-b border-rule py-2.5 hover:bg-tape has-[a.card-link:focus-visible]:outline-2 has-[a.card-link:focus-visible]:outline-offset-[-2px] has-[a.card-link:focus-visible]:outline-crank sm:grid-cols-[8rem_minmax(0,1fr)_auto]"
+            className="group relative grid grid-cols-[7.25rem_minmax(0,1fr)_auto] items-center gap-x-4 border-b border-rule py-2.5 hover:bg-tape has-[a.card-link:focus-visible]:outline-2 has-[a.card-link:focus-visible]:outline-offset-[-2px] has-[a.card-link:focus-visible]:outline-crank sm:grid-cols-[10rem_minmax(0,1fr)_auto]"
           >
             <Link
               href={show.href}
               aria-label={label}
-              className="card-link poster pl-2 text-[30px] leading-none outline-none after:absolute after:inset-0 after:content-[''] group-hover:text-crank sm:text-[36px] tnum"
+              className="card-link poster pl-2 text-[27px] leading-none whitespace-nowrap outline-none after:absolute after:inset-0 after:content-[''] group-hover:text-crank sm:text-[36px] tnum"
             >
               {shortDate(show.date) ?? '?'}
             </Link>
