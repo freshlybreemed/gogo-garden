@@ -52,6 +52,7 @@ export default async function ShowPage(props: Params) {
         <div className="paper min-w-0 flex-1 border-t-2 border-dashed border-ink/30 px-5 pt-4 pb-5 sm:border-t-0 sm:border-l-2 md:px-8 md:pt-6">
           <p className="font-display text-[17px] font-extrabold uppercase">
             {show.kind === 'live' ? 'Live PA' : 'Studio / mixtape'}
+            {!show.date && show.year ? `, ${show.year}` : ''}
             {show.disc ? `, disc ${show.disc}` : ''}
           </p>
           {dated ? (

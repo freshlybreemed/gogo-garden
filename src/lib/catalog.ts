@@ -173,6 +173,7 @@ async function load(): Promise<Catalog> {
         aliases,
       });
       const showImage = mostCommon(albumSongs.map((s) => s.imageUrl)) ?? image;
+      const showYear = info.date?.slice(0, 4) ?? (loose ? null : mostCommon(albumSongs.map((s) => s.year)));
       const slugBase = slugify([info.date, info.venue ?? info.title].filter(Boolean).join(' ')) || 'tape';
       const href = `/shows/${encodeURIComponent(acc.id)}/${slugBase}-${shortHash(album)}`;
       const show: ShowModel = {
@@ -195,6 +196,7 @@ async function load(): Promise<Catalog> {
         addedAt: albumSongs.reduce((max, s) => (s.addedAt > max ? s.addedAt : max), ''),
         isNew: albumSongs.some((s) => isNewSong(s, now)),
         image: showImage,
+        year: showYear,
       };
       const showTracks = albumSongs.map<TrackModel>((s) => ({
         id: s.id,
@@ -212,6 +214,7 @@ async function load(): Promise<Catalog> {
         showDate: info.date,
         venueSlug: info.kind === 'live' ? first.venueSlug : null,
         image: s.imageUrl || showImage,
+        year: s.year ?? showYear,
       }));
       for (const t of showTracks) {
         haystack.set(

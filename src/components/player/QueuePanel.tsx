@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import { useShallow } from 'zustand/react/shallow';
 import { usePlayerStore } from '@/stores/PlayerStore';
-import { formatDuration, shortDate, trackTitle } from '@/lib/shows';
+import { formatDuration, trackTitle, trackWhen } from '@/lib/shows';
 import { Equalizer } from '../art/Equalizer';
 import { IconClose } from '../icons';
 
@@ -94,7 +94,7 @@ export function QueuePanel() {
                       {trackTitle(t)}
                     </span>
                     <span className="block truncate text-[12.5px] text-dust">
-                      {t.bandName} / {[shortDate(t.showDate), t.showName].filter(Boolean).join(' ')}
+                      {t.bandName} / {[trackWhen(t), t.showName].filter(Boolean).join(' ')}
                     </span>
                   </span>
                   <span className="text-[12px] text-dust tnum">{formatDuration(t.duration)}</span>

@@ -22,6 +22,8 @@ export type SongDoc = {
   streams: number;
   /** Show date from the import (`YYYY-MM-DD`), if present. */
   showDate: string | null;
+  /** Release / recording year (from tags), if known. */
+  year: string | null;
   venue: string | null;
   venueSlug: string | null;
   /** When the document was added (ObjectId timestamp, ISO). */
@@ -47,6 +49,8 @@ export type TrackModel = {
   /** Venue for live shows, title for tapes. */
   showName: string;
   showDate: string | null;
+  /** Year, for tracks without a full show date (singles, studio tapes). */
+  year: string | null;
   venueSlug: string | null;
   /** Cover: the show's album art, else the band photo, else null (gradient card). */
   image: string | null;
@@ -87,6 +91,8 @@ export type ShowModel = {
   addedAt: string;
   /** Has songs from the latest ingest or added in the last 14 days. */
   isNew: boolean;
+  /** Year: the show date's, else the most common tag year (null for a Singles bucket). */
+  year: string | null;
   /** Cover: most common album art on the show's songs, else the band photo. */
   image: string | null;
 };

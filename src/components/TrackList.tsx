@@ -4,7 +4,7 @@ import Link from 'next/link';
 import clsx from 'clsx';
 import { useShallow } from 'zustand/react/shallow';
 import { usePlayerStore } from '@/stores/PlayerStore';
-import { formatDuration, plural, shortDate, trackTitle, venueHref } from '@/lib/shows';
+import { formatDuration, plural, trackTitle, venueHref, trackWhen } from '@/lib/shows';
 import type { TrackModel } from '@/lib/types';
 import { Equalizer } from './art/Equalizer';
 import { LikeButton } from './LikeButton';
@@ -85,7 +85,7 @@ export function TrackList({ tracks, variant, source, className }: Props) {
                   <span className="block truncate text-[13px] text-dust">
                     {track.bandName}
                     <span aria-hidden="true"> / </span>
-                    {[shortDate(track.showDate), track.showName].filter(Boolean).join(' ')}
+                    {[trackWhen(track), track.showName].filter(Boolean).join(' ')}
                   </span>
                 ) : null}
               </span>

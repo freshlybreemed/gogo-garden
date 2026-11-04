@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import { useShallow } from 'zustand/react/shallow';
 import { usePlayerStore, playerStoreSelectors } from '@/stores/PlayerStore';
 import { formatTime } from '@/lib/helpers';
-import { fountain, shortDate, trackTitle, venueHref } from '@/lib/shows';
+import { fountain, trackTitle, venueHref, trackWhen } from '@/lib/shows';
 import type { TrackModel } from '@/lib/types';
 import { BandArt } from '@/components/art/BandArt';
 import { LikeButton } from '@/components/LikeButton';
@@ -100,7 +100,7 @@ function AudioEngine() {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: trackTitle(track),
       artist: track.bandName,
-      album: [shortDate(track.showDate), track.showName].filter(Boolean).join(' '),
+      album: [trackWhen(track), track.showName].filter(Boolean).join(' '),
       artwork: track.image ? [{ src: track.image, sizes: '512x512' }] : [],
     });
     const handlers: [MediaSessionAction, MediaSessionActionHandler][] = [
@@ -257,7 +257,7 @@ function Transport({ size = 'md' }: { size?: 'md' | 'lg' }) {
 function TrackChip({ track, className }: { track: TrackModel; className?: string }) {
   if (track.image) {
     // Cover art (album art, else the band photo) with the date tabbed on.
-    const d = shortDate(track.showDate);
+    const d = trackWhen(track);
     return (
       <span className={clsx('relative block shrink-0 overflow-hidden', className)} aria-hidden="true">
         <BandArt name={track.bandName} image={track.image} palette={track.palette} className="absolute inset-0" />
@@ -277,7 +277,7 @@ function TrackChip({ track, className }: { track: TrackModel; className?: string
     >
       {/* The band name sits next to the chip; the chip carries the date. */}
       {(() => {
-        const d = shortDate(track.showDate);
+        const d = trackWhen(track);
         const m = d?.match(/^(\d+-\d+)-(\d{2})$/);
         if (m) {
           return (
@@ -345,7 +345,7 @@ function PlayerBar({ track, onExpand }: { track: TrackModel; onExpand: () => voi
                 </Link>
                 <span aria-hidden="true"> / </span>
                 <Link href={track.showHref} className="hover:text-paper hover:underline">
-                  {shortDate(track.showDate) ?? track.showName}
+                  {trackWhen(track) ?? track.showName}
                 </Link>
                 {track.showDate ? (
                   <>
@@ -481,7 +481,7 @@ function NowPlayingSheet({ track, onClose }: { track: TrackModel; onClose: () =>
           <>
             <BandArt name={track.bandName} image={track.image} palette={track.palette} className="absolute inset-0" priority />
             <span className="relative mt-auto self-start bg-ink px-2 py-1 text-paper">
-              <span className="poster block text-[40px] leading-[0.9]">{shortDate(track.showDate) ?? 'Tape'}</span>
+              <span className="poster block text-[40px] leading-[0.9]">{trackWhen(track) ?? 'Tape'}</span>
               <span className="block font-display text-[16px] leading-tight font-extrabold uppercase">{track.showName}</span>
             </span>
           </>
@@ -489,7 +489,7 @@ function NowPlayingSheet({ track, onClose }: { track: TrackModel; onClose: () =>
           <>
             <span className="poster text-[48px]">{track.bandName}</span>
             <span>
-              <span className="poster block text-[72px]">{shortDate(track.showDate) ?? 'Tape'}</span>
+              <span className="poster block text-[72px]">{trackWhen(track) ?? 'Tape'}</span>
               <span className="block font-display text-[22px] leading-tight font-extrabold uppercase">{track.showName}</span>
             </span>
           </>
@@ -512,7 +512,7 @@ function NowPlayingSheet({ track, onClose }: { track: TrackModel; onClose: () =>
           {track.bandName}
         </Link>
         <p className="truncate text-[14px] text-dust">
-          {shortDate(track.showDate)}{' '}
+          {trackWhen(track)}{' '}
           {track.venueSlug ? (
             <Link href={venueHref(track.venueSlug)} onClick={onClose} className="underline-offset-4 hover:text-paper hover:underline">
               {track.showName}

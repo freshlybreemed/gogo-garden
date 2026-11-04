@@ -319,3 +319,8 @@ export function venueStatus(status: string | null): { label: string; open: boole
 export function place(city: string | null, state: string | null) {
   return [city, state].filter(Boolean).join(', ') || null;
 }
+
+/** Short label for when a track is from: the show date ("3-30-11"), else its year ("2024"). */
+export function trackWhen(t: { showDate: string | null; year?: string | null }): string | null {
+  return shortDate(t.showDate) ?? t.year ?? null;
+}

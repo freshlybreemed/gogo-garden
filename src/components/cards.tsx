@@ -55,12 +55,14 @@ export function ShowCard({ show, hideBand = false }: { show: ShowModel; hideBand
               {show.venue ?? 'Venue unknown'}
             </Link>
           ) : (
-            <span className="mt-1 line-clamp-2 font-display text-[18px] leading-[1.05] font-extrabold uppercase">
-              {show.venue ?? 'Venue unknown'}
+            <span className="mt-1 line-clamp-2 font-display text-[18px] leading-[1.05] font-extrabold uppercase tnum">
+              {show.venue ?? (show.date ? null : show.year) ?? 'Venue unknown'}
             </span>
           )
         ) : show.date ? (
           <span className="mt-1 text-[13px] font-semibold">{longDate(show.date)}</span>
+        ) : show.year ? (
+          <span className="mt-1 font-display text-[18px] leading-none font-extrabold tnum">{show.year}</span>
         ) : null}
         {show.note ? <span className="mt-1 line-clamp-1 text-[12.5px] italic">{show.note}</span> : null}
         <span className="mt-auto flex items-end justify-between gap-2 border-t border-ink/25 pt-1.5 text-[12px] font-medium">
@@ -71,7 +73,7 @@ export function ShowCard({ show, hideBand = false }: { show: ShowModel; hideBand
             </span>
           ) : (
             <span className="tnum truncate">
-              {dated ? longDate(show.date) : show.kind === 'tape' ? 'Studio / mixtape' : 'Date unknown'}
+              {dated ? longDate(show.date) : [show.kind === 'tape' ? 'Studio / mixtape' : null, show.year].filter(Boolean).join(', ') || 'Date unknown'}
             </span>
           )}
           <span className="tnum shrink-0">{plural(show.trackCount, 'track')}</span>
@@ -158,7 +160,7 @@ export function ShowRows({ shows }: { shows: ShowModel[] }) {
               aria-label={label}
               className="card-link poster pl-2 text-[27px] leading-none whitespace-nowrap outline-none after:absolute after:inset-0 after:content-[''] group-hover:text-crank sm:text-[36px] tnum"
             >
-              {shortDate(show.date) ?? '?'}
+              {shortDate(show.date) ?? show.year ?? '?'}
             </Link>
             <span className="min-w-0">
               {show.venueSlug ? (
