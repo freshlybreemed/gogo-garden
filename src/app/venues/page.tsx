@@ -35,7 +35,7 @@ export default async function VenuesPage() {
                   href={venueHref(v.slug)}
                   className="group grid grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-3 py-3.5 outline-offset-[-2px] hover:bg-tape"
                 >
-                  <span className="relative flex h-10 w-9 items-center justify-center text-crank" aria-hidden="true">
+                  <span className="relative flex h-10 w-9 items-center justify-center text-paper" aria-hidden="true">
                     <IconPin className="h-10 w-10" />
                     <span className="absolute top-[9px] text-[12px] font-extrabold text-ink tnum">{i + 1}</span>
                   </span>

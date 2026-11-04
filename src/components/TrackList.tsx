@@ -45,7 +45,7 @@ export function TrackList({ tracks, variant, source, className }: Props) {
               isCurrent ? 'bg-tape-2' : 'hover:bg-tape',
             )}
           >
-            {isCurrent ? <span className="absolute inset-y-0 left-0 w-[3px] bg-crank" aria-hidden="true" /> : null}
+            {isCurrent ? <span className="absolute inset-y-0 left-0 w-[3px] bg-leaf" aria-hidden="true" /> : null}
             <button
               type="button"
               onClick={() => toggleTrack(track, tracks, source)}
@@ -56,11 +56,11 @@ export function TrackList({ tracks, variant, source, className }: Props) {
               <span className="relative flex h-6 items-center justify-center text-[13px] text-dust tnum">
                 {isCurrent ? (
                   <>
-                    <Equalizer active={playing} className="text-crank group-hover:hidden" />
+                    <Equalizer active={playing} className="text-leaf group-hover:hidden" />
                     {playing ? (
-                      <IconPause className="hidden h-4 w-4 text-crank group-hover:block" />
+                      <IconPause className="hidden h-4 w-4 text-leaf group-hover:block" />
                     ) : (
-                      <IconPlay className="hidden h-4 w-4 text-crank group-hover:block" />
+                      <IconPlay className="hidden h-4 w-4 text-leaf group-hover:block" />
                     )}
                   </>
                 ) : (
@@ -74,7 +74,7 @@ export function TrackList({ tracks, variant, source, className }: Props) {
                 <span
                   className={clsx(
                     'block truncate text-[15px] font-semibold',
-                    isCurrent ? 'text-crank' : placeholder ? 'text-paper/85' : 'text-paper',
+                    isCurrent ? 'text-leaf-light' : placeholder ? 'text-paper/85' : 'text-paper',
                   )}
                 >
                   {title}

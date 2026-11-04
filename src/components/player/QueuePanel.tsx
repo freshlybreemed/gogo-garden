@@ -87,10 +87,10 @@ export function QueuePanel() {
                   )}
                 >
                   <span className="text-[12px] text-dust tnum">
-                    {isCurrent ? <Equalizer active={playing} className="text-crank" /> : i + 1}
+                    {isCurrent ? <Equalizer active={playing} className="text-leaf" /> : i + 1}
                   </span>
                   <span className="min-w-0">
-                    <span className={clsx('block truncate text-[14px] font-semibold', isCurrent && 'text-crank')}>
+                    <span className={clsx('block truncate text-[14px] font-semibold', isCurrent && 'text-leaf-light')}>
                       {trackTitle(t)}
                     </span>
                     <span className="block truncate text-[12.5px] text-dust">

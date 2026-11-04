@@ -26,6 +26,8 @@ export type SongDoc = {
   venueSlug: string | null;
   /** When the document was added (ObjectId timestamp, ISO). */
   addedAt: string;
+  /** Import batch tag, e.g. "frshly-ingest-2026-11". */
+  source: string | null;
 };
 
 /** A song as the UI sees it: resolved band and show. */
@@ -59,6 +61,8 @@ export type BandModel = {
   trackCount: number;
   firstDate: string | null;
   lastDate: string | null;
+  /** New to the app (bands id >= 45). */
+  isNew: boolean;
 };
 
 export type ShowModel = {
@@ -79,6 +83,8 @@ export type ShowModel = {
   duration: number;
   streams: number;
   addedAt: string;
+  /** Has songs from the latest ingest or added in the last 14 days. */
+  isNew: boolean;
 };
 
 /** Normalized `venues` document (the researched write-up). */

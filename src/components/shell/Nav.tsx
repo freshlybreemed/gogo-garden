@@ -11,7 +11,7 @@ import { fountain } from '@/lib/shows';
 import { Equalizer } from '../art/Equalizer';
 import { IconBands, IconHome, IconPin, IconSearch, IconUser } from '../icons';
 
-export type NavBand = { id: string; name: string; palette: number; showCount: number };
+export type NavBand = { id: string; name: string; palette: number; showCount: number; isNew: boolean };
 
 const LINKS = [
   { href: '/', label: 'Home', icon: IconHome },
@@ -80,7 +80,7 @@ export function Sidebar({ bands, initialLoggedIn }: { bands: NavBand[]; initialL
                   active ? 'text-paper' : 'text-dust hover:text-paper',
                 )}
               >
-                {active ? <span className="absolute inset-y-2 left-0 w-[3px] bg-crank" aria-hidden="true" /> : null}
+                {active ? <span className="absolute inset-y-2 left-0 w-[3px] bg-leaf" aria-hidden="true" /> : null}
                 <Icon className="h-5 w-5" />
                 {label}
               </Link>
@@ -108,10 +108,17 @@ export function Sidebar({ bands, initialLoggedIn }: { bands: NavBand[]; initialL
                     active ? 'bg-tape-2 text-paper' : 'text-paper/75 hover:bg-tape hover:text-paper',
                   )}
                 >
-                  <span className="h-3.5 w-3.5 shrink-0" style={{ backgroundImage: fountain(b.palette) }} aria-hidden="true" />
-                  <span className={clsx('min-w-0 flex-1 truncate', live && 'text-crank')}>{b.name}</span>
+                  <span
+                    className={clsx('h-3.5 w-3.5 shrink-0', b.isNew && 'outline-2 outline-offset-1 outline-leaf')}
+                    style={{ backgroundImage: fountain(b.palette) }}
+                    aria-hidden="true"
+                  />
+                  <span className={clsx('min-w-0 flex-1 truncate', (live || b.isNew) && 'text-leaf-light')}>
+                    {b.name}
+                    {b.isNew ? <span className="sr-only">, new band</span> : null}
+                  </span>
                   {live ? (
-                    <Equalizer active={playing} className="text-crank" />
+                    <Equalizer active={playing} className="text-leaf" />
                   ) : (
                     <span className="text-[12px] text-dust tnum">{b.showCount}</span>
                   )}
@@ -183,7 +190,7 @@ export function TabBar() {
                   active ? 'text-paper' : 'text-dust',
                 )}
               >
-                {active ? <span className="absolute inset-x-6 top-0 h-[3px] bg-crank" aria-hidden="true" /> : null}
+                {active ? <span className="absolute inset-x-6 top-0 h-[3px] bg-leaf" aria-hidden="true" /> : null}
                 <Icon className="h-5 w-5" />
                 {label}
               </Link>

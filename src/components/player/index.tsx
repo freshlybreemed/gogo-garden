@@ -285,14 +285,14 @@ function PlayerBar({ track, onExpand }: { track: TrackModel; onExpand: () => voi
     <section
       aria-label="Player"
       className={clsx(
-        'fixed inset-x-0 z-40 border-t border-rule bg-[#0f0d0a]',
+        'fixed inset-x-0 z-40 border-t border-rule bg-tape',
         // Mobile: mini player above the tab bar. Desktop: full-width bar.
         'bottom-[calc(56px+env(safe-area-inset-bottom))] md:bottom-0',
       )}
     >
       {/* Mobile progress hairline */}
       <span className="absolute inset-x-0 top-0 h-[2px] bg-rule md:hidden" aria-hidden="true">
-        <span className="block h-full bg-crank" style={{ width: `${pct}%` }} />
+        <span className="block h-full bg-paper" style={{ width: `${pct}%` }} />
       </span>
 
       <div className="mx-auto grid h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 md:h-[88px] md:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_minmax(0,1fr)] md:gap-6 md:px-5">

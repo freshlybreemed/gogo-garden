@@ -16,7 +16,7 @@ function inline(text: string, keyBase: string): ReactNode[] {
     const key = `${keyBase}-${i++}`;
     if (m[1] && m[2]) {
       out.push(
-        <a key={key} href={m[2]} target="_blank" rel="noopener noreferrer" className="underline decoration-crank underline-offset-4 hover:text-crank">
+        <a key={key} href={m[2]} target="_blank" rel="noopener noreferrer" className="underline decoration-paper/50 underline-offset-4 hover:decoration-paper">
           {m[1]}
         </a>,
       );
@@ -45,7 +45,7 @@ export function Markdown({ source, className }: { source: string; className?: st
         }
         if (lines.every((l) => /^\s*[-*]\s+/.test(l))) {
           return (
-            <ul key={key} className="my-4 list-[square] space-y-1 pl-5 marker:text-crank">
+            <ul key={key} className="my-4 list-[square] space-y-1 pl-5 marker:text-dust">
               {lines.map((l, li) => (
                 <li key={li}>{inline(l.replace(/^\s*[-*]\s+/, ''), `${key}-${li}`)}</li>
               ))}
@@ -54,7 +54,7 @@ export function Markdown({ source, className }: { source: string; className?: st
         }
         if (lines.every((l) => l.startsWith('>'))) {
           return (
-            <blockquote key={key} className="my-5 border-l-[3px] border-crank pl-4 italic">
+            <blockquote key={key} className="my-5 border-l-[3px] border-paper/40 pl-4 italic">
               {inline(lines.map((l) => l.replace(/^>\s?/, '')).join(' '), key)}
             </blockquote>
           );

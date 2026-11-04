@@ -37,7 +37,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#14120e',
+  themeColor: '#17120d',
   viewportFit: 'cover',
 };
 
@@ -51,7 +51,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     const catalog = await getCatalog();
     bands = catalog.bands
       .filter((b) => b.trackCount > 0)
-      .map((b) => ({ id: b.id, name: b.name, palette: b.palette, showCount: b.showCount }));
+      .map((b) => ({ id: b.id, name: b.name, palette: b.palette, showCount: b.showCount, isNew: b.isNew }));
   } catch (err) {
     // Pages render their own error state; the shell still works.
     console.error(err);

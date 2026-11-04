@@ -195,7 +195,7 @@ export default async function VenuePage({ params }: Params) {
             </div>
             <aside className="space-y-8">
               {facts.length ? (
-                <dl className="space-y-4 border-l-[3px] border-crank pl-4 text-[14px] leading-[1.5]">
+                <dl className="space-y-4 border-l-[3px] border-paper/30 pl-4 text-[14px] leading-[1.5]">
                   {facts.map((f) => (
                     <div key={f.label}>
                       <dt className="font-semibold text-dust">{f.label}</dt>
@@ -225,7 +225,7 @@ export default async function VenuePage({ params }: Params) {
           /* Empty state: the tapes are the only record. Say what we do know. */
           <section aria-label="What we know" className="border-t border-rule pt-8">
             <div className="paper relative max-w-[44rem] px-6 pt-6 pb-5">
-              <span className="absolute -top-2 left-8 h-4 w-24 -rotate-2 bg-[#d9cfae]/85" aria-hidden="true" />
+              <span className="absolute -top-2 left-8 h-4 w-24 -rotate-2 bg-tape-strip/90" aria-hidden="true" />
               <p className="font-marker text-[22px] leading-[1.3]">
                 Only known from the tapes.
               </p>
@@ -256,7 +256,7 @@ export default async function VenuePage({ params }: Params) {
                   key={i}
                   className={clsx('paper relative px-5 pt-6 pb-4', i % 3 === 0 ? '-rotate-1' : i % 3 === 1 ? 'rotate-[0.8deg]' : '')}
                 >
-                  <span className="absolute -top-2 left-1/2 h-4 w-20 -translate-x-1/2 rotate-2 bg-[#d9cfae]/85" aria-hidden="true" />
+                  <span className="absolute -top-2 left-1/2 h-4 w-20 -translate-x-1/2 rotate-2 bg-tape-strip/90" aria-hidden="true" />
                   <blockquote className="font-marker text-[19px] leading-[1.35]">&ldquo;{m.quote}&rdquo;</blockquote>
                   <p className="mt-3 text-[12.5px] font-semibold">
                     {m.author ?? 'Anonymous'}

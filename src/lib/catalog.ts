@@ -33,6 +33,18 @@ export type Catalog = {
 };
 
 const TTL_MS = 60_000;
+
+/** Songs from the latest import batch, or added in the last two weeks, are "new". */
+const NEW_SOURCE = 'frshly-ingest-2026-11';
+const NEW_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
+/** Bands added with the 2026-11 ingest start at id 45. */
+const FIRST_NEW_BAND_ID = 45;
+
+// Not `lastModified`: streamUp stamps that on every play, so it would mark
+// any recently played show as new.
+function isNewSong(s: SongDoc, now: number) {
+  return s.source === NEW_SOURCE || now - Date.parse(s.addedAt) < NEW_WINDOW_MS;
+}
 const g = globalThis as unknown as { _catalog?: { at: number; promise: Promise<Catalog> } };
 
 export function getCatalog(): Promise<Catalog> {
@@ -80,6 +92,7 @@ function trackOrder(a: SongDoc, b: SongDoc) {
 }
 
 async function load(): Promise<Catalog> {
+  const now = Date.now();
   const [artists, songs, venueDocList] = await Promise.all([
     getArtists(),
     getSongs(),
@@ -178,6 +191,7 @@ async function load(): Promise<Catalog> {
         duration: albumSongs.reduce((n, s) => n + s.duration, 0),
         streams: albumSongs.reduce((n, s) => n + s.streams, 0),
         addedAt: albumSongs.reduce((max, s) => (s.addedAt > max ? s.addedAt : max), ''),
+        isNew: albumSongs.some((s) => isNewSong(s, now)),
       };
       const showTracks = albumSongs.map<TrackModel>((s) => ({
         id: s.id,
@@ -220,6 +234,7 @@ async function load(): Promise<Catalog> {
       trackCount: acc.songs.length,
       firstDate: dates[0] ?? null,
       lastDate: dates[dates.length - 1] ?? null,
+      isNew: /^\d+$/.test(acc.id) && Number(acc.id) >= FIRST_NEW_BAND_ID,
     });
   }
 

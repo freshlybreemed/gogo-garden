@@ -2,21 +2,29 @@
 
 /*
  * Tha Garden: an underground go-go player.
- * Tar-black room, newsprint text, one crank-orange accent for "live" things
- * (playing, primary actions, focus). The loud color lives in the band art:
- * split-fountain gradients after Globe Poster's go-go show cards.
+ * Soil-brown room, newsprint text and paper. Two accents with fixed jobs:
+ *   leaf green  - what's growing: active nav, now playing, new tapes/bands
+ *   crank orange - what you press: primary buttons, focus, closed stamps
+ * The loud color lives in the band art: split-fountain gradients after
+ * Globe Poster's go-go show cards.
  */
 
 @theme inline {
-  --color-tar: #14120e;
-  --color-tape: #1c1915;
-  --color-tape-2: #25211b;
-  --color-rule: #36312a;
-  --color-paper: #eee7d7;
+  /* Contrast (WCAG): paper/tar 15.0, paper/tape 13.7, ink/card 13.3,
+     dust/tape-2 5.9, leaf-light/tape-2 11.0, leaf/tar 8.9, ink/crank 5.8 */
+  --color-tar: #17120d;
+  --color-tape: #231b13;
+  --color-tape-2: #2d2319;
+  --color-rule: #3a2e22;
+  --color-paper: #efe6d2;
+  --color-card: #e6dcc3;
   --color-dust: #a89f8c;
-  --color-ink: #0d0c0a;
+  --color-ink: #1b150f;
+  --color-leaf: #8bc34a;
+  --color-leaf-light: #c5e59a;
   --color-crank: #ff5a1f;
   --color-crank-hot: #ff7a45;
+  --color-tape-strip: #cdbf9c;
 
   --font-display: var(--font-poster), 'Arial Narrow', Impact, sans-serif;
   --font-body: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
@@ -96,7 +104,7 @@
 
   /* Newsprint J-card face with its own paper tooth. */
   .paper {
-    background-color: var(--color-paper);
+    background-color: var(--color-card);
     color: var(--color-ink);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .3 0 0 0 0 .2 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
   }

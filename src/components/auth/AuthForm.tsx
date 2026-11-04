@@ -92,7 +92,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
         </Link>
       </p>
       {!firebaseConfigured ? (
-        <p className="mt-6 border-l-[3px] border-crank pl-3 text-[14px] text-paper/85">
+        <p className="mt-6 border-l-[3px] border-rule pl-3 text-[14px] text-paper/85">
           Accounts are switched off on this server. Listening works without one.
         </p>
       ) : null}

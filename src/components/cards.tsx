@@ -64,9 +64,16 @@ export function ShowCard({ show, hideBand = false }: { show: ShowModel; hideBand
         ) : null}
         {show.note ? <span className="mt-1 line-clamp-1 text-[12.5px] italic">{show.note}</span> : null}
         <span className="mt-auto flex items-end justify-between gap-2 border-t border-ink/25 pt-1.5 text-[12px] font-medium">
-          <span className="tnum truncate">
-            {dated ? longDate(show.date) : show.kind === 'tape' ? 'Studio / mixtape' : 'Date unknown'}
-          </span>
+          {show.isNew ? (
+            <span className="flex items-center gap-1.5 truncate font-semibold">
+              <NewDot />
+              Newly added
+            </span>
+          ) : (
+            <span className="tnum truncate">
+              {dated ? longDate(show.date) : show.kind === 'tape' ? 'Studio / mixtape' : 'Date unknown'}
+            </span>
+          )}
           <span className="tnum shrink-0">{plural(show.trackCount, 'track')}</span>
         </span>
       </span>
@@ -75,7 +82,7 @@ export function ShowCard({ show, hideBand = false }: { show: ShowModel; hideBand
           Disc {show.disc}
         </span>
       ) : null}
-      <NowPlayingMark showHref={show.href} className="absolute right-2 bottom-8 text-crank" />
+      <NowPlayingMark showHref={show.href} className="absolute right-2 bottom-8 box-content bg-ink p-1 text-leaf" />
     </div>
   );
 }
@@ -89,13 +96,17 @@ export function BandCard({ band, priority }: { band: BandModel; priority?: boole
         image={band.image}
         palette={band.palette}
         priority={priority}
-        className="transition-transform duration-150 ease-out group-hover:-translate-y-0.5"
+        className={clsx(
+          'transition-transform duration-150 ease-out group-hover:-translate-y-0.5',
+          band.isNew && 'outline-2 outline-offset-2 outline-leaf',
+        )}
       />
       <span className="mt-2.5 flex items-center justify-between gap-2">
         <span className="poster truncate text-[24px] leading-none group-hover:text-crank">{band.name}</span>
-        <NowPlayingMark bandId={band.id} className="shrink-0 text-crank" />
+        <NowPlayingMark bandId={band.id} className="shrink-0 text-leaf" />
       </span>
       <span className="tnum mt-1 block text-[13px] text-dust">
+        {band.isNew ? <span className="font-semibold text-leaf-light">New band, </span> : null}
         {plural(band.showCount, 'tape')}
         {years ? `, ${years}` : ''}
       </span>
@@ -162,12 +173,20 @@ export function ShowRows({ shows }: { shows: ShowModel[] }) {
                   {show.venue ?? 'Venue unknown'}
                 </span>
               )}
-              <span className="block truncate text-[13px] text-dust">
-                {[longDate(show.date), show.disc ? `Disc ${show.disc}` : null, show.note].filter(Boolean).join(', ')}
+              <span className="flex items-center gap-1.5 truncate text-[13px] text-dust">
+                {show.isNew ? (
+                  <span className="flex shrink-0 items-center gap-1.5 font-semibold text-leaf-light">
+                    <NewDot />
+                    Newly added
+                  </span>
+                ) : null}
+                <span className="truncate">
+                  {[longDate(show.date), show.disc ? `Disc ${show.disc}` : null, show.note].filter(Boolean).join(', ')}
+                </span>
               </span>
             </span>
             <span className="flex items-center gap-4 pr-3 text-[13px] text-dust tnum">
-              <NowPlayingMark showHref={show.href} className="text-crank" />
+              <NowPlayingMark showHref={show.href} className="text-leaf" />
               <span>{plural(show.trackCount, 'track')}</span>
               <span className="hidden w-16 text-right sm:block">{formatRunTime(show.duration)}</span>
             </span>
@@ -176,4 +195,9 @@ export function ShowRows({ shows }: { shows: ShowModel[] }) {
       })}
     </ol>
   );
+}
+
+/** Leaf-green "new" dot. Always paired with a text label; the ink ring keeps it visible on paper. */
+function NewDot() {
+  return <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-leaf ring-1 ring-ink" aria-hidden="true" />;
 }

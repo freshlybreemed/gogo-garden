@@ -65,7 +65,7 @@ export function CrateButton({ className }: { className?: string }) {
       }
       className={clsx(
         'inline-flex h-14 items-center gap-3 bg-ink px-6 text-[17px] font-bold text-paper',
-        'hover:bg-[#2a251e] active:translate-y-px disabled:opacity-70',
+        'hover:bg-tape-2 active:translate-y-px disabled:opacity-70',
         className,
       )}
     >

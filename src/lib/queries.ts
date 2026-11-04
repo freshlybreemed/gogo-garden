@@ -36,6 +36,7 @@ function toSong(doc: WithId<Document>): SongDoc {
     venue: doc.venue ? String(doc.venue).trim() || null : null,
     venueSlug: doc.venueSlug ? String(doc.venueSlug).trim() || null : null,
     addedAt: (oid ? oid.getTimestamp() : new Date(0)).toISOString(),
+    source: doc.source ? String(doc.source) : null,
   };
 }
 
@@ -67,6 +68,7 @@ export async function getSongs(): Promise<SongDoc[]> {
           date: 1,
           venue: 1,
           venueSlug: 1,
+          source: 1,
         },
       },
     )

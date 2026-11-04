@@ -85,7 +85,7 @@ export default async function SearchPage({ searchParams }: Props) {
                   href={venueHref(v.slug)}
                   className="inline-flex h-12 items-center gap-2 border border-rule px-3 hover:border-paper"
                 >
-                  <IconPin className="h-4 w-4 text-crank" />
+                  <IconPin className="h-4 w-4 text-dust" />
                   <span className="poster text-[22px] leading-none">{v.name}</span>
                   <span className="text-[12px] text-dust tnum">{plural(v.showCount, 'night')}</span>
                 </Link>

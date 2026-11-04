@@ -41,7 +41,7 @@ export default async function Home() {
       </section>
 
       <section aria-labelledby="recent" className="mt-12">
-        <SectionHead id="recent" title="Just added" href="/bands" linkLabel="Browse bands" />
+        <SectionHead id="recent" title="New growth" href="/bands" linkLabel="Browse bands" />
         <ul className="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
           {recent.map((show) => (
             <li key={show.key}>
