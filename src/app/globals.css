@@ -1,0 +1,181 @@
+@import 'tailwindcss';
+
+/*
+ * GoGo Garden: an underground go-go player.
+ * Soil-brown room, newsprint text and paper. Two accents with fixed jobs:
+ *   leaf green  - what's growing: active nav, now playing, new tapes/bands
+ *   crank orange - what you press: primary buttons, focus, closed stamps
+ * The loud color lives in the band art: split-fountain gradients after
+ * Globe Poster's go-go show cards.
+ */
+
+@theme inline {
+  /* Contrast (WCAG): paper/tar 15.0, paper/tape 13.7, ink/card 13.3,
+     dust/tape-2 5.9, leaf-light/tape-2 11.0, leaf/tar 8.9, ink/crank 5.8 */
+  --color-tar: #17120d;
+  --color-tape: #231b13;
+  --color-tape-2: #2d2319;
+  --color-rule: #3a2e22;
+  --color-paper: #efe6d2;
+  --color-card: #e6dcc3;
+  --color-dust: #a89f8c;
+  --color-ink: #1b150f;
+  --color-leaf: #8bc34a;
+  --color-leaf-light: #c5e59a;
+  --color-crank: #ff5a1f;
+  --color-crank-hot: #ff7a45;
+  --color-tape-strip: #cdbf9c;
+
+  --font-display: var(--font-poster), 'Arial Narrow', Impact, sans-serif;
+  --font-body: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-marker: var(--font-scrawl), 'Comic Sans MS', cursive;
+
+  --animate-eq: eq 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes eq {
+  0% {
+    transform: scaleY(0.25);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+@layer base {
+  html {
+    background: var(--color-tar);
+    color: var(--color-paper);
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    min-height: 100dvh;
+    background: var(--color-tar);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    font-feature-settings: 'tnum' 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Photocopy grain over everything; never intercepts input. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.11;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.4 -.25'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-crank);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-crank);
+    color: var(--color-ink);
+  }
+}
+
+@layer components {
+  /* Poster wood-type: the display face set tight and uppercase. */
+  .poster {
+    font-family: var(--font-display);
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 0.86;
+    letter-spacing: -0.005em;
+  }
+
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Newsprint J-card face with its own paper tooth. */
+  .paper {
+    background-color: var(--color-card);
+    color: var(--color-ink);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .3 0 0 0 0 .2 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+  }
+
+  /* Photo run through the copier onto colored stock. */
+  .xerox {
+    filter: grayscale(1) contrast(1.45) brightness(1.08);
+    mix-blend-mode: multiply;
+  }
+
+  /* Range inputs: seek + volume. --pct is set inline. */
+  input[data-slider] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 20px;
+    background: transparent;
+    cursor: pointer;
+    --track: var(--color-rule);
+    --fill: var(--color-paper);
+  }
+  input[data-slider]:hover,
+  input[data-slider]:focus-visible {
+    --fill: var(--color-crank);
+  }
+  input[data-slider]:focus-visible {
+    outline-offset: 0;
+  }
+  input[data-slider]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: linear-gradient(to right, var(--fill) var(--pct, 0%), var(--track) var(--pct, 0%));
+  }
+  input[data-slider]::-moz-range-track {
+    height: 4px;
+    background: linear-gradient(to right, var(--fill) var(--pct, 0%), var(--track) var(--pct, 0%));
+  }
+  input[data-slider]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    margin-top: -4px;
+    background: var(--color-paper);
+    border: 0;
+    border-radius: 0;
+    opacity: 0;
+  }
+  input[data-slider]::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: var(--color-paper);
+    border: 0;
+    border-radius: 0;
+    opacity: 0;
+  }
+  input[data-slider]:hover::-webkit-slider-thumb,
+  input[data-slider]:focus-visible::-webkit-slider-thumb {
+    opacity: 1;
+  }
+  input[data-slider]:hover::-moz-range-thumb,
+  input[data-slider]:focus-visible::-moz-range-thumb {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
