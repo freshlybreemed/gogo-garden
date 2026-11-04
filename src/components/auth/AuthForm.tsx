@@ -79,7 +79,9 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
       }
       setLoggedIn(true);
       f.setPassword('');
-      router.push('/');
+      // Back to wherever the gate sent them from (same-origin paths only).
+      const next = new URLSearchParams(window.location.search).get('next');
+      router.push(next && next.startsWith('/') && !next.startsWith('//') ? next : '/');
       router.refresh();
     } catch (err) {
       f.setError(friendly(err));
@@ -94,7 +96,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
     <div className="mx-auto max-w-[30rem] px-4 pt-8 md:pt-16">
       <h1 className="poster text-[clamp(64px,12vw,112px)] leading-[0.8]">{isSignup ? 'Sign up' : 'Log in'}</h1>
       <p className="mt-3 text-[15px] text-dust">
-        {isSignup ? 'Already have an account? ' : 'New here? '}
+        {isSignup ? 'Make an account to start listening. Already have one? ' : 'New here? '}
         <Link href={isSignup ? '/login' : '/signup'} className="font-semibold text-paper underline underline-offset-4 hover:text-crank">
           {isSignup ? 'Log in' : 'Create an account'}
         </Link>

@@ -10,6 +10,7 @@ import { fountain, shortDate, trackTitle, venueHref } from '@/lib/shows';
 import type { TrackModel } from '@/lib/types';
 import { BandArt } from '@/components/art/BandArt';
 import { LikeButton } from '@/components/LikeButton';
+import { AddToPlaylist } from '@/components/AddToPlaylist';
 import {
   IconBack30,
   IconChevronDown,
@@ -360,6 +361,7 @@ function PlayerBar({ track, onExpand }: { track: TrackModel; onExpand: () => voi
                 ) : null}
               </span>
             </span>
+            <AddToPlaylist url={track.url} title={title} up />
             <LikeButton url={track.url} title={title} />
           </div>
         </div>
@@ -497,7 +499,10 @@ function NowPlayingSheet({ track, onClose }: { track: TrackModel; onClose: () =>
       <div className="mt-auto">
         <div className="flex items-start justify-between gap-3">
           <h2 className="min-w-0 truncate text-[22px] font-bold">{title}</h2>
-          <LikeButton url={track.url} title={title} className="-mt-1 -mr-2 h-11 w-11" />
+          <span className="-mt-1 -mr-2 flex">
+            <AddToPlaylist url={track.url} title={title} className="h-11 w-11" up />
+            <LikeButton url={track.url} title={title} className="h-11 w-11" />
+          </span>
         </div>
         <Link
           href={`/bands/${encodeURIComponent(track.bandId)}`}

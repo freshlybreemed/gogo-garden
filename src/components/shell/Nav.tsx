@@ -7,6 +7,7 @@ import { useAppStore } from '@/stores/AppStore';
 import { usePlayerStore } from '@/stores/PlayerStore';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useLikesStore } from '@/stores/LikesStore';
+import { usePlaylistsStore } from '@/stores/PlaylistsStore';
 import { fountain } from '@/lib/shows';
 import { Equalizer } from '../art/Equalizer';
 import { IconBands, IconHome, IconPin, IconSearch, IconUser } from '../icons';
@@ -34,6 +35,7 @@ function useAuth(initialLoggedIn: boolean) {
   const signOut = async () => {
     await supabaseBrowser().auth.signOut().catch(() => undefined);
     useLikesStore.getState().reset();
+    usePlaylistsStore.getState().reset();
     setLoggedIn(false);
     router.refresh();
   };
@@ -133,7 +135,10 @@ export function Sidebar({ bands, initialLoggedIn }: { bands: NavBand[]; initialL
         {loggedIn ? (
           <span className="flex gap-4">
             <Link href="/liked" className="font-semibold text-paper hover:text-crank">
-              Liked songs
+              Liked
+            </Link>
+            <Link href="/playlists" className="font-semibold text-paper hover:text-crank">
+              Playlists
             </Link>
             <button type="button" onClick={signOut} className="font-semibold text-dust hover:text-paper">
               Log out
@@ -164,6 +169,9 @@ export function MobileTop({ initialLoggedIn }: { initialLoggedIn: boolean }) {
         <span className="flex items-center gap-3">
           <Link href="/liked" className="inline-flex h-11 items-center px-1 text-[14px] font-semibold text-paper">
             Liked
+          </Link>
+          <Link href="/playlists" className="inline-flex h-11 items-center px-1 text-[14px] font-semibold text-paper">
+            Playlists
           </Link>
           <button type="button" onClick={signOut} className="h-11 px-1 text-[14px] font-semibold text-dust hover:text-paper">
             Log out

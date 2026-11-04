@@ -165,3 +165,9 @@ export const IconHeart = ({ filled, ...p }: P & { filled?: boolean }) => (
     />
   </Icon>
 );
+
+export const IconPlaylistAdd = (p: P) => (
+  <Icon {...p}>
+    <path d="M3 6h12M3 11h12M3 16h7M18 13v8M14 17h8" />
+  </Icon>
+);

@@ -8,6 +8,7 @@ import { formatDuration, plural, shortDate, trackTitle, venueHref } from '@/lib/
 import type { TrackModel } from '@/lib/types';
 import { Equalizer } from './art/Equalizer';
 import { LikeButton } from './LikeButton';
+import { AddToPlaylist } from './AddToPlaylist';
 import { IconPause, IconPlay } from './icons';
 
 type Props = {
@@ -102,6 +103,7 @@ export function TrackList({ tracks, variant, source, className }: Props) {
                 <span className="hidden w-20 text-right sm:block">{plural(track.streams, 'play')}</span>
               ) : null}
               <span className="w-12 text-right">{formatDuration(track.duration)}</span>
+              <AddToPlaylist url={track.url} title={title} className="hidden sm:inline-flex" />
               <LikeButton url={track.url} title={title} />
             </span>
           </li>
