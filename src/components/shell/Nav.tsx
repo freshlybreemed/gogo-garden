@@ -42,9 +42,9 @@ function useAuth(initialLoggedIn: boolean) {
 
 export function Wordmark({ className }: { className?: string }) {
   return (
-    <Link href="/" className={clsx('inline-block text-ink outline-offset-4', className)} aria-label="Tha Garden, home">
+    <Link href="/" className={clsx('inline-block text-ink outline-offset-4', className)} aria-label="GoGo Garden, home">
       <span className="block px-2.5 pt-2 pb-1.5" style={{ backgroundImage: fountain(0, 90) }}>
-        <span className="poster block text-[15px] leading-none">Tha</span>
+        <span className="poster block text-[15px] leading-none">GoGo</span>
         <span className="poster block text-[34px] leading-[0.82]">Garden</span>
       </span>
     </Link>

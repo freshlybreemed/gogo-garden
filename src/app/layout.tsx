@@ -29,9 +29,12 @@ const marker = Permanent_Marker({
 });
 
 export const metadata: Metadata = {
-  title: { default: 'Tha Garden', template: '%s – Tha Garden' },
-  description: 'Live go-go PA tapes from DC bands, streaming.',
-  icons: { icon: '/favicon.ico', apple: '/logo192.png' },
+  metadataBase: new URL('https://thegogogarden.com'),
+  title: { default: 'GoGo Garden', template: '%s – GoGo Garden' },
+  description: 'Live from the go-go: DC go-go PA tapes, streaming.',
+  applicationName: 'GoGo Garden',
+  appleWebApp: { title: 'GoGo Garden', capable: true, statusBarStyle: 'black-translucent' },
+  icons: { icon: '/favicon.ico', apple: '/apple-touch-icon.png' },
   manifest: '/manifest.json',
 };
 

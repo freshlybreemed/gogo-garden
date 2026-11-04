@@ -24,14 +24,14 @@ export default async function Home() {
         className="relative overflow-hidden px-5 pt-6 pb-6 text-ink sm:px-8 sm:pt-8 md:pb-8"
         style={{ backgroundImage: fountain(0) }}
       >
-        <p className="font-display text-[18px] font-extrabold uppercase sm:text-[22px]">Tha Garden presents</p>
+        <p className="font-display text-[18px] font-extrabold uppercase sm:text-[22px]">GoGo Garden presents</p>
         <h1 id="hero-title" className="poster mt-1 text-[clamp(64px,15vw,184px)] leading-[0.84]">
           The PA tapes
         </h1>
         <div className="mt-5 flex flex-col gap-5 border-t-[3px] border-ink pt-4 lg:flex-row lg:items-end lg:justify-between">
           <p className="max-w-[34rem] font-display text-[22px] leading-[1.05] font-extrabold uppercase sm:text-[28px]">
             {plural(live.length, 'live show')} from {plural(bands.length, 'band')}
-            {span ? `, ${span}` : ''}. Recorded off the board, straight from the go‑go.
+            {span ? `, ${span}` : ''}. Recorded off the board, live from the go‑go.
           </p>
           <div className="flex flex-col items-start gap-2">
             <CrateButton />
