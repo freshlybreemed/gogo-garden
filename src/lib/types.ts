@@ -48,6 +48,8 @@ export type TrackModel = {
   showName: string;
   showDate: string | null;
   venueSlug: string | null;
+  /** Cover: the show's album art, else the band photo, else null (gradient card). */
+  image: string | null;
 };
 
 export type BandModel = {
@@ -85,6 +87,8 @@ export type ShowModel = {
   addedAt: string;
   /** Has songs from the latest ingest or added in the last 14 days. */
   isNew: boolean;
+  /** Cover: most common album art on the show's songs, else the band photo. */
+  image: string | null;
 };
 
 /** Normalized `venues` document (the researched write-up). */

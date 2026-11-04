@@ -8,6 +8,7 @@ import { usePlayerStore, playerStoreSelectors } from '@/stores/PlayerStore';
 import { formatTime } from '@/lib/helpers';
 import { fountain, shortDate, trackTitle, venueHref } from '@/lib/shows';
 import type { TrackModel } from '@/lib/types';
+import { BandArt } from '@/components/art/BandArt';
 import {
   IconBack30,
   IconChevronDown,
@@ -98,6 +99,7 @@ function AudioEngine() {
       title: trackTitle(track),
       artist: track.bandName,
       album: [shortDate(track.showDate), track.showName].filter(Boolean).join(' '),
+      artwork: track.image ? [{ src: track.image, sizes: '512x512' }] : [],
     });
     const handlers: [MediaSessionAction, MediaSessionActionHandler][] = [
       ['play', () => s().resume()],
@@ -251,6 +253,20 @@ function Transport({ size = 'md' }: { size?: 'md' | 'lg' }) {
 }
 
 function TrackChip({ track, className }: { track: TrackModel; className?: string }) {
+  if (track.image) {
+    // Cover art (album art, else the band photo) with the date tabbed on.
+    const d = shortDate(track.showDate);
+    return (
+      <span className={clsx('relative block shrink-0 overflow-hidden', className)} aria-hidden="true">
+        <BandArt name={track.bandName} image={track.image} palette={track.palette} className="absolute inset-0" />
+        {d ? (
+          <span className="absolute bottom-0 left-0 bg-ink px-1 font-display text-[10px] leading-[1.4] font-black text-paper tnum">
+            {d}
+          </span>
+        ) : null}
+      </span>
+    );
+  }
   return (
     <span
       className={clsx('flex shrink-0 flex-col justify-between overflow-hidden p-1.5 text-ink', className)}
@@ -444,14 +460,26 @@ function NowPlayingSheet({ track, onClose }: { track: TrackModel; onClose: () =>
       <Link
         href={track.showHref}
         onClick={onClose}
-        className="mx-auto mt-4 flex aspect-square w-full max-w-[340px] flex-col justify-between p-5 text-ink"
+        className="relative mx-auto mt-4 flex aspect-square w-full max-w-[340px] flex-col justify-between p-5 text-ink"
         style={{ backgroundImage: fountain(track.palette) }}
       >
-        <span className="poster text-[48px]">{track.bandName}</span>
-        <span>
-          <span className="poster block text-[72px]">{shortDate(track.showDate) ?? 'Tape'}</span>
-          <span className="block font-display text-[22px] leading-tight font-extrabold uppercase">{track.showName}</span>
-        </span>
+        {track.image ? (
+          <>
+            <BandArt name={track.bandName} image={track.image} palette={track.palette} className="absolute inset-0" priority />
+            <span className="relative mt-auto self-start bg-ink px-2 py-1 text-paper">
+              <span className="poster block text-[40px] leading-[0.9]">{shortDate(track.showDate) ?? 'Tape'}</span>
+              <span className="block font-display text-[16px] leading-tight font-extrabold uppercase">{track.showName}</span>
+            </span>
+          </>
+        ) : (
+          <>
+            <span className="poster text-[48px]">{track.bandName}</span>
+            <span>
+              <span className="poster block text-[72px]">{shortDate(track.showDate) ?? 'Tape'}</span>
+              <span className="block font-display text-[22px] leading-tight font-extrabold uppercase">{track.showName}</span>
+            </span>
+          </>
+        )}
       </Link>
 
       <div className="mt-auto">

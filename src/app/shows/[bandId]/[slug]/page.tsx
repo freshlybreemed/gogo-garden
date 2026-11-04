@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { SectionHead, ShowCard } from '@/components/cards';
+import { BandArt } from '@/components/art/BandArt';
 import { PlayButton } from '@/components/PlayButton';
 import { TrackList } from '@/components/TrackList';
 import { getCatalog } from '@/lib/catalog';
@@ -82,6 +83,15 @@ export default async function ShowPage(props: Params) {
             {show.streams ? <span>{plural(show.streams, 'play')}</span> : null}
           </p>
         </div>
+        {show.image ? (
+          <BandArt
+            name={show.bandName}
+            image={show.image}
+            palette={show.palette}
+            className="hidden shrink-0 self-start sm:block sm:w-56 lg:w-72"
+            priority
+          />
+        ) : null}
       </header>
 
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 py-6">

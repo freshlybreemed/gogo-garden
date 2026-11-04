@@ -152,12 +152,7 @@ async function load(): Promise<Catalog> {
     const palette = paletteFor(acc.id + acc.name);
 
     // Fall back to the most common cover on the band's songs.
-    let image = acc.image;
-    if (!image) {
-      const counts = new Map<string, number>();
-      for (const s of acc.songs) if (s.imageUrl) counts.set(s.imageUrl, (counts.get(s.imageUrl) ?? 0) + 1);
-      image = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
-    }
+    const image = acc.image ?? mostCommon(acc.songs.map((s) => s.imageUrl));
 
     const byAlbum = new Map<string, SongDoc[]>();
     for (const s of acc.songs) {
@@ -171,6 +166,7 @@ async function load(): Promise<Catalog> {
       albumSongs.sort(trackOrder);
       const first = albumSongs[0];
       const info = parseAlbum(album, { date: first.showDate, venue: first.venue, aliases });
+      const showImage = mostCommon(albumSongs.map((s) => s.imageUrl)) ?? image;
       const slugBase = slugify([info.date, info.venue ?? info.title].filter(Boolean).join(' ')) || 'tape';
       const href = `/shows/${encodeURIComponent(acc.id)}/${slugBase}-${shortHash(album)}`;
       const show: ShowModel = {
@@ -192,6 +188,7 @@ async function load(): Promise<Catalog> {
         streams: albumSongs.reduce((n, s) => n + s.streams, 0),
         addedAt: albumSongs.reduce((max, s) => (s.addedAt > max ? s.addedAt : max), ''),
         isNew: albumSongs.some((s) => isNewSong(s, now)),
+        image: showImage,
       };
       const showTracks = albumSongs.map<TrackModel>((s) => ({
         id: s.id,
@@ -208,6 +205,7 @@ async function load(): Promise<Catalog> {
         showName: info.kind === 'live' ? (info.venue ?? 'Unknown venue') : info.title,
         showDate: info.date,
         venueSlug: info.kind === 'live' ? first.venueSlug : null,
+        image: s.imageUrl || showImage,
       }));
       for (const t of showTracks) {
         haystack.set(
@@ -351,4 +349,14 @@ export function sampleTracks(c: Catalog, n: number) {
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
   return pool.slice(0, n);
+}
+
+/** Most frequent non-empty value, or null. */
+function mostCommon(values: (string | undefined | null)[]): string | null {
+  const counts = new Map<string, number>();
+  for (const v of values) if (v) counts.set(v, (counts.get(v) ?? 0) + 1);
+  let best: string | null = null;
+  let n = 0;
+  for (const [v, c] of counts) if (c > n) [best, n] = [v, c];
+  return best;
 }
