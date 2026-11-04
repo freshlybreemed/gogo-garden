@@ -54,7 +54,7 @@ export async function getSongs(): Promise<SongDoc[]> {
   const docs = await db
     .collection('music')
     .find(
-      {},
+      { hidden: { $ne: true } },
       {
         projection: {
           artistId: 1,

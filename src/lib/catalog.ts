@@ -59,6 +59,11 @@ export function getCatalog(): Promise<Catalog> {
   return g._catalog.promise;
 }
 
+/** Drop the cached catalog so the next request reloads it (after uploads / moderation). */
+export function invalidateCatalog() {
+  g._catalog = undefined;
+}
+
 /** Keep the cached count in step with a streamUp so "most streamed" stays live. */
 export async function bumpCachedStream(trackId: string) {
   if (!g._catalog) return;
