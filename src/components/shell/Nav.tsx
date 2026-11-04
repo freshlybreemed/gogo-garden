@@ -140,6 +140,9 @@ export function Sidebar({ bands, initialLoggedIn }: { bands: NavBand[]; initialL
             <Link href="/playlists" className="font-semibold text-paper hover:text-crank">
               Playlists
             </Link>
+            <Link href="/upload" className="font-semibold text-paper hover:text-crank">
+              Upload
+            </Link>
             <button type="button" onClick={signOut} className="font-semibold text-dust hover:text-paper">
               Log out
             </button>
@@ -172,6 +175,9 @@ export function MobileTop({ initialLoggedIn }: { initialLoggedIn: boolean }) {
           </Link>
           <Link href="/playlists" className="inline-flex h-11 items-center px-1 text-[14px] font-semibold text-paper">
             Playlists
+          </Link>
+          <Link href="/upload" className="inline-flex h-11 items-center px-1 text-[14px] font-semibold text-paper">
+            Upload
           </Link>
           <button type="button" onClick={signOut} className="h-11 px-1 text-[14px] font-semibold text-dust hover:text-paper">
             Log out
