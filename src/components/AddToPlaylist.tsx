@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import { usePlaylistsStore } from '@/stores/PlaylistsStore';
 import { IconPlaylistAdd } from './icons';
@@ -12,7 +13,8 @@ export function AddToPlaylist({ url, title, className, up }: { url: string; titl
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
   const ref = useRef<HTMLDivElement>(null);
-  const { playlists, loaded, load, create, addTrack } = usePlaylistsStore();
+  const { playlists, loaded, userId, load, create, addTrack } = usePlaylistsStore();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!open) return;
@@ -59,48 +61,59 @@ export function AddToPlaylist({ url, title, className, up }: { url: string; titl
           onClick={(e) => e.stopPropagation()}
         >
           <p className="px-2 pt-1 pb-2 text-[12px] font-semibold text-dust">{note || 'Add to playlist'}</p>
-          <ul className="max-h-56 overflow-y-auto">
-            {playlists.map((p) => (
-              <li key={p.id}>
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => add(p.id, p.name)}
-                  className="flex w-full items-center justify-between px-2 py-2 hover:bg-tape"
-                >
-                  <span className="truncate">{p.name}</span>
-                  <span className="text-[12px] text-dust tnum">{p.count}</span>
-                </button>
-              </li>
-            ))}
-            {loaded && !playlists.length ? <li className="px-2 py-1 text-[13px] text-dust">No playlists yet.</li> : null}
-          </ul>
-          <form
-            className="mt-2 flex gap-2 border-t border-rule pt-2"
-            onSubmit={async (e) => {
-              e.preventDefault();
-              const id = await create(name);
-              if (id) {
-                setName('');
-                await add(id, name.trim());
-              }
-            }}
-          >
-            <input
-              value={name}
-              onChange={(e) => setName(e.currentTarget.value)}
-              placeholder="New playlist"
-              aria-label="New playlist name"
-              maxLength={120}
-              className="h-9 min-w-0 flex-1 border-b border-rule bg-transparent px-1 outline-none focus:border-crank"
-            />
-            <button type="submit" className="h-9 bg-crank px-3 text-[13px] font-bold text-ink">
-              Make
-            </button>
-          </form>
-          <Link href="/playlists" className="mt-2 block px-2 py-1 text-[12px] font-semibold text-dust hover:text-paper">
-            All playlists
-          </Link>
+          {loaded && !userId ? (
+            <p className="px-2 pb-2 text-[13px]">
+              <Link href={`/login?next=${encodeURIComponent(pathname || '/')}`} className="font-semibold underline underline-offset-4 hover:text-crank">
+                Log in
+              </Link>{' '}
+              to make playlists.
+            </p>
+          ) : (
+            <>
+            <ul className="max-h-56 overflow-y-auto">
+              {playlists.map((p) => (
+                <li key={p.id}>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => add(p.id, p.name)}
+                    className="flex w-full items-center justify-between px-2 py-2 hover:bg-tape"
+                  >
+                    <span className="truncate">{p.name}</span>
+                    <span className="text-[12px] text-dust tnum">{p.count}</span>
+                  </button>
+                </li>
+              ))}
+              {loaded && !playlists.length ? <li className="px-2 py-1 text-[13px] text-dust">No playlists yet.</li> : null}
+            </ul>
+            <form
+              className="mt-2 flex gap-2 border-t border-rule pt-2"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const id = await create(name);
+                if (id) {
+                  setName('');
+                  await add(id, name.trim());
+                }
+              }}
+            >
+              <input
+                value={name}
+                onChange={(e) => setName(e.currentTarget.value)}
+                placeholder="New playlist"
+                aria-label="New playlist name"
+                maxLength={120}
+                className="h-9 min-w-0 flex-1 border-b border-rule bg-transparent px-1 outline-none focus:border-crank"
+              />
+              <button type="submit" className="h-9 bg-crank px-3 text-[13px] font-bold text-ink">
+                Make
+              </button>
+            </form>
+            <Link href="/playlists" className="mt-2 block px-2 py-1 text-[12px] font-semibold text-dust hover:text-paper">
+              All playlists
+            </Link>
+            </>
+          )}
         </div>
       ) : null}
     </div>

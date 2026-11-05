@@ -25,6 +25,8 @@ import {
 } from '../icons';
 import { Slider } from './Slider';
 import { QueuePanel } from './QueuePanel';
+import { SignupGate } from '@/components/auth/SignupGate';
+import { useAppStore } from '@/stores/AppStore';
 
 /** Seconds of playback before a listen counts as a stream. */
 const STREAM_THRESHOLD_SECS = 30;
@@ -33,9 +35,14 @@ const STREAM_THRESHOLD_SECS = 30;
  * Lives in the root layout, so it (and the <audio> element) never unmounts
  * while the user navigates between routes.
  */
-export default function Player() {
+export default function Player({ initialLoggedIn = false }: { initialLoggedIn?: boolean }) {
   const current = usePlayerStore((s) => s.currentTrack);
   const [expanded, setExpanded] = useState(false);
+
+  // Free-play limit needs to know whether the server saw a session.
+  useEffect(() => {
+    useAppStore.getState().setSsrLoggedIn(initialLoggedIn);
+  }, [initialLoggedIn]);
 
   return (
     <>
@@ -47,6 +54,7 @@ export default function Player() {
         </>
       ) : null}
       <QueuePanel />
+      <SignupGate />
     </>
   );
 }

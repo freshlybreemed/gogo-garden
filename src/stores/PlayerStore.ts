@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { clamp } from '@/lib/helpers';
 import { streamUp as streamUpAction } from '@/app/actions';
 import type { TrackModel } from '@/lib/types';
+import { takeFreePlay } from '@/lib/freePlays';
+import { isLoggedIn } from '@/stores/AppStore';
 
 export type PlayerStore = {
   playing: boolean;
@@ -21,6 +23,9 @@ export type PlayerStore = {
   /** Track id the current play has already been counted for. */
   streamedTrackId?: string;
   streamUpState: 'pending' | 'resolved' | 'rejected';
+  /** A logged-out listener used their free plays: show the "make an account" prompt instead of playing. */
+  signupGate: boolean;
+  closeSignupGate: () => void;
   /** Play `tracks` starting at `index`; the list becomes the queue. */
   playList: (tracks: TrackModel[], index?: number, source?: string) => void;
   /** Play/pause the given track, starting it (with `list` as the queue) if needed. */
@@ -55,9 +60,18 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
   cue: { position: 0, nonce: 0 },
   queueOpen: false,
   streamUpState: 'resolved',
+  signupGate: false,
+  closeSignupGate() {
+    set({ signupGate: false });
+  },
   playList(tracks, index = 0, source) {
     const track = tracks[index];
     if (!track) return;
+    // Every new track start goes through here (play buttons, track rows, queue, next, auto-advance).
+    if (!isLoggedIn() && !takeFreePlay()) {
+      set({ playing: false, signupGate: true });
+      return;
+    }
     // Each start is a new listen and may be counted again.
     set({
       queue: tracks,
