@@ -1,12 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { safeNext } from '@/lib/nextPath';
 
 // Email confirmation / password-reset links land here with a one-time code.
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
-  const next = url.searchParams.get('next');
-  const dest = next && next.startsWith('/') && !next.startsWith('//') ? next : '/';
+  const dest = safeNext(url.searchParams.get('next'));
   if (code) {
     const supabase = await supabaseServer();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
