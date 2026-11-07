@@ -14,7 +14,7 @@ const MAX_TRACKS = 40;
 const MAX_BYTES = 50 * 1024 * 1024;
 const AUDIO = /\.(mp3|m4a)$/i;
 const KINDS = [
-  { v: 'live', label: 'Live PA' },
+  { v: 'live', label: 'Live show' },
   { v: 'studio', label: 'Studio' },
   { v: 'mixtape', label: 'Mixtape' },
   { v: 'single', label: 'Single(s)' },
@@ -160,7 +160,7 @@ export function UploadForm({ userId, bands, venues }: { userId: string; bands: B
         </div>
         <div className="sm:col-span-2">
           <Label htmlFor="title">Album or show name</Label>
-          <input id="title" value={title} onChange={(e) => setTitle(e.currentTarget.value)} maxLength={160} placeholder="e.g. 3-30-11 @ Gee's, or Live PA the Leak Pt. 5" className={inputCls} />
+          <input id="title" value={title} onChange={(e) => setTitle(e.currentTarget.value)} maxLength={160} placeholder="e.g. 3-30-11 @ Gee's, or The Leak Pt. 5" className={inputCls} />
         </div>
         <fieldset className="sm:col-span-2">
           <legend className="text-[13px] font-semibold text-dust">Type</legend>

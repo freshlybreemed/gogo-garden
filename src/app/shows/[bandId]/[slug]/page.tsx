@@ -51,7 +51,7 @@ export default async function ShowPage(props: Params) {
         </Link>
         <div className="paper min-w-0 flex-1 border-t-2 border-dashed border-ink/30 px-5 pt-4 pb-5 sm:border-t-0 sm:border-l-2 md:px-8 md:pt-6">
           <p className="font-display text-[17px] font-extrabold uppercase">
-            {show.kind === 'live' ? 'Live PA' : 'Studio / mixtape'}
+            {show.kind === 'live' ? 'Live show' : 'Studio / mixtape'}
             {!show.date && show.year ? `, ${show.year}` : ''}
             {show.disc ? `, disc ${show.disc}` : ''}
           </p>
@@ -65,13 +65,13 @@ export default async function ShowPage(props: Params) {
                   href={venueHref(show.venueSlug)}
                   className="mt-2 block font-display text-[clamp(26px,4vw,48px)] leading-[0.95] font-black uppercase decoration-[3px] underline-offset-4 hover:underline"
                 >
-                  {show.venue ?? 'Venue unknown'}
+                  {show.venue}
                 </Link>
-              ) : (
+              ) : show.venue ? (
                 <span className="mt-2 block font-display text-[clamp(26px,4vw,48px)] leading-[0.95] font-black uppercase">
-                  {show.venue ?? 'Venue unknown'}
+                  {show.venue}
                 </span>
-              )}
+              ) : null}
             </h1>
           ) : (
             <h1 className="poster mt-1 text-[clamp(48px,8vw,112px)] leading-[0.85]">{show.title}</h1>

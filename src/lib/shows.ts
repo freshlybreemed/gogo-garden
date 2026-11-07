@@ -160,7 +160,7 @@ export function parseAlbum(
       kind: 'live',
       date,
       venue,
-      title: venue ?? 'Unknown venue',
+      title: venue ?? '',
       note: notes.filter(Boolean).join(', ') || null,
       disc,
     };
@@ -174,7 +174,7 @@ export function parseAlbum(
       kind: 'live',
       date: null,
       venue: venue || null,
-      title: venue || 'Unknown venue',
+      title: venue || '',
       note: notes.filter(Boolean).join(', ') || null,
       disc,
     };

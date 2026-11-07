@@ -52,11 +52,11 @@ export function ShowCard({ show, hideBand = false }: { show: ShowModel; hideBand
               href={venueHref(show.venueSlug)}
               className="relative z-10 mt-1 line-clamp-2 self-start font-display text-[18px] leading-[1.05] font-extrabold uppercase decoration-2 underline-offset-2 hover:underline"
             >
-              {show.venue ?? 'Venue unknown'}
+              {show.venue}
             </Link>
           ) : (
             <span className="mt-1 line-clamp-2 font-display text-[18px] leading-[1.05] font-extrabold uppercase tnum">
-              {show.venue ?? (show.date ? null : show.year) ?? 'Venue unknown'}
+              {show.venue ?? (show.date ? null : show.year)}
             </span>
           )
         ) : show.date ? (
@@ -172,7 +172,7 @@ export function ShowRows({ shows }: { shows: ShowModel[] }) {
                 </Link>
               ) : (
                 <span className="block truncate font-display text-[20px] leading-tight font-extrabold text-paper/70 uppercase">
-                  {show.venue ?? 'Venue unknown'}
+                  {show.venue}
                 </span>
               )}
               <span className="flex items-center gap-1.5 truncate text-[13px] text-dust">

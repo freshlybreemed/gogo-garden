@@ -220,7 +220,7 @@ async function load(): Promise<Catalog> {
         bandName: acc.name,
         palette,
         showHref: href,
-        showName: info.kind === 'live' ? (info.venue ?? 'Unknown venue') : info.title,
+        showName: info.kind === 'live' ? (info.venue ?? '') : info.title,
         showDate: info.date,
         venueSlug: info.kind === 'live' ? first.venueSlug : null,
         image: s.imageUrl || showImage,
