@@ -6,7 +6,15 @@ export type ArtistModel = {
   shortName: string;
   useShortName: boolean;
   image?: string;
+  bio?: string;
+  founded?: string;
+  members?: BandMember[];
+  sources?: BandSource[];
 };
+
+/** A known member of a band, from the researched write-up. */
+export type BandMember = { name: string; role: string | null; years: string | null };
+export type BandSource = { title: string | null; url: string };
 
 /** Raw song document, lightly normalized (see queries.ts). */
 export type SongDoc = {
@@ -67,8 +75,12 @@ export type BandModel = {
   trackCount: number;
   firstDate: string | null;
   lastDate: string | null;
-  /** New to the app (bands id >= 45). */
+  /** First tape landed in the last 14 days. */
   isNew: boolean;
+  bio: string | null;
+  founded: string | null;
+  members: BandMember[];
+  sources: BandSource[];
 };
 
 export type ShowModel = {
@@ -89,7 +101,7 @@ export type ShowModel = {
   duration: number;
   streams: number;
   addedAt: string;
-  /** Has songs from the latest ingest or added in the last 14 days. */
+  /** Has songs added in the last 14 days. */
   isNew: boolean;
   /** Year: the show date's, else the most common tag year (null for a Singles bucket). */
   year: string | null;

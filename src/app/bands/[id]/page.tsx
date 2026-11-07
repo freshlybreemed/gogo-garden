@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { BandArt } from '@/components/art/BandArt';
+import { BandAbout } from '@/components/band/BandAbout';
 import { SectionHead, ShowCard, ShowRows } from '@/components/cards';
 import { PlayButton } from '@/components/PlayButton';
 import { TrackList } from '@/components/TrackList';
@@ -89,6 +90,8 @@ export default async function BandPage({ params }: Params) {
             <TrackList tracks={popular} variant="mixed" source={source} />
           </section>
         ) : null}
+
+        <BandAbout band={band} />
 
         {live.length ? (
           <section aria-labelledby="shows" className="mt-12">

@@ -34,16 +34,13 @@ export type Catalog = {
 
 const TTL_MS = 60_000;
 
-/** Songs from the latest import batch, or added in the last two weeks, are "new". */
-const NEW_SOURCE = 'frshly-ingest-2026-11';
+/** Songs added in the last two weeks are "new"; a band is new when its first tape is. */
 const NEW_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
-/** Bands added with the 2026-11 ingest start at id 45. */
-const FIRST_NEW_BAND_ID = 45;
 
 // Not `lastModified`: streamUp stamps that on every play, so it would mark
 // any recently played show as new.
 function isNewSong(s: SongDoc, now: number) {
-  return s.source === NEW_SOURCE || now - Date.parse(s.addedAt) < NEW_WINDOW_MS;
+  return now - Date.parse(s.addedAt) < NEW_WINDOW_MS;
 }
 const g = globalThis as unknown as { _catalog?: { at: number; promise: Promise<Catalog> } };
 
@@ -115,7 +112,14 @@ async function load(): Promise<Catalog> {
     for (const n of [a.name, a.shortName]) if (n) artistByName.set(normalizeName(n), a);
   }
 
-  type BandAcc = { id: string; name: string; fullName: string | null; image: string | null; songs: SongDoc[] };
+  type BandAcc = {
+    id: string;
+    name: string;
+    fullName: string | null;
+    image: string | null;
+    artist: ArtistModel | null;
+    songs: SongDoc[];
+  };
   const bandAcc = new Map<string, BandAcc>();
   for (const a of artists) {
     bandAcc.set(a.id, {
@@ -123,6 +127,7 @@ async function load(): Promise<Catalog> {
       name: displayName(a),
       fullName: a.name && a.name !== displayName(a) ? a.name : null,
       image: a.image || null,
+      artist: a,
       songs: [],
     });
   }
@@ -136,7 +141,7 @@ async function load(): Promise<Catalog> {
       const slug = slugify(song.artist) || 'unknown';
       id = `x-${slug}`;
       if (!bandAcc.has(id)) {
-        bandAcc.set(id, { id, name: song.artist || 'Unknown band', fullName: null, image: null, songs: [] });
+        bandAcc.set(id, { id, name: song.artist || 'Unknown band', fullName: null, image: null, artist: null, songs: [] });
       }
     }
     bandAcc.get(id)!.songs.push(song);
@@ -246,7 +251,11 @@ async function load(): Promise<Catalog> {
       trackCount: acc.songs.length,
       firstDate: dates[0] ?? null,
       lastDate: dates[dates.length - 1] ?? null,
-      isNew: /^\d+$/.test(acc.id) && Number(acc.id) >= FIRST_NEW_BAND_ID,
+      isNew: acc.songs.length > 0 && acc.songs.every((s) => isNewSong(s, now)),
+      bio: acc.artist?.bio ?? null,
+      founded: acc.artist?.founded ?? null,
+      members: acc.artist?.members ?? [],
+      sources: acc.artist?.sources ?? [],
     });
   }
 
