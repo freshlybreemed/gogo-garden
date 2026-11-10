@@ -11,7 +11,7 @@ import type { BandMember } from './types';
  */
 
 export type EditEntity = 'track' | 'band';
-export type EditField = 'title' | 'bio' | 'founded' | 'members' | 'image';
+export type EditField = 'title' | 'bio' | 'founded' | 'members' | 'image' | 'altImage';
 type Value = string | BandMember[] | null;
 
 export type EditRow = {
@@ -35,7 +35,7 @@ export type EditRow = {
 };
 
 const DAILY_LIMIT = 300;
-const FIELDS: Record<EditEntity, EditField[]> = { track: ['title'], band: ['bio', 'founded', 'members', 'image'] };
+const FIELDS: Record<EditEntity, EditField[]> = { track: ['title'], band: ['bio', 'founded', 'members', 'image', 'altImage'] };
 
 export class EditError extends Error {}
 
@@ -60,7 +60,8 @@ export function normalise(field: EditField, raw: unknown): Value {
     }
     case 'founded':
       return clean(raw, 40) || null;
-    case 'image': {
+    case 'image':
+    case 'altImage': {
       const v = clean(raw, 500);
       if (!v) return null;
       if (!/^https:\/\/\S+$/.test(v)) throw new EditError('The photo has to be an https link.');

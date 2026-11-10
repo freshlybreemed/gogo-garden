@@ -6,7 +6,7 @@ import { SectionHead, ShowCard, ShowRows } from '@/components/cards';
 import { PlayButton } from '@/components/PlayButton';
 import { TrackList } from '@/components/TrackList';
 import { getCatalog, popularForBand } from '@/lib/catalog';
-import { fountain, plural, yearSpan } from '@/lib/shows';
+import { bandPhoto, fountain, plural, yearSpan } from '@/lib/shows';
 import { currentUser } from '@/lib/supabase/server';
 import type { ShowModel } from '@/lib/types';
 
@@ -40,6 +40,7 @@ export default async function BandPage({ params }: Params) {
   const tapes = shows.filter((s) => s.kind === 'tape');
   const popular = popularForBand(catalog, band.id, 10);
   const years = yearSpan(band.firstDate, band.lastDate);
+  const photo = bandPhoto(band);
   const source = `${band.name}, popular`;
 
   return (
@@ -49,7 +50,8 @@ export default async function BandPage({ params }: Params) {
         <div className="flex flex-col gap-5 px-4 pt-5 pb-6 sm:flex-row sm:items-end sm:gap-8 md:px-8 md:pt-10 md:pb-8">
           <BandArt
             name={band.name}
-            image={band.image}
+            image={photo}
+            fallback={band.image}
             palette={band.palette}
             priority
             className="w-40 shrink-0 border-[3px] border-ink sm:w-52 lg:w-64"

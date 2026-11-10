@@ -2,7 +2,7 @@ import Link from 'next/link';
 import clsx from 'clsx';
 import { BandArt } from './art/BandArt';
 import { NowPlayingMark } from './art/NowPlayingMark';
-import { formatRunTime, fountain, longDate, plural, shortDate, venueHref, yearSpan } from '@/lib/shows';
+import { bandPhoto, formatRunTime, fountain, longDate, plural, shortDate, venueHref, yearSpan } from '@/lib/shows';
 import type { BandModel, ShowModel } from '@/lib/types';
 
 /**
@@ -95,7 +95,8 @@ export function BandCard({ band, priority }: { band: BandModel; priority?: boole
     <Link href={`/bands/${encodeURIComponent(band.id)}`} className="group block min-w-0 outline-offset-4">
       <BandArt
         name={band.name}
-        image={band.image}
+        image={bandPhoto(band)}
+        fallback={band.image}
         palette={band.palette}
         priority={priority}
         className={clsx(

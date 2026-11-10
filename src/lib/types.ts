@@ -6,6 +6,8 @@ export type ArtistModel = {
   shortName: string;
   useShortName: boolean;
   image?: string;
+  /** A second photo, shown some of the time (like an artist's alternate pictures). */
+  altImage?: string;
   bio?: string;
   founded?: string;
   members?: BandMember[];
@@ -73,6 +75,8 @@ export type BandModel = {
   /** Long name when the display name is a short one ("RE" -> "Reaction Band"). */
   fullName: string | null;
   image: string | null;
+  /** Alternate band photo; pages sometimes show it instead of `image`. */
+  altImage: string | null;
   palette: number;
   showCount: number;
   trackCount: number;

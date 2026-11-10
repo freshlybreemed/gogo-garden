@@ -61,14 +61,18 @@ export async function renameTrack(showHref: string, trackId: string, title: stri
 /** Update a band's bio, start year and members. */
 export async function saveBandAbout(
   bandId: string,
-  about: { bio: string; founded: string; members: BandMember[] },
+  about: { bio: string; founded: string; members: BandMember[]; image?: string; altImage?: string },
 ): Promise<EditResult> {
   const href = `/bands/${encodeURIComponent(bandId)}`;
   return run(async () => {
     const user = await signedIn();
     const band = (await getCatalog()).bandById.get(bandId);
     if (!band) throw new EditError('Unknown band.');
-    return applyEdits(user, 'band', bandId, about, { label: band.name, href });
+    // Photos are pre-filled from what the page shows; only write them if someone changed them.
+    const changes: Record<string, unknown> = { bio: about.bio, founded: about.founded, members: about.members };
+    if (about.image !== undefined && about.image.trim() !== (band.image ?? '')) changes.image = about.image;
+    if (about.altImage !== undefined && about.altImage.trim() !== (band.altImage ?? '')) changes.altImage = about.altImage;
+    return applyEdits(user, 'band', bandId, changes, { label: band.name, href });
   }, [href]);
 }
 

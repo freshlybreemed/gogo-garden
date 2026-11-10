@@ -325,3 +325,8 @@ export function place(city: string | null, state: string | null) {
 export function trackWhen(t: { showDate: string | null; year?: string | null }): string | null {
   return shortDate(t.showDate) ?? t.year ?? null;
 }
+
+/** The band photo for this page view: the main one, or about a third of the time the alternate. */
+export function bandPhoto(band: { image: string | null; altImage: string | null }) {
+  return band.altImage && Math.random() < 0.34 ? band.altImage : band.image;
+}

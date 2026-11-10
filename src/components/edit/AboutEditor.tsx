@@ -15,6 +15,8 @@ export function AboutEditor({
   bio,
   founded,
   members,
+  image,
+  altImage,
   signedIn,
 }: {
   bandId: string;
@@ -22,10 +24,18 @@ export function AboutEditor({
   bio: string | null;
   founded: string | null;
   members: BandMember[];
+  image: string | null;
+  altImage: string | null;
   signedIn: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ bio: bio ?? '', founded: founded ?? '', members: members.length ? members : [blank()] });
+  const [form, setForm] = useState({
+    bio: bio ?? '',
+    founded: founded ?? '',
+    members: members.length ? members : [blank()],
+    image: image ?? '',
+    altImage: altImage ?? '',
+  });
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, start] = useTransition();
   const empty = !bio && !members.length;
@@ -80,6 +90,17 @@ export function AboutEditor({
         Started (year)
         <input value={form.founded} maxLength={40} onChange={(e) => setForm((f) => ({ ...f, founded: e.target.value }))} className={`${input} mt-1`} />
       </label>
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <label className="block text-[13px] font-semibold text-dust">
+          Main photo (link)
+          <input value={form.image} maxLength={500} placeholder="https://…" onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))} className={`${input} mt-1`} />
+        </label>
+        <label className="block text-[13px] font-semibold text-dust">
+          Alternate photo (link, shown sometimes)
+          <input value={form.altImage} maxLength={500} placeholder="https://…" onChange={(e) => setForm((f) => ({ ...f, altImage: e.target.value }))} className={`${input} mt-1`} />
+        </label>
+      </div>
 
       <fieldset className="mt-4">
         <legend className="text-[13px] font-semibold text-dust">Members</legend>

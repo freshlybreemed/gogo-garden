@@ -15,6 +15,7 @@ function toArtist(doc: WithId<Document>): ArtistModel {
     shortName: str(doc.shortName),
     useShortName: Boolean(doc.useShortName),
     image: doc.image ? String(doc.image) : undefined,
+    altImage: doc.altImage ? String(doc.altImage) : undefined,
     bio: str(doc.bio).trim() || undefined,
     founded: str(doc.founded).trim() || undefined,
     members: Array.isArray(doc.members)

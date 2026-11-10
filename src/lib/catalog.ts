@@ -250,6 +250,7 @@ async function load(): Promise<Catalog> {
       name: acc.name,
       fullName: acc.fullName,
       image,
+      altImage: acc.artist?.altImage ?? null,
       palette,
       showCount: bandShows.length,
       trackCount: acc.songs.length,
