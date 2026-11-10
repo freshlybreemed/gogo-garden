@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import { supabaseBrowser } from '@/lib/supabase/client';
@@ -8,7 +8,17 @@ import { finalizeUpload, type UploadInput } from '@/app/upload/actions';
 
 type Band = { id: number; name: string };
 type Venue = { slug: string; name: string };
-type Row = { file: File; title: string; duration: number; track: number | null; error?: string };
+type Row = {
+  id: string;
+  file: File;
+  title: string;
+  duration: number;
+  track: number | null;
+  error?: string;
+  /** Tags still being read from the file. */
+  reading?: boolean;
+  status?: 'queued' | 'uploading' | 'done' | 'failed';
+};
 
 const MAX_TRACKS = 40;
 const MAX_BYTES = 50 * 1024 * 1024;
@@ -27,7 +37,14 @@ async function readTags(file: File): Promise<Pick<Row, 'title' | 'duration' | 't
   const fallback = file.name.replace(/\.[^.]+$/, '').replace(/^\d{1,3}[\s._-]+/, '').trim();
   try {
     const { parseBlob } = await import('music-metadata');
-    const meta = await parseBlob(file, { duration: true, skipCovers: true });
+    // Phones can take ages on long VBR tapes: give up after 6s and use the file name.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const meta = await Promise.race([
+      parseBlob(file, { duration: true, skipCovers: true }),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error('slow')), 6000);
+      }),
+    ]).finally(() => clearTimeout(timer));
     return {
       title: meta.common.title?.trim() || fallback,
       duration: Math.round(meta.format.duration ?? 0),
@@ -57,27 +74,55 @@ export function UploadForm({ userId, bands, venues }: { userId: string; bands: B
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState('');
   const [error, setError] = useState('');
+  const [fileNote, setFileNote] = useState('');
+  const [bytes, setBytes] = useState({ done: 0, total: 0 });
+  const statusRef = useRef<HTMLDivElement>(null);
+
+  // Leaving mid-upload would strand half a tape: ask first.
+  useEffect(() => {
+    if (!busy) return;
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [busy]);
 
   const band = useMemo(() => bands.find((b) => norm(b.name) === norm(bandText)), [bands, bandText]);
   const venue = useMemo(() => venues.find((v) => norm(v.name) === norm(venueText)), [venues, venueText]);
   const isNewBand = bandText.trim().length > 0 && !band;
 
   async function addFiles(list: FileList | null) {
-    if (!list) return;
-    const picked = [...list].filter((f) => AUDIO.test(f.name));
-    const next = await Promise.all(
-      picked.map(async (file) => ({
-        file,
-        ...(await readTags(file)),
-        error: file.size > MAX_BYTES ? 'Over 50 MB' : undefined,
-      })),
+    if (!list || !list.length) return;
+    const all = [...list];
+    // Some phones hand over files without an extension; trust the MIME type then.
+    const picked = all.filter((f) => AUDIO.test(f.name) || /^audio\/(mpeg|mp3|mp4|x-m4a|aac)$/.test(f.type));
+    const skipped = all.length - picked.length;
+    setFileNote(
+      !picked.length
+        ? 'Those weren’t MP3 or M4A files, so nothing was added.'
+        : skipped
+          ? `Added ${picked.length}. Skipped ${skipped} that weren’t MP3 or M4A.`
+          : `Added ${picked.length} file${picked.length === 1 ? '' : 's'}. Reading titles…`,
     );
-    setRows((cur) =>
-      [...cur, ...next]
-        .sort((a, b) => (a.track ?? 999) - (b.track ?? 999) || a.file.name.localeCompare(b.file.name))
-        .slice(0, MAX_TRACKS),
+    if (!picked.length) return;
+    // Show the files right away; fill in titles and lengths as each one is read.
+    const fresh: Row[] = picked.map((file) => ({
+      id: crypto.randomUUID(),
+      file,
+      title: file.name.replace(/\.[^.]+$/, '').replace(/^\d{1,3}[\s._-]+/, '').trim(),
+      duration: 0,
+      track: null,
+      reading: true,
+      error: file.size > MAX_BYTES ? 'Over 50 MB' : undefined,
+    }));
+    setRows((cur) => [...cur, ...fresh].slice(0, MAX_TRACKS));
+    await Promise.all(
+      fresh.map(async (row) => {
+        const tags = await readTags(row.file);
+        setRows((cur) => cur.map((r) => (r.id === row.id ? { ...r, ...tags, reading: false } : r)));
+      }),
     );
-    setError(picked.length < list.length ? 'Only MP3 and M4A files are allowed; others were skipped.' : '');
+    setRows((cur) => [...cur].sort((a, b) => (a.track ?? 999) - (b.track ?? 999) || a.file.name.localeCompare(b.file.name)));
+    setFileNote((n) => n.replace(' Reading titles…', ''));
   }
 
   const move = (i: number, d: -1 | 1) =>
@@ -97,8 +142,12 @@ export function UploadForm({ userId, bands, venues }: { userId: string; bands: B
     if (!rows.length) return setError('Add at least one MP3.');
     if (rows.some((r) => r.error)) return setError('Remove the files marked in red first.');
     if (!attest) return setError('Check the box to confirm you can share these.');
+    if (rows.some((r) => r.reading)) return setError('Still reading the files. Give it a second.');
 
     setBusy(true);
+    setBytes({ done: 0, total: rows.reduce((n, r) => n + r.file.size, 0) });
+    setRows((cur) => cur.map((r) => ({ ...r, status: 'queued' })));
+    requestAnimationFrame(() => statusRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
     const supabase = supabaseBrowser();
     const uploadId = crypto.randomUUID();
     const folder = `${userId}/${uploadId}`;
@@ -106,12 +155,18 @@ export function UploadForm({ userId, bands, venues }: { userId: string; bands: B
       const tracks: UploadInput['tracks'] = [];
       for (const [i, r] of rows.entries()) {
         setProgress(`Uploading ${i + 1} of ${rows.length}: ${r.title}`);
+        setRows((cur) => cur.map((x) => (x.id === r.id ? { ...x, status: 'uploading' } : x)));
         const ext = r.file.name.match(/\.(mp3|m4a)$/i)?.[1].toLowerCase() ?? 'mp3';
         const path = `${folder}/${String(i + 1).padStart(2, '0')}-${slug(r.title)}.${ext}`;
         const { error: upErr } = await supabase.storage
           .from('uploads')
           .upload(path, r.file, { contentType: ext === 'm4a' ? 'audio/mp4' : 'audio/mpeg', upsert: false });
-        if (upErr) throw new Error(`“${r.title}” didn’t upload: ${upErr.message}`);
+        if (upErr) {
+          setRows((cur) => cur.map((x) => (x.id === r.id ? { ...x, status: 'failed' } : x)));
+          throw new Error(`“${r.title}” didn’t upload: ${upErr.message}`);
+        }
+        setRows((cur) => cur.map((x) => (x.id === r.id ? { ...x, status: 'done' } : x)));
+        setBytes((b) => ({ ...b, done: b.done + r.file.size }));
         tracks.push({ path, title: r.title, position: i + 1, duration: r.duration });
       }
       let coverPath: string | null = null;
@@ -138,12 +193,19 @@ export function UploadForm({ userId, bands, venues }: { userId: string; bands: B
         attest,
       });
       if (!res.ok) throw new Error(res.error);
+      setProgress('Done! Taking you to the band…');
       router.push(`/bands/${res.bandId}`);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(
+        /failed to fetch|network|load failed/i.test(msg)
+          ? 'Lost the connection mid-upload. Check your signal and tap the button to try again.'
+          : msg,
+      );
       setBusy(false);
       setProgress('');
+      setRows((cur) => cur.map((r) => (r.status === 'done' || r.status === 'failed' ? r : { ...r, status: undefined })));
     }
   }
 
@@ -202,16 +264,27 @@ export function UploadForm({ userId, bands, venues }: { userId: string; bands: B
         <label htmlFor="files" className="mt-2 flex min-h-28 cursor-pointer flex-col items-center justify-center border-2 border-dashed border-rule p-6 text-center hover:border-crank">
           <span className="poster text-[28px]">Drop the tape here</span>
           <span className="mt-1 text-[13px] text-dust">MP3 or M4A, up to 50 MB each. Titles and order come from the files; fix them below.</span>
-          <input id="files" type="file" accept=".mp3,.m4a,audio/mpeg,audio/mp4" multiple onChange={(e) => { void addFiles(e.currentTarget.files); e.currentTarget.value = ''; }} className="sr-only" />
+          <input id="files" type="file" accept=".mp3,.m4a,audio/mpeg,audio/mp4" multiple disabled={busy} onChange={(e) => { void addFiles(e.currentTarget.files); e.currentTarget.value = ''; }} className="sr-only" />
         </label>
+        {fileNote ? <p role="status" className="mt-2 text-[13px] font-semibold text-leaf-light">{fileNote}</p> : null}
         {rows.length ? (
           <ol className="mt-4 border-t border-rule">
             {rows.map((r, i) => (
-              <li key={`${r.file.name}-${i}`} className={clsx('grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 border-b border-rule py-1.5', r.error && 'bg-crank/10')}>
-                <span className="text-center text-[13px] text-dust tnum">{i + 1}</span>
+              <li key={r.id} className={clsx('grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 border-b border-rule py-1.5', (r.error || r.status === 'failed') && 'bg-crank/10', r.status === 'uploading' && 'bg-tape')}>
+                <span className="flex justify-center text-[13px] text-dust tnum" aria-label={r.status ?? undefined}>
+                  {r.status === 'done' ? (
+                    <span className="text-leaf-light">✓</span>
+                  ) : r.status === 'uploading' || r.reading ? (
+                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-dust border-t-crank" />
+                  ) : r.status === 'failed' ? (
+                    <span className="text-crank">!</span>
+                  ) : (
+                    i + 1
+                  )}
+                </span>
                 <span className="min-w-0">
                   <input value={r.title} aria-label={`Title for track ${i + 1}`} onChange={(e) => { const v = e.currentTarget.value; setRows((cur) => cur.map((x, j) => (j === i ? { ...x, title: v } : x))); }} className="h-9 w-full bg-transparent text-[15px] text-paper outline-none focus:border-b focus:border-crank" />
-                  <span className="block truncate text-[12px] text-dust">{r.error ?? r.file.name}{r.duration ? ` · ${Math.floor(r.duration / 60)}:${String(r.duration % 60).padStart(2, '0')}` : ''}</span>
+                  <span className="block truncate text-[12px] text-dust">{r.error ?? (r.reading ? 'Reading…' : r.status === 'uploading' ? 'Uploading…' : r.file.name)}{r.duration ? ` · ${Math.floor(r.duration / 60)}:${String(r.duration % 60).padStart(2, '0')}` : ''}</span>
                 </span>
                 <span className="flex text-[13px] font-semibold text-dust">
                   <button type="button" onClick={() => move(i, -1)} aria-label="Move up" className="h-9 w-8 hover:text-paper">↑</button>
@@ -238,9 +311,29 @@ export function UploadForm({ userId, bands, venues }: { userId: string; bands: B
         </label>
       </section>
 
-      <div>
+      <div ref={statusRef}>
         <p role="alert" className="min-h-[1.5em] text-[14px] font-semibold text-crank">{error}</p>
-        {progress ? <p role="status" className="text-[14px] text-dust">{progress}</p> : null}
+        {busy ? (
+          <div
+            className="fixed inset-x-0 bottom-[calc(56px+env(safe-area-inset-bottom))] z-50 border-t border-rule bg-tape p-4 shadow-[0_-8px_24px_rgba(0,0,0,.45)] md:static md:z-auto md:mb-3 md:border md:shadow-none"
+            role="status"
+            aria-live="polite"
+          >
+            <div className="flex items-center gap-3">
+              <span className="h-5 w-5 shrink-0 animate-spin rounded-full border-[3px] border-dust/40 border-t-crank" />
+              <p className="min-w-0 truncate text-[14px] font-semibold text-paper">{progress || 'Starting…'}</p>
+            </div>
+            <div className="mt-3 h-2 overflow-hidden bg-ink" aria-hidden="true">
+              <div
+                className="h-full bg-crank transition-[width] duration-500"
+                style={{ width: `${bytes.total ? Math.max(4, Math.round((bytes.done / bytes.total) * 100)) : 4}%` }}
+              />
+            </div>
+            <p className="mt-2 text-[12px] text-dust">
+              {bytes.total ? `${Math.round((bytes.done / bytes.total) * 100)}% · ` : ''}Keep this page open until it finishes.
+            </p>
+          </div>
+        ) : null}
         <button type="submit" disabled={busy} className="mt-2 h-12 bg-crank px-6 text-[16px] font-bold text-ink hover:bg-crank-hot disabled:opacity-60">
           {busy ? 'Uploading…' : 'Put it in the garden'}
         </button>

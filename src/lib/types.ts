@@ -63,6 +63,8 @@ export type TrackModel = {
   venueSlug: string | null;
   /** Cover: the show's album art, else the band photo, else null (gradient card). */
   image: string | null;
+  /** The band photo, to fall back on when the cover art won't load. */
+  bandImage: string | null;
 };
 
 export type BandModel = {

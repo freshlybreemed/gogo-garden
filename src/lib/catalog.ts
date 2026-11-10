@@ -224,6 +224,7 @@ async function load(): Promise<Catalog> {
         showDate: info.date,
         venueSlug: info.kind === 'live' ? first.venueSlug : null,
         image: s.imageUrl || showImage,
+        bandImage: image,
         year: s.year ?? showYear,
       }));
       for (const t of showTracks) {

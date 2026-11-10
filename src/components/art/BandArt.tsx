@@ -11,6 +11,8 @@ import { fountain } from '@/lib/shows';
 type Props = {
   name: string;
   image: string | null;
+  /** Tried when `image` won't load (e.g. the band photo behind a dead cover). */
+  fallback?: string | null;
   palette: number;
   className?: string;
   /** Eager-load above-the-fold art. */
@@ -36,17 +38,24 @@ function posterLines(name: string): string[] {
  * Band art: the photo run through the copier onto fluorescent split-fountain
  * stock, or, when there's no usable photo, a generated Globe-style name card.
  */
-export function BandArt({ name, image, palette, className, priority }: Props) {
-  const [failed, setFailed] = useState(false);
+export function BandArt({ name, image, fallback, palette, className, priority }: Props) {
+  // Cover first, then the fallback photo, then the name card.
+  const sources = [image, fallback].filter((s, i, a): s is string => Boolean(s) && a.indexOf(s) === i);
+  const [attempt, setAttempt] = useState(0);
+  const src = sources[attempt] ?? null;
+  const failed = !src;
+  const fail = () => setAttempt((n) => n + 1);
   const imgRef = useRef<HTMLImageElement>(null);
   // A server-rendered <img> can fail before hydration attaches onError.
   useEffect(() => {
     const img = imgRef.current;
-    if (img && img.complete && img.naturalWidth < 40) setFailed(true);
-  }, []);
-  const showPhoto = Boolean(image) && !failed;
+    if (img && img.complete && img.naturalWidth < 40) fail();
+  }, [src]);
+  // A new track or band: start over at its cover.
+  useEffect(() => setAttempt(0), [image, fallback]);
+  const showPhoto = !failed;
   // YouTube "hqdefault" thumbs are letterboxed 4:3; zoom past the bars.
-  const letterboxed = image ? /ytimg\.com|img\.youtube\.com/.test(image) : false;
+  const letterboxed = src ? /ytimg\.com|img\.youtube\.com/.test(src) : false;
 
   return (
     <div
@@ -55,16 +64,17 @@ export function BandArt({ name, image, palette, className, priority }: Props) {
     >
       {showPhoto ? (
         <img
+          key={src}
           ref={imgRef}
-          src={image!}
+          src={src!}
           alt=""
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
           referrerPolicy="no-referrer"
-          onError={() => setFailed(true)}
+          onError={fail}
           onLoad={(e) => {
             // Some dead links resolve to a 1x1 or tiny placeholder.
-            if (e.currentTarget.naturalWidth < 40) setFailed(true);
+            if (e.currentTarget.naturalWidth < 40) fail();
           }}
           className={clsx('xerox absolute inset-0 h-full w-full object-cover', letterboxed && 'scale-[1.36]')}
         />

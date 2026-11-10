@@ -109,7 +109,7 @@ function AudioEngine() {
       title: trackTitle(track),
       artist: track.bandName,
       album: [trackWhen(track), track.showName].filter(Boolean).join(' '),
-      artwork: track.image ? [{ src: track.image, sizes: '512x512' }] : [],
+      artwork: (track.image ?? track.bandImage) ? [{ src: (track.image ?? track.bandImage)!, sizes: '512x512' }] : [],
     });
     const handlers: [MediaSessionAction, MediaSessionActionHandler][] = [
       ['play', () => s().resume()],
@@ -268,7 +268,7 @@ function TrackChip({ track, className }: { track: TrackModel; className?: string
     const d = trackWhen(track);
     return (
       <span className={clsx('relative block shrink-0 overflow-hidden', className)} aria-hidden="true">
-        <BandArt name={track.bandName} image={track.image} palette={track.palette} className="absolute inset-0" />
+        <BandArt name={track.bandName} image={track.image} fallback={track.bandImage} palette={track.palette} className="absolute inset-0" />
         {d ? (
           <span className="absolute bottom-0 left-0 bg-ink px-1 font-display text-[10px] leading-[1.4] font-black text-paper tnum">
             {d}
@@ -487,7 +487,7 @@ function NowPlayingSheet({ track, onClose }: { track: TrackModel; onClose: () =>
       >
         {track.image ? (
           <>
-            <BandArt name={track.bandName} image={track.image} palette={track.palette} className="absolute inset-0" priority />
+            <BandArt name={track.bandName} image={track.image} fallback={track.bandImage} palette={track.palette} className="absolute inset-0" priority />
             <span className="relative mt-auto self-start bg-ink px-2 py-1 text-paper">
               <span className="poster block text-[40px] leading-[0.9]">{trackWhen(track) ?? 'Tape'}</span>
               <span className="block font-display text-[16px] leading-tight font-extrabold uppercase">{track.showName}</span>
