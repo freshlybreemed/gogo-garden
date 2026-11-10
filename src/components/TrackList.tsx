@@ -11,6 +11,7 @@ import { Equalizer } from './art/Equalizer';
 import { LikeButton } from './LikeButton';
 import { AddToPlaylist } from './AddToPlaylist';
 import { IconPause, IconPlay } from './icons';
+import { RenamePencil, RenameRow } from './edit/RenameTrack';
 
 type Props = {
   tracks: TrackModel[];
@@ -31,6 +32,9 @@ export function TrackList({ tracks, variant, source, className, initial }: Props
   const [expanded, setExpanded] = useState(false);
   const collapsible = initial !== undefined && tracks.length > initial;
   const visible = collapsible && !expanded ? tracks.slice(0, initial) : tracks;
+  // Per-song naming: which row is open, and names saved here (shown before the refresh lands).
+  const [renaming, setRenaming] = useState<string | null>(null);
+  const [named, setNamed] = useState<Record<string, string>>({});
 
   const { currentId, playing, toggleTrack } = usePlayerStore(
     useShallow((s) => ({
@@ -45,8 +49,8 @@ export function TrackList({ tracks, variant, source, className, initial }: Props
       <ol className="border-t border-rule">
         {visible.map((track, i) => {
           const isCurrent = track.id === currentId;
-          const title = trackTitle(track);
-          const placeholder = track.part !== null;
+          const title = named[track.id] ?? trackTitle(track);
+          const placeholder = track.part !== null && !named[track.id];
           return (
             <li
               key={track.id}
@@ -110,10 +114,22 @@ export function TrackList({ tracks, variant, source, className, initial }: Props
                 {variant === 'ranked' ? (
                   <span className="hidden w-20 text-right sm:block">{plural(track.streams, 'play')}</span>
                 ) : null}
+                {placeholder ? <RenamePencil onClick={() => setRenaming(track.id)} label={`Name ${title}`} /> : null}
                 <span className="w-12 text-right">{formatDuration(track.duration)}</span>
                 <AddToPlaylist url={track.url} title={title} className="hidden sm:inline-flex" />
                 <LikeButton url={track.url} title={title} />
               </span>
+              {renaming === track.id ? (
+                <RenameRow
+                  showHref={track.showHref}
+                  trackId={track.id}
+                  placeholder={title}
+                  onDone={(t) => {
+                    setRenaming(null);
+                    if (t) setNamed((n) => ({ ...n, [track.id]: t }));
+                  }}
+                />
+              ) : null}
             </li>
           );
         })}

@@ -143,6 +143,9 @@ export function Sidebar({ bands, initialLoggedIn }: { bands: NavBand[]; initialL
             <Link href="/upload" className="font-semibold text-paper hover:text-crank">
               Upload
             </Link>
+            <Link href="/feedback" className="text-dust hover:text-paper">
+              Feedback
+            </Link>
             <button type="button" onClick={signOut} className="font-semibold text-dust hover:text-paper">
               Log out
             </button>
@@ -154,6 +157,9 @@ export function Sidebar({ bands, initialLoggedIn }: { bands: NavBand[]; initialL
             </Link>
             <Link href="/signup" className="text-dust hover:text-paper">
               Sign up
+            </Link>
+            <Link href="/feedback" className="text-dust hover:text-paper">
+              Feedback
             </Link>
           </span>
         )}

@@ -53,6 +53,11 @@ export async function saveTrackTitles(showHref: string, titles: Record<string, s
   }, [showHref, '/']);
 }
 
+/** Name one track (the per-song pencil). */
+export async function renameTrack(showHref: string, trackId: string, title: string): Promise<EditResult> {
+  return saveTrackTitles(showHref, { [trackId]: title });
+}
+
 /** Update a band's bio, start year and members. */
 export async function saveBandAbout(
   bandId: string,

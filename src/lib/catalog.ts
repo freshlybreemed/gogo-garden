@@ -460,6 +460,18 @@ export function searchCatalog(c: Catalog, query: string) {
   return { bands, venues, shows: shows.slice(0, 24), tracks: allTracks.slice(0, 100), trackTotal: allTracks.length, order };
 }
 
+/** Shows with untitled cuts ("Part 3"), most untitled first. */
+export function untitledShows(c: Catalog, limit = 200) {
+  return c.shows
+    .map((show) => {
+      const tracks = c.tracksByShow.get(show.href) ?? [];
+      return { show, untitled: tracks.filter((t) => t.part !== null).length, total: tracks.length };
+    })
+    .filter((x) => x.untitled > 0)
+    .sort((a, b) => b.untitled - a.untitled || b.show.streams - a.show.streams)
+    .slice(0, limit);
+}
+
 export function sampleTracks(c: Catalog, n: number) {
   const pool = [...c.tracks];
   for (let i = pool.length - 1; i > 0; i--) {

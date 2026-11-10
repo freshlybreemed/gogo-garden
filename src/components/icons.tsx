@@ -171,3 +171,10 @@ export const IconPlaylistAdd = (p: P) => (
     <path d="M3 6h12M3 11h12M3 16h7M18 13v8M14 17h8" />
   </Icon>
 );
+
+export const IconPencil = (p: P) => (
+  <Icon {...p}>
+    <path d="M4 20l1-5L15.5 4.5l4 4L9 19z" />
+    <path d="M13 7l4 4" />
+  </Icon>
+);

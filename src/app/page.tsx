@@ -2,7 +2,8 @@ import Image from 'next/image';
 import { BandCard, SectionHead, ShowCard } from '@/components/cards';
 import { CrateButton } from '@/components/PlayButton';
 import { TrackList } from '@/components/TrackList';
-import { getCatalog, mostStreamed, recentlyAdded } from '@/lib/catalog';
+import Link from 'next/link';
+import { getCatalog, mostStreamed, recentlyAdded, untitledShows } from '@/lib/catalog';
 import { fountain, plural } from '@/lib/shows';
 
 /** Homepage banners: one is picked per visit. Each credits the night the photo came from. */
@@ -29,6 +30,8 @@ export default async function Home() {
   const catalog = await getCatalog();
   const recent = recentlyAdded(catalog, 10);
   const top = mostStreamed(catalog, 10);
+  const needNames = untitledShows(catalog, 4);
+  const untitledTotal = untitledShows(catalog).reduce((n, x) => n + x.untitled, 0);
   const bands = [...catalog.bands].filter((b) => b.trackCount > 0).sort((a, b) => b.trackCount - a.trackCount);
   const live = catalog.shows.filter((s) => s.kind === 'live');
   // Every show counts toward the span: exact date if we have it, else the release year.
@@ -103,6 +106,36 @@ export default async function Home() {
         </ul>
       </section>
 
+      {needNames.length ? (
+        <section aria-labelledby="name-these" className="mt-12 border-[3px] border-leaf/70 p-5 sm:p-6">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 id="name-these" className="poster text-[34px] sm:text-[40px]">
+                Help name these
+              </h2>
+              <p className="mt-1 max-w-[52ch] text-[14px] text-dust">
+                {plural(untitledTotal, 'cut')} on the tapes are still just “Part 3”. You were there. Know the song? Tap the pencil and name it.
+              </p>
+            </div>
+            <Link href="/name-these" className="text-[13px] font-semibold text-paper underline underline-offset-4 hover:text-leaf-light">
+              See all
+            </Link>
+          </div>
+          <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+            {needNames.map(({ show, untitled }) => (
+              <li key={show.key}>
+                <Link href={show.href} className="flex items-center justify-between gap-3 border border-rule px-3 py-2.5 hover:border-paper">
+                  <span className="min-w-0 truncate text-[14px] font-semibold text-paper">
+                    {show.bandName} · {show.album}
+                  </span>
+                  <span className="shrink-0 text-[12px] text-leaf-light tnum">{untitled} untitled</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       {top.length ? (
         <section aria-labelledby="top" className="mt-12">
           <SectionHead id="top" title="Most streamed" />
@@ -120,6 +153,14 @@ export default async function Home() {
           ))}
         </ul>
       </section>
+
+      <p className="mt-12 border-t border-rule pt-5 text-[14px] text-dust">
+        Ideas, something broken, or know more about a tape?{' '}
+        <Link href="/feedback?from=/" className="font-semibold text-paper underline underline-offset-4 hover:text-leaf-light">
+          Send feedback
+        </Link>
+        .
+      </p>
     </div>
   );
 }
