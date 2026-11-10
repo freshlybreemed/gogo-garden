@@ -158,11 +158,36 @@ async function load(): Promise<Catalog> {
   const tracks: TrackModel[] = [];
   const haystack = new Map<string, string>();
 
+  // Which bands use each cover, so a cover that belongs to one band can be spotted on another's tracks.
+  const coverBands = new Map<string, Map<string, number>>();
+  for (const acc of bandAcc.values())
+    for (const s of acc.songs) {
+      if (!s.imageUrl) continue;
+      const m = coverBands.get(s.imageUrl) ?? new Map<string, number>();
+      m.set(acc.id, (m.get(acc.id) ?? 0) + 1);
+      coverBands.set(s.imageUrl, m);
+    }
+
   for (const acc of bandAcc.values()) {
     const palette = paletteFor(acc.id + acc.name);
 
+    // Stray covers: art embedded in one release's files that got copied onto many tapes
+    // (one New Impressionz CD cover sat on 47 of their shows), or another band's flyer.
+    // Those tracks fall back to the show's real art, then the band photo.
+    const coverAlbums = new Map<string, Set<string>>();
+    for (const s of acc.songs) if (s.imageUrl) (coverAlbums.get(s.imageUrl) ?? coverAlbums.set(s.imageUrl, new Set()).get(s.imageUrl)!).add(s.album);
+    const stray = new Set<string>();
+    for (const [url, albums] of coverAlbums) {
+      if (url === acc.image) continue;
+      if (albums.size >= 3) stray.add(url);
+      const users = coverBands.get(url)!;
+      const owner = [...users].sort((a, b) => b[1] - a[1])[0][0];
+      if (owner !== acc.id) stray.add(url);
+    }
+    const cover = (s: SongDoc) => (s.imageUrl && !stray.has(s.imageUrl) ? s.imageUrl : '');
+
     // Fall back to the most common cover on the band's songs.
-    const image = acc.image ?? mostCommon(acc.songs.map((s) => s.imageUrl));
+    const image = acc.image ?? mostCommon(acc.songs.map(cover));
 
     const byAlbum = new Map<string, SongDoc[]>();
     for (const s of acc.songs) {
@@ -182,7 +207,7 @@ async function load(): Promise<Catalog> {
         venue: loose ? null : first.venue,
         aliases,
       });
-      const showImage = mostCommon(albumSongs.map((s) => s.imageUrl)) ?? image;
+      const showImage = mostCommon(albumSongs.map(cover)) ?? image;
       const showYear = info.date?.slice(0, 4) ?? (loose ? null : mostCommon(albumSongs.map((s) => s.year)));
       const slugBase = slugify([info.date, info.venue ?? info.title].filter(Boolean).join(' ')) || 'tape';
       const href = `/shows/${encodeURIComponent(acc.id)}/${slugBase}-${shortHash(album)}`;
@@ -224,7 +249,7 @@ async function load(): Promise<Catalog> {
         showName: info.kind === 'live' ? (info.venue ?? '') : info.title,
         showDate: info.date,
         venueSlug: info.kind === 'live' ? first.venueSlug : null,
-        image: s.imageUrl || showImage,
+        image: cover(s) || showImage,
         bandImage: image,
         year: s.year ?? showYear,
       }));

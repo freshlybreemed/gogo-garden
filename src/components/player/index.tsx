@@ -44,6 +44,23 @@ export default function Player({ initialLoggedIn = false }: { initialLoggedIn?: 
     useAppStore.getState().setSsrLoggedIn(initialLoggedIn);
   }, [initialLoggedIn]);
 
+  // Space plays/pauses from anywhere on the page, unless you're typing or on a button/link
+  // (where Space already means "press this").
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.code !== 'Space' && e.key !== ' ') return;
+      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = e.target as HTMLElement | null;
+      if (el?.closest('input, textarea, select, button, a, [contenteditable="true"], [role="slider"], [role="button"]')) return;
+      const { currentTrack, toggle } = usePlayerStore.getState();
+      if (!currentTrack) return;
+      e.preventDefault(); // don't scroll the page
+      toggle();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   return (
     <>
       <AudioEngine />
