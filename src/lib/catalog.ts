@@ -347,24 +347,116 @@ export function popularForBand(c: Catalog, bandId: string, limit: number) {
     .map(({ t }) => t);
 }
 
+export type SearchSection = 'bands' | 'venues' | 'shows' | 'tracks';
+
+/** Loose form for matching: lowercase, no punctuation, "impressionz" ~ "impressions", no "band"/"the". */
+function loose(s: string) {
+  return s
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .split(' ')
+    .filter((w) => w && w !== 'band' && w !== 'the')
+    .map((w) => w.replace(/z$/, 's'))
+    .join(' ');
+}
+
+/** How well `q` names `name`: 3 exact, 2 starts with, 1 contains every word, 0 no. */
+function nameScore(q: string, name: string) {
+  const a = loose(q);
+  const b = loose(name);
+  if (!a || !b) return 0;
+  if (a === b || a.replace(/ /g, '') === b.replace(/ /g, '')) return 3;
+  if (b.startsWith(a)) return 2;
+  return a.split(' ').every((w) => b.includes(w)) ? 1 : 0;
+}
+
+/** Full names and nicknames people search by, keyed by the band's name on the site. */
+const KNOWN_AS: Record<string, string[]> = {
+  BYB: ['Backyard Band', 'Backyard'],
+  TOB: ['TakeOva Band', 'Take Over Band'],
+  TCB: ['Total Control Band', 'TC Bounce'],
+  'New Impressionz': ['NIB', 'New Impressions'],
+  'New Vision': ['NVB'],
+  'Nexx Level': ['NLB', 'Next Level'],
+  'Tru Expressionz': ['TEB', 'True Expressions'],
+  'E.U.': ['EU', 'Experience Unlimited'],
+  'Rare Essence': ['RE'],
+  'Junkyard Band': ['JYB', 'Junkyard'],
+  NEG: ['Northeast Groovers'],
+  '3DB': ['Third Dimension Band'],
+  CCB: ['Critical Condition Band'],
+  Reaction: ['Reaction Band'],
+  Renegade: ['Renegade Band'],
+  'Chuck Brown': ['Chuck Brown and the Soul Searchers', 'Soul Searchers'],
+};
+
+/** Every name a band goes by: site name, full name, known nicknames, and "X, better known as" from the bio. */
+function bandNames(b: BandModel) {
+  const fromBio = b.bio?.match(/^([A-Z][^,.]{2,50}),? (?:better )?known as/)?.[1];
+  return [b.name, b.fullName, ...(KNOWN_AS[b.name] ?? []), fromBio].filter((n): n is string => Boolean(n));
+}
+
+const DATE_RE = /^(\d{1,2}[-/.]\d{1,2}([-/.]\d{2,4})?|(19|20)\d{2})$/;
+
+/**
+ * Search, plus a guess at what the person meant so the page can lead with it:
+ * a band name puts bands (and their shows) first, a date puts shows first,
+ * a venue puts venues first, a song title puts tracks first.
+ */
 export function searchCatalog(c: Catalog, query: string) {
   const q = query.trim().toLowerCase();
-  if (!q) return { bands: [], venues: [], shows: [], tracks: [], trackTotal: 0 };
+  const order: SearchSection[] = ['bands', 'venues', 'tracks', 'shows'];
+  if (!q) return { bands: [], venues: [], shows: [], tracks: [], trackTotal: 0, order };
   const words = q.split(/\s+/);
   const hit = (s: string) => words.every((w) => s.includes(w));
 
-  const bands = c.bands.filter((b) => hit(b.name.toLowerCase()));
-  const venues = c.venues.filter((v) => {
-    const doc = c.venueDocs.get(v.slug);
-    return hit([v.name, v.city ?? '', ...(doc?.aka ?? [])].join(' ').toLowerCase());
-  });
+  const scoredBands = c.bands
+    .map((b) => ({ b, score: Math.max(...bandNames(b).map((n) => nameScore(q, n))) }))
+    .filter((x) => x.score > 0)
+    .sort((x, y) => y.score - x.score || y.b.trackCount - x.b.trackCount);
+  const bands = scoredBands.map((x) => x.b);
+  const bandScore = scoredBands[0]?.score ?? 0;
+
+  const scoredVenues = c.venues
+    .map((v) => {
+      const doc = c.venueDocs.get(v.slug);
+      const names = [v.name, ...(doc?.aka ?? [])];
+      const score = Math.max(...names.map((n) => nameScore(q, n)), hit([v.name, v.city ?? '', ...(doc?.aka ?? [])].join(' ').toLowerCase()) ? 1 : 0);
+      return { v, score };
+    })
+    .filter((x) => x.score > 0)
+    .sort((x, y) => y.score - x.score || y.v.showCount - x.v.showCount);
+  const venues = scoredVenues.map((x) => x.v);
+  const venueScore = scoredVenues[0]?.score ?? 0;
+
+  const topBandIds = new Set(scoredBands.filter((x) => x.score === bandScore).map((x) => x.b.id));
   const shows = c.shows
-    .filter((s) => hit([s.bandName, s.album, s.venue ?? '', s.title, s.note ?? ''].join(' ').toLowerCase()))
+    .filter(
+      (s) =>
+        (bandScore >= 2 && topBandIds.has(s.bandId)) ||
+        hit([s.bandName, s.album, s.venue ?? '', s.title, s.note ?? ''].join(' ').toLowerCase()),
+    )
     .sort(byDateDesc);
+
   const allTracks = c.tracks.filter((t) => hit(c.haystack.get(t.id) ?? ''));
-  // Title matches first.
-  allTracks.sort((a, b) => Number(hit(b.title.toLowerCase())) - Number(hit(a.title.toLowerCase())));
-  return { bands, venues, shows: shows.slice(0, 24), tracks: allTracks.slice(0, 100), trackTotal: allTracks.length };
+  const titleScore = (t: TrackModel) => nameScore(q, t.title);
+  // Best title matches first, then most played.
+  allTracks.sort((a, b) => titleScore(b) - titleScore(a) || b.streams - a.streams);
+  const trackScore = allTracks.length ? titleScore(allTracks[0]) : 0;
+
+  const isDate = DATE_RE.test(q);
+  const score: Record<SearchSection, number> = {
+    bands: bands.length ? bandScore + 0.3 : -1, // a band name beats a same-named song
+    venues: venues.length ? venueScore + 0.2 : -1,
+    shows: shows.length ? (isDate ? 4 : bandScore >= 2 ? bandScore : 0.5) : -1,
+    tracks: allTracks.length ? (trackScore || 0.4) : -1,
+  };
+  // Shows sit right after their band when the search is a band name.
+  if (bandScore >= 2 && shows.length) score.shows = score.bands - 0.1;
+  order.sort((x, y) => score[y] - score[x]);
+
+  return { bands, venues, shows: shows.slice(0, 24), tracks: allTracks.slice(0, 100), trackTotal: allTracks.length, order };
 }
 
 export function sampleTracks(c: Catalog, n: number) {
