@@ -104,8 +104,10 @@ export type ShowModel = {
   duration: number;
   streams: number;
   addedAt: string;
-  /** Has songs added in the last 14 days. */
+  /** The whole show arrived in the last 14 days. */
   isNew: boolean;
+  /** Tracks added in the last 14 days (an older show that just gained a few shows "+N new"). */
+  newTracks: number;
   /** Year: the show date's, else the most common tag year (null for a Singles bucket). */
   year: string | null;
   /** Cover: most common album art on the show's songs, else the band photo. */

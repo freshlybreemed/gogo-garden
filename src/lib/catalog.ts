@@ -204,7 +204,8 @@ async function load(): Promise<Catalog> {
         duration: albumSongs.reduce((n, s) => n + s.duration, 0),
         streams: albumSongs.reduce((n, s) => n + s.streams, 0),
         addedAt: albumSongs.reduce((max, s) => (s.addedAt > max ? s.addedAt : max), ''),
-        isNew: albumSongs.some((s) => isNewSong(s, now)),
+        newTracks: albumSongs.filter((s) => isNewSong(s, now)).length,
+        isNew: albumSongs.every((s) => isNewSong(s, now)),
         image: showImage,
         year: showYear,
       };
@@ -326,7 +327,8 @@ async function load(): Promise<Catalog> {
 export function recentlyAdded(c: Catalog, limit: number) {
   // Every kind of tape counts: singles and undated PAs are new growth too.
   return [...c.shows]
-    .sort((a, b) => b.addedAt.localeCompare(a.addedAt) || byDateDesc(a, b))
+    // Whole new shows first, then older shows that just gained tracks.
+    .sort((a, b) => Number(b.isNew) - Number(a.isNew) || b.addedAt.localeCompare(a.addedAt) || byDateDesc(a, b))
     .slice(0, limit);
 }
 

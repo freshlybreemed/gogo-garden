@@ -66,10 +66,10 @@ export function ShowCard({ show, hideBand = false }: { show: ShowModel; hideBand
         ) : null}
         {show.note ? <span className="mt-1 line-clamp-1 text-[12.5px] italic">{show.note}</span> : null}
         <span className="mt-auto flex items-end justify-between gap-2 border-t border-ink/25 pt-1.5 text-[12px] font-medium">
-          {show.isNew ? (
+          {show.isNew || show.newTracks ? (
             <span className="flex items-center gap-1.5 truncate font-semibold">
               <NewDot />
-              Newly added
+              {show.isNew ? 'Newly added' : `+${show.newTracks} new track${show.newTracks === 1 ? '' : 's'}`}
             </span>
           ) : (
             <span className="tnum truncate">
@@ -176,10 +176,10 @@ export function ShowRows({ shows }: { shows: ShowModel[] }) {
                 </span>
               )}
               <span className="flex items-center gap-1.5 truncate text-[13px] text-dust">
-                {show.isNew ? (
+                {show.isNew || show.newTracks ? (
                   <span className="flex shrink-0 items-center gap-1.5 font-semibold text-leaf-light">
                     <NewDot />
-                    Newly added
+                    {show.isNew ? 'Newly added' : `+${show.newTracks} new`}
                   </span>
                 ) : null}
                 <span className="truncate">
