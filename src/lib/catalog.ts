@@ -240,7 +240,9 @@ async function load(): Promise<Catalog> {
     bandShows.sort(byDateDesc);
     shows.push(...bandShows);
     showsByBand.set(acc.id, bandShows);
-    const dates = bandShows.map((s) => s.date).filter((d): d is string => Boolean(d)).sort();
+    // Every track counts toward the span: its show date, else its own year. That way undated
+    // tapes and loose singles (which have no show-level year) still stretch it.
+    const dates = acc.songs.map((s) => s.showDate ?? s.year).filter((d): d is string => Boolean(d)).sort();
     bands.push({
       id: acc.id,
       name: acc.name,

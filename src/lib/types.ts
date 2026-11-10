@@ -13,7 +13,8 @@ export type ArtistModel = {
 };
 
 /** A known member of a band, from the researched write-up. */
-export type BandMember = { name: string; role: string | null; years: string | null };
+/** `social`: an Instagram @handle or a full https URL. */
+export type BandMember = { name: string; role: string | null; years: string | null; social?: string | null };
 export type BandSource = { title: string | null; url: string };
 
 /** Raw song document, lightly normalized (see queries.ts). */

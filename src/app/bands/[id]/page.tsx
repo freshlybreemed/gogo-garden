@@ -7,6 +7,7 @@ import { PlayButton } from '@/components/PlayButton';
 import { TrackList } from '@/components/TrackList';
 import { getCatalog, popularForBand } from '@/lib/catalog';
 import { fountain, plural, yearSpan } from '@/lib/shows';
+import { currentUser } from '@/lib/supabase/server';
 import type { ShowModel } from '@/lib/types';
 
 type Params = { params: Promise<{ id: string }> };
@@ -30,7 +31,7 @@ function byYear(shows: ShowModel[]) {
 
 export default async function BandPage({ params }: Params) {
   const { id } = await params;
-  const catalog = await getCatalog();
+  const [catalog, user] = await Promise.all([getCatalog(), currentUser()]);
   const band = catalog.bandById.get(decodeURIComponent(id));
   if (!band) notFound();
 
@@ -87,11 +88,11 @@ export default async function BandPage({ params }: Params) {
         {popular.length ? (
           <section aria-labelledby="popular">
             <SectionHead id="popular" title="Popular" />
-            <TrackList tracks={popular} variant="mixed" source={source} />
+            <TrackList tracks={popular} variant="mixed" source={source} initial={5} />
           </section>
         ) : null}
 
-        <BandAbout band={band} />
+        <BandAbout band={band} signedIn={Boolean(user)} />
 
         {live.length ? (
           <section aria-labelledby="shows" className="mt-12">

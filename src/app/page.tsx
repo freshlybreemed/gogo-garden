@@ -1,8 +1,29 @@
+import Image from 'next/image';
 import { BandCard, SectionHead, ShowCard } from '@/components/cards';
 import { CrateButton } from '@/components/PlayButton';
 import { TrackList } from '@/components/TrackList';
 import { getCatalog, mostStreamed, recentlyAdded } from '@/lib/catalog';
 import { fountain, plural } from '@/lib/shows';
+
+/** Homepage banners: one is picked per visit. Each credits the night the photo came from. */
+const BANNERS = [
+  {
+    src: '/images/hero-crank.jpg',
+    alt: 'A percussionist laughing mid-song in front of a Maryland flag at Crank Karaoke',
+    position: 'object-[50%_35%]',
+    kicker: 'Live at Crank Karaoke',
+    title: 'Where the pocket lives.',
+    by: { src: '/images/crank-karaoke.png', alt: 'Crank Karaoke', width: 600, height: 415, className: 'h-[56px] w-auto sm:h-[64px]' },
+  },
+  {
+    src: '/images/hero-930.jpg',
+    alt: 'A guitarist and dancers mid-song on stage at the 9:30 Club',
+    position: 'object-[38%_30%]',
+    kicker: 'CCB · Live at the 9:30 Club',
+    title: 'Live from the go‑go.',
+    by: { src: '/images/chicken-mumbo-sauce.png', alt: 'Chicken & Mumbo Sauce', width: 700, height: 376, className: 'h-[52px] w-auto sm:h-[66px]' },
+  },
+];
 
 export default async function Home() {
   const catalog = await getCatalog();
@@ -10,32 +31,63 @@ export default async function Home() {
   const top = mostStreamed(catalog, 10);
   const bands = [...catalog.bands].filter((b) => b.trackCount > 0).sort((a, b) => b.trackCount - a.trackCount);
   const live = catalog.shows.filter((s) => s.kind === 'live');
-  const years = live
-    .map((s) => s.date?.slice(0, 4))
+  // Every show counts toward the span: exact date if we have it, else the release year.
+  const years = catalog.shows
+    .map((s) => (s.date ?? s.year)?.slice(0, 4))
     .filter((y): y is string => Boolean(y))
     .sort();
-  const span = years.length ? `${years[0]} to ${years[years.length - 1]}` : null;
+  const banner = BANNERS[Math.floor(Math.random() * BANNERS.length)];
+  const span = years.length ? `${years[0]} to today` : null;
 
   return (
     <div className="px-4 pt-4 md:px-8 md:pt-8">
-      {/* The poster. Split-fountain stock, wood type, one call to action. */}
+      {/* The photo first: a live band in the pocket, printed warm like an old flyer. */}
       <section
         aria-labelledby="hero-title"
-        className="relative overflow-hidden px-5 pt-6 pb-6 text-ink sm:px-8 sm:pt-8 md:pb-8"
-        style={{ backgroundImage: fountain(0) }}
+        className="relative isolate flex min-h-[520px] flex-col justify-end overflow-hidden text-paper sm:min-h-[560px] lg:min-h-[620px]"
       >
-        <p className="font-display text-[18px] font-extrabold uppercase sm:text-[22px]">GoGo Garden presents</p>
-        <h1 id="hero-title" className="poster mt-1 text-[clamp(64px,15vw,184px)] leading-[0.84]">
-          The PA tapes
-        </h1>
-        <div className="mt-5 flex flex-col gap-5 border-t-[3px] border-ink pt-4 lg:flex-row lg:items-end lg:justify-between">
-          <p className="max-w-[34rem] font-display text-[22px] leading-[1.05] font-extrabold uppercase sm:text-[28px]">
-            {plural(live.length, 'live show')} from {plural(bands.length, 'band')}
-            {span ? `, ${span}` : ''}. Recorded off the board, live from the go‑go.
+        <Image
+          src={banner.src}
+          alt={banner.alt}
+          fill
+          priority
+          sizes="100vw"
+          className={`-z-20 object-cover ${banner.position} [filter:sepia(.3)_contrast(1.12)_saturate(1.15)_brightness(.92)]`}
+        />
+        <p className="absolute top-4 right-4 flex items-center gap-2.5 text-[11px] font-bold tracking-[.14em] text-paper/85 uppercase sm:top-5 sm:right-6">
+          <span className="hidden sm:inline">Brought to you by</span>
+          <Image src={banner.by.src} alt={banner.by.alt} width={banner.by.width} height={banner.by.height} className={`${banner.by.className} drop-shadow-[0_2px_6px_rgba(0,0,0,.6)]`} />
+        </p>
+        {/* Vignette and a dark floor for the type. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_35%,transparent_45%,rgba(0,0,0,.55)),linear-gradient(to_top,rgba(20,15,10,.92),rgba(20,15,10,.35)_45%,transparent_70%)]"
+        />
+        {/* Film grain. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 opacity-[.18] mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+          }}
+        />
+        <div className="px-5 pt-6 pb-6 sm:px-8 md:pb-8">
+          <p className="inline-block px-2 py-0.5 font-display text-[16px] font-extrabold uppercase text-ink sm:text-[18px]" style={{ backgroundImage: fountain(0) }}>
+            {banner.kicker}
           </p>
-          <div className="flex flex-col items-start gap-2">
-            <CrateButton />
-            <p className="text-[13px] font-medium">Plays 40 random tracks from the whole library.</p>
+          <h1 id="hero-title" className="poster mt-2 text-[clamp(52px,10vw,124px)] leading-[0.86]">
+            {banner.title}
+          </h1>
+          <div className="mt-4 flex flex-col gap-5 border-t-[3px] border-paper/80 pt-4 lg:flex-row lg:items-end lg:justify-between">
+            <p className="max-w-[34rem] font-display text-[20px] leading-[1.05] font-extrabold uppercase sm:text-[26px]">
+              {plural(live.length, 'live show')} from {plural(bands.length, 'band')}
+              {span ? `, ${span}` : ''}. Recorded off the board.
+            </p>
+            <div className="flex flex-col items-start gap-2">
+              <CrateButton />
+              <p className="text-[13px] font-medium text-paper/80">Plays 40 random tracks from the whole library.</p>
+            </div>
           </div>
         </div>
       </section>

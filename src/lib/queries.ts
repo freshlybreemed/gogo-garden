@@ -24,6 +24,7 @@ function toArtist(doc: WithId<Document>): ArtistModel {
             name: str(m.name).trim(),
             role: str(m.role).trim() || null,
             years: str(m.years).trim() || null,
+            social: str(m.social).trim() || null,
           }))
       : undefined,
     sources: Array.isArray(doc.sources)

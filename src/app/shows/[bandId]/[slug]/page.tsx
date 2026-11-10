@@ -5,8 +5,10 @@ import { SectionHead, ShowCard } from '@/components/cards';
 import { BandArt } from '@/components/art/BandArt';
 import { PlayButton } from '@/components/PlayButton';
 import { TrackList } from '@/components/TrackList';
+import { TitleEditor } from '@/components/edit/TitleEditor';
+import { currentUser } from '@/lib/supabase/server';
 import { getCatalog } from '@/lib/catalog';
-import { formatRunTime, fountain, longDate, plural, shortDate, venueHref } from '@/lib/shows';
+import { formatRunTime, fountain, longDate, plural, shortDate, trackTitle, venueHref } from '@/lib/shows';
 
 type Params = { params: Promise<{ bandId: string; slug: string }> };
 
@@ -25,7 +27,7 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
 }
 
 export default async function ShowPage(props: Params) {
-  const { catalog, show, tracks } = await findShow(props);
+  const [{ catalog, show, tracks }, user] = await Promise.all([findShow(props), currentUser()]);
   if (!show) notFound();
 
   const bandHref = `/bands/${encodeURIComponent(show.bandId)}`;
@@ -117,6 +119,11 @@ export default async function ShowPage(props: Params) {
             ? 'PA tapes run as one long set, so untitled cuts are numbered by their place on the tape.'
             : `Original album name: ${show.album}`}
         </p>
+        <TitleEditor
+          showHref={show.href}
+          signedIn={Boolean(user)}
+          tracks={tracks.map((t, i) => ({ id: t.id, position: i + 1, title: t.part !== null ? '' : trackTitle(t), placeholder: t.part !== null }))}
+        />
       </section>
 
       {nearby.length ? (
