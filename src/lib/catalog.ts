@@ -163,6 +163,10 @@ async function load(): Promise<Catalog> {
 
     // Fall back to the most common cover on the band's songs.
     const image = acc.image ?? mostCommon(acc.songs.map((s) => s.imageUrl));
+    // The band's photo pool: main, alternate, then extras. A show with no cover of its own
+    // takes one of these (always the same one for that show), so tapes don't all look alike.
+    const photos = [...new Set([acc.image, acc.artist?.altImage, ...(acc.artist?.photos ?? [])].filter((u): u is string => Boolean(u)))];
+    const poolFor = (key: string) => (photos.length > 1 ? photos[parseInt(shortHash(key), 36) % photos.length] : image);
 
     const byAlbum = new Map<string, SongDoc[]>();
     for (const s of acc.songs) {
@@ -182,7 +186,9 @@ async function load(): Promise<Catalog> {
         venue: loose ? null : first.venue,
         aliases,
       });
-      const showImage = mostCommon(albumSongs.map((s) => s.imageUrl)) ?? image;
+      // A "cover" that's just the band's main photo isn't album art: let the photo pool fill it.
+      const ownCover = (u: string) => (u && u !== acc.image ? u : '');
+      const showImage = mostCommon(albumSongs.map((s) => ownCover(s.imageUrl))) ?? poolFor(album);
       const showYear = info.date?.slice(0, 4) ?? (loose ? null : mostCommon(albumSongs.map((s) => s.year)));
       const slugBase = slugify([info.date, info.venue ?? info.title].filter(Boolean).join(' ')) || 'tape';
       const href = `/shows/${encodeURIComponent(acc.id)}/${slugBase}-${shortHash(album)}`;
@@ -224,7 +230,7 @@ async function load(): Promise<Catalog> {
         showName: info.kind === 'live' ? (info.venue ?? '') : info.title,
         showDate: info.date,
         venueSlug: info.kind === 'live' ? first.venueSlug : null,
-        image: s.imageUrl || showImage,
+        image: ownCover(s.imageUrl) || showImage,
         bandImage: image,
         year: s.year ?? showYear,
       }));
@@ -251,6 +257,7 @@ async function load(): Promise<Catalog> {
       fullName: acc.fullName,
       image,
       altImage: acc.artist?.altImage ?? null,
+      photos,
       palette,
       showCount: bandShows.length,
       trackCount: acc.songs.length,

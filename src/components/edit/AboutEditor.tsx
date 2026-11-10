@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { saveBandAbout } from '@/app/edit/actions';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import type { BandMember } from '@/lib/types';
 
 const blank = (): BandMember => ({ name: '', role: null, years: null, social: null });
@@ -16,7 +17,7 @@ export function AboutEditor({
   founded,
   members,
   image,
-  altImage,
+  photos,
   signedIn,
 }: {
   bandId: string;
@@ -25,7 +26,8 @@ export function AboutEditor({
   founded: string | null;
   members: BandMember[];
   image: string | null;
-  altImage: string | null;
+  /** The band's whole photo pool, main first. */
+  photos: string[];
   signedIn: boolean;
 }) {
   const [open, setOpen] = useState(false);
@@ -34,9 +36,38 @@ export function AboutEditor({
     founded: founded ?? '',
     members: members.length ? members : [blank()],
     image: image ?? '',
-    altImage: altImage ?? '',
+    photos: photos.filter((p) => p !== image),
   });
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [link, setLink] = useState('');
+  const [uploading, setUploading] = useState('');
+
+  async function uploadPhotos(files: FileList | null) {
+    if (!files?.length) return;
+    const supabase = supabaseBrowser();
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return setMsg({ ok: false, text: 'Log in to add photos.' });
+    const added: string[] = [];
+    for (const [i, file] of [...files].slice(0, 12).entries()) {
+      if (!/^image\/(jpeg|png|webp)$/.test(file.type)) continue;
+      if (file.size > 15 * 1024 * 1024) continue;
+      setUploading(`Uploading photo ${i + 1} of ${Math.min(files.length, 12)}…`);
+      const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+      const path = `${data.user.id}/band-photos/${bandId}-${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from('uploads').upload(path, file, { contentType: file.type });
+      if (error) {
+        setMsg({ ok: false, text: `A photo didn’t upload: ${error.message}` });
+        continue;
+      }
+      added.push(supabase.storage.from('uploads').getPublicUrl(path).data.publicUrl);
+    }
+    setUploading('');
+    if (added.length) {
+      setForm((f) => ({ ...f, photos: [...f.photos, ...added] }));
+      setMsg({ ok: true, text: `Added ${added.length} photo${added.length === 1 ? '' : 's'}. Hit Save to keep them.` });
+    }
+  }
+
   const [pending, start] = useTransition();
   const empty = !bio && !members.length;
   const href = `/bands/${encodeURIComponent(bandId)}`;
@@ -91,16 +122,53 @@ export function AboutEditor({
         <input value={form.founded} maxLength={40} onChange={(e) => setForm((f) => ({ ...f, founded: e.target.value }))} className={`${input} mt-1`} />
       </label>
 
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <label className="block text-[13px] font-semibold text-dust">
-          Main photo (link)
-          <input value={form.image} maxLength={500} placeholder="https://…" onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))} className={`${input} mt-1`} />
-        </label>
-        <label className="block text-[13px] font-semibold text-dust">
-          Alternate photo (link, shown sometimes)
-          <input value={form.altImage} maxLength={500} placeholder="https://…" onChange={(e) => setForm((f) => ({ ...f, altImage: e.target.value }))} className={`${input} mt-1`} />
-        </label>
-      </div>
+      <label className="mt-3 block max-w-[30rem] text-[13px] font-semibold text-dust">
+        Main photo (link)
+        <input value={form.image} maxLength={500} placeholder="https://…" onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))} className={`${input} mt-1`} />
+      </label>
+
+      <fieldset className="mt-4">
+        <legend className="text-[13px] font-semibold text-dust">More photos ({form.photos.length})</legend>
+        <p className="mt-0.5 text-[12.5px] text-dust">Tapes without a cover borrow these, and band cards rotate through them. Shows, flyers, the band on stage.</p>
+        {form.photos.length ? (
+          <ul className="mt-2 flex flex-wrap gap-2">
+            {form.photos.map((u) => (
+              <li key={u} className="relative">
+                {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary photo hosts */}
+                <img src={u} alt="" referrerPolicy="no-referrer" className="h-20 w-20 border border-rule object-cover" />
+                <button
+                  type="button"
+                  aria-label="Remove photo"
+                  onClick={() => setForm((f) => ({ ...f, photos: f.photos.filter((p) => p !== u) }))}
+                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-ink text-[12px] text-paper ring-1 ring-rule hover:bg-crank hover:text-ink"
+                >
+                  ✕
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <label className="cursor-pointer border border-rule px-3 py-2 text-[13px] font-semibold text-paper hover:bg-tape">
+            Upload photos
+            <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" onChange={(e) => { void uploadPhotos(e.currentTarget.files); e.currentTarget.value = ''; }} />
+          </label>
+          <input value={link} onChange={(e) => setLink(e.target.value)} placeholder="or paste an image link" className={`${input} max-w-[18rem]`} />
+          <button
+            type="button"
+            onClick={() => {
+              const u = link.trim();
+              if (!/^https:\/\/\S+$/.test(u)) return setMsg({ ok: false, text: 'Paste an https image link.' });
+              setForm((f) => ({ ...f, photos: [...new Set([...f.photos, u])] }));
+              setLink('');
+            }}
+            className="px-2 text-[13px] font-semibold text-paper underline underline-offset-4"
+          >
+            Add link
+          </button>
+          {uploading ? <span className="text-[13px] text-dust">{uploading}</span> : null}
+        </div>
+      </fieldset>
 
       <fieldset className="mt-4">
         <legend className="text-[13px] font-semibold text-dust">Members</legend>

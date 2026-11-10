@@ -326,7 +326,9 @@ export function trackWhen(t: { showDate: string | null; year?: string | null }):
   return shortDate(t.showDate) ?? t.year ?? null;
 }
 
-/** The band photo for this page view: the main one, or about a third of the time the alternate. */
-export function bandPhoto(band: { image: string | null; altImage: string | null }) {
-  return band.altImage && Math.random() < 0.34 ? band.altImage : band.image;
+/** The band photo for this page view: the main one about half the time, else another from the pool. */
+export function bandPhoto(band: { image: string | null; photos: string[] }) {
+  const others = band.photos.filter((p) => p !== band.image);
+  if (!others.length || Math.random() < 0.5) return band.image;
+  return others[Math.floor(Math.random() * others.length)];
 }

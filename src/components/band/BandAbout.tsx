@@ -75,7 +75,7 @@ export function BandAbout({ band, signedIn }: { band: BandModel; signedIn: boole
         founded={band.founded}
         members={band.members}
         image={band.image}
-        altImage={band.altImage}
+        photos={band.photos}
         signedIn={signedIn}
       />
     </section>

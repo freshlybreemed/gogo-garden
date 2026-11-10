@@ -11,8 +11,8 @@ import type { BandMember } from './types';
  */
 
 export type EditEntity = 'track' | 'band';
-export type EditField = 'title' | 'bio' | 'founded' | 'members' | 'image' | 'altImage';
-type Value = string | BandMember[] | null;
+export type EditField = 'title' | 'bio' | 'founded' | 'members' | 'image' | 'altImage' | 'photos';
+type Value = string | string[] | BandMember[] | null;
 
 export type EditRow = {
   id: string;
@@ -35,7 +35,7 @@ export type EditRow = {
 };
 
 const DAILY_LIMIT = 300;
-const FIELDS: Record<EditEntity, EditField[]> = { track: ['title'], band: ['bio', 'founded', 'members', 'image', 'altImage'] };
+const FIELDS: Record<EditEntity, EditField[]> = { track: ['title'], band: ['bio', 'founded', 'members', 'image', 'altImage', 'photos'] };
 
 export class EditError extends Error {}
 
@@ -66,6 +66,13 @@ export function normalise(field: EditField, raw: unknown): Value {
       if (!v) return null;
       if (!/^https:\/\/\S+$/.test(v)) throw new EditError('The photo has to be an https link.');
       return v;
+    }
+    case 'photos': {
+      if (!Array.isArray(raw)) throw new EditError('Photos must be a list.');
+      const list = [...new Set(raw.map((u) => clean(u, 500)).filter(Boolean))];
+      if (list.length > 24) throw new EditError('24 photos max per band.');
+      for (const u of list) if (!/^https:\/\/\S+$/.test(u)) throw new EditError('Each photo has to be an https link.');
+      return list;
     }
     case 'members': {
       if (!Array.isArray(raw)) throw new EditError('Members must be a list.');
@@ -117,6 +124,7 @@ async function target(entity: EditEntity, entityId: string) {
 function current(doc: Record<string, unknown>, field: EditField): Value {
   const v = doc[field];
   if (field === 'members') return normalise('members', Array.isArray(v) ? v : []);
+  if (field === 'photos') return Array.isArray(v) ? v.map(String) : [];
   const s = v === undefined || v === null ? '' : String(v).trim();
   return s || null;
 }

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { revertEdit } from '@/app/edit/actions';
 import type { BandMember } from '@/lib/types';
 
-type Value = string | BandMember[] | null;
+type Value = string | string[] | BandMember[] | null;
 type Row = {
   id: string;
   at: string;
@@ -22,11 +22,24 @@ type Row = {
 
 function show(v: Value) {
   if (v === null || v === '') return <span className="italic text-dust">empty</span>;
+  if (Array.isArray(v) && v.every((x) => typeof x === 'string')) {
+    const urls = v as string[];
+    if (!urls.length) return <span className="italic text-dust">no photos</span>;
+    return (
+      <span className="flex flex-wrap gap-1.5">
+        {urls.map((u) => (
+          // eslint-disable-next-line @next/next/no-img-element -- arbitrary photo hosts
+          <img key={u} src={u} alt="" className="h-12 w-12 object-cover" referrerPolicy="no-referrer" />
+        ))}
+      </span>
+    );
+  }
   if (Array.isArray(v)) {
-    if (!v.length) return <span className="italic text-dust">no members</span>;
+    const members = v as BandMember[];
+    if (!members.length) return <span className="italic text-dust">no members</span>;
     return (
       <ul className="space-y-0.5">
-        {v.map((m, i) => (
+        {members.map((m, i) => (
           <li key={i}>
             {m.name}
             <span className="text-dust">{[m.role, m.years, m.social].filter(Boolean).length ? ` — ${[m.role, m.years, m.social].filter(Boolean).join(', ')}` : ''}</span>

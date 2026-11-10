@@ -8,6 +8,8 @@ export type ArtistModel = {
   image?: string;
   /** A second photo, shown some of the time (like an artist's alternate pictures). */
   altImage?: string;
+  /** More band photos: they fill in for shows that have no cover, and rotate on band cards. */
+  photos?: string[];
   bio?: string;
   founded?: string;
   members?: BandMember[];
@@ -77,6 +79,8 @@ export type BandModel = {
   image: string | null;
   /** Alternate band photo; pages sometimes show it instead of `image`. */
   altImage: string | null;
+  /** Every band photo, main first (main, alternate, then the rest). */
+  photos: string[];
   palette: number;
   showCount: number;
   trackCount: number;
