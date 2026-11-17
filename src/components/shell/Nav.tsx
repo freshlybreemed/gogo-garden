@@ -10,7 +10,7 @@ import { useLikesStore } from '@/stores/LikesStore';
 import { usePlaylistsStore } from '@/stores/PlaylistsStore';
 import { fountain } from '@/lib/shows';
 import { Equalizer } from '../art/Equalizer';
-import { IconBands, IconHome, IconPin, IconSearch, IconTrophy, IconUser } from '../icons';
+import { IconBands, IconHome, IconPin, IconSearch, IconTape, IconTrophy, IconUser } from '../icons';
 
 export type NavBand = { id: string; name: string; palette: number; showCount: number; isNew: boolean };
 
@@ -20,6 +20,7 @@ const LINKS = [
   { href: '/bands', label: 'Bands', icon: IconBands },
   { href: '/venues', label: 'Venues', icon: IconPin },
   { href: '/leaderboard', label: 'Leaderboard', short: 'Top', icon: IconTrophy },
+  { href: '/palace', label: 'PA Palace', short: 'Palace', icon: IconTape },
 ] as const;
 
 function isActive(pathname: string, href: string) {
@@ -219,7 +220,7 @@ export function TabBar() {
         'after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-[120px] after:bg-tar',
       )}
     >
-      <ul className="grid h-14 grid-cols-5">
+      <ul className="grid h-14 grid-cols-6">
         {LINKS.map((link) => {
           const { href, icon: Icon } = link;
           const label = 'short' in link ? link.short : link.label;

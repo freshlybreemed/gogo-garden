@@ -184,3 +184,12 @@ export const IconTrophy = (p: P) => (
     <path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H3v2a4 4 0 0 0 4 4M17 6h4v2a4 4 0 0 1-4 4M12 14v4M8 21h8" />
   </Icon>
 );
+
+export const IconTape = (p: P) => (
+  <Icon {...p}>
+    <rect x="3" y="6" width="18" height="12" />
+    <circle cx="9" cy="12" r="2" />
+    <circle cx="15" cy="12" r="2" />
+    <path d="M9 14h6" />
+  </Icon>
+);
