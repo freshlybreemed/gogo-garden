@@ -1,11 +1,11 @@
 {
   "source": "PA Palace Music",
   "base": "https://papalace.com",
-  "fetchedAt": "2026-11-17T08:56:10.445Z",
+  "fetchedAt": "2026-11-17T16:34:39.373Z",
   "tapes": [
     {
       "id": 2606,
-      "band": "Mab 2 0 Martinis",
+      "band": "Mental Attraction",
       "date": "2025-11-28",
       "venue": null,
       "title": "MAB 2.0 Martinis 11-28-25",
@@ -25,7 +25,7 @@
     },
     {
       "id": 2612,
-      "band": "Faycez U Know Dominion Raceway",
+      "band": "Faycez-U-Know",
       "date": "2025-11-17",
       "venue": null,
       "title": "Faycez-U-Know Dominion Raceway 11-17-25",
@@ -105,7 +105,7 @@
     },
     {
       "id": 1587,
-      "band": "Faycez U Know",
+      "band": "Faycez-U-Know",
       "date": "2024-12-20",
       "venue": "Da Burg",
       "title": "Faycez-U-Know 12-20-24 Da Burg",
@@ -120,7 +120,7 @@
     },
     {
       "id": 2088,
-      "band": "Ne Groovers",
+      "band": "Northeast Groovers",
       "date": "2024-09-01",
       "venue": "St Charles Fairgrounds",
       "title": "NE Groovers 9-1-24 St Charles Fairgrounds",
@@ -170,7 +170,7 @@
     },
     {
       "id": 489,
-      "band": "Ne Groovers",
+      "band": "Northeast Groovers",
       "date": "2024-05-18",
       "venue": "Diamond Lounge",
       "title": "NE Groovers 5-18-24 Diamond Lounge",
@@ -225,7 +225,7 @@
     },
     {
       "id": 491,
-      "band": "Ne Groovers",
+      "band": "Northeast Groovers",
       "date": "2023-07-02",
       "venue": "Five Sisters",
       "title": "NE Groovers 7-2-23 Five Sisters",
@@ -255,7 +255,7 @@
     },
     {
       "id": 492,
-      "band": "Ne Groovers",
+      "band": "Northeast Groovers",
       "date": "2023-02-24",
       "venue": "Babylon",
       "title": "NE Groovers 2-24-23 Babylon",
@@ -335,7 +335,7 @@
     },
     {
       "id": 634,
-      "band": "A Team",
+      "band": "A-Team",
       "date": "2022-07-02",
       "venue": "Marlboro Club",
       "title": "A-Team 7-2-22 Marlboro Club",
@@ -350,7 +350,7 @@
     },
     {
       "id": 601,
-      "band": "Faycez U Know",
+      "band": "Faycez-U-Know",
       "date": "2022-05-28",
       "venue": "Dominion Raceway",
       "title": "Faycez U Know 5-28-22 Dominion Raceway",
@@ -370,7 +370,7 @@
     },
     {
       "id": 470,
-      "band": "What",
+      "band": "What Band",
       "date": "2022-03-09",
       "venue": "Fast Eddies",
       "title": "What 3-9-22 Fast Eddies",
@@ -400,7 +400,7 @@
     },
     {
       "id": 469,
-      "band": "What",
+      "band": "What Band",
       "date": "2022-02-27",
       "venue": "Martinis",
       "title": "What 2-27-22 Martinis",
@@ -415,7 +415,7 @@
     },
     {
       "id": 606,
-      "band": "Faycez U Know",
+      "band": "Faycez-U-Know",
       "date": "2022-02-18",
       "venue": "Babylon",
       "title": "Faycez U Know 2-18-22 Babylon",
@@ -450,7 +450,7 @@
     },
     {
       "id": 483,
-      "band": "What Nipseys",
+      "band": "What Band",
       "date": "2021-12-16",
       "venue": null,
       "title": "What Nipseys 12-16-21",
@@ -530,7 +530,7 @@
     },
     {
       "id": 2188,
-      "band": "Da Mixx",
+      "band": "DaMixx",
       "date": "2021-07-23",
       "venue": "Vfw",
       "title": "Da Mixx 7-23-21 VFW",
@@ -575,7 +575,7 @@
     },
     {
       "id": 636,
-      "band": "A Team",
+      "band": "A-Team",
       "date": "2021-04-15",
       "venue": "El Rancho",
       "title": "A-Team 4-15-21 El Rancho",
@@ -670,7 +670,7 @@
     },
     {
       "id": 1135,
-      "band": "R S Project",
+      "band": "R N S Project",
       "date": "2019-02-16",
       "venue": "Paradigm",
       "title": "R & S Project 2-16-19 Paradigm",
@@ -690,7 +690,7 @@
     },
     {
       "id": 920,
-      "band": "Sirius Vybe",
+      "band": "Sirius Company",
       "date": "2018-10-18",
       "venue": "Society Lounge",
       "title": "Sirius Vybe 10-18-18 Society Lounge",
@@ -730,7 +730,7 @@
     },
     {
       "id": 2272,
-      "band": "Re Up Band",
+      "band": "RE-Up Band",
       "date": "2018-05-12",
       "venue": "Infuse",
       "title": "RE-Up Band 5-12-18 Infuse",
@@ -745,7 +745,7 @@
     },
     {
       "id": 503,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "2017-10-19",
       "venue": "Club Xs",
       "title": "Backyard 10-19-17 Club XS",
@@ -765,7 +765,7 @@
     },
     {
       "id": 1698,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "2017-09-28",
       "venue": "Xs",
       "title": "Backyard 9-28-17 XS",
@@ -825,7 +825,7 @@
     },
     {
       "id": 1701,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "2016-05-13",
       "venue": "Aqua",
       "title": "Backyard 5-13-16 Aqua",
@@ -880,7 +880,7 @@
     },
     {
       "id": 1703,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "2014-11-14",
       "venue": "Ibiza",
       "title": "Backyard 11-14-14 Ibiza",
@@ -900,7 +900,7 @@
     },
     {
       "id": 2259,
-      "band": "Ne Groovers",
+      "band": "Northeast Groovers",
       "date": "2014-05-17",
       "venue": null,
       "title": "NE Groovers 5-17-14",
@@ -1015,7 +1015,7 @@
     },
     {
       "id": 1704,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "2010-10-28",
       "venue": "Morgan State",
       "title": "Backyard 10-28-10 Morgan State",
@@ -1030,7 +1030,7 @@
     },
     {
       "id": 1820,
-      "band": "Lissen 2 0 My Place",
+      "band": "Lissen 2.0",
       "date": "2010-10-11",
       "venue": null,
       "title": "Lissen 2.0 My Place 10-11-10",
@@ -1050,7 +1050,7 @@
     },
     {
       "id": 3044,
-      "band": "Junkyard",
+      "band": "Junkyard Band",
       "date": "2010-08-07",
       "venue": "Capitol Skyline Hotel",
       "title": "Junkyard 8-7-10 Capitol Skyline Hotel",
@@ -1105,7 +1105,7 @@
     },
     {
       "id": 3001,
-      "band": "Tcb",
+      "band": "TCB",
       "date": "2009-07-26",
       "venue": "La Pearla",
       "title": "TCB 7-26-09 La Pearla",
@@ -1160,7 +1160,7 @@
     },
     {
       "id": 1073,
-      "band": "Junkyard",
+      "band": "Junkyard Band",
       "date": "2006-10-28",
       "venue": "Club Xs",
       "title": "Junkyard 10-28-06 Club XS",
@@ -1255,7 +1255,7 @@
     },
     {
       "id": 2941,
-      "band": "Ccb",
+      "band": "CCB",
       "date": "2005-10-01",
       "venue": null,
       "title": "CCB 10-1-05",
@@ -1290,7 +1290,7 @@
     },
     {
       "id": 2989,
-      "band": "Mob",
+      "band": "M.O.B.",
       "date": "2005-07-02",
       "venue": "Mad Chef",
       "title": "MOB 7-2-05 Mad Chef",
@@ -1310,7 +1310,7 @@
     },
     {
       "id": 2983,
-      "band": "Mob",
+      "band": "M.O.B.",
       "date": "2005-07-01",
       "venue": "Culture Club",
       "title": "MOB 7-1-05 Culture Club",
@@ -1330,7 +1330,7 @@
     },
     {
       "id": 2977,
-      "band": "Mob",
+      "band": "M.O.B.",
       "date": "2005-06-26",
       "venue": null,
       "title": "MOB 6-26-05",
@@ -1350,7 +1350,7 @@
     },
     {
       "id": 1171,
-      "band": "Tcb",
+      "band": "TCB",
       "date": "2005-06-19",
       "venue": "Club Levels",
       "title": "TCB 6-19-2005 Club Levels",
@@ -1370,7 +1370,7 @@
     },
     {
       "id": 2971,
-      "band": "Mob",
+      "band": "M.O.B.",
       "date": "2005-05-27",
       "venue": "Culture Club",
       "title": "MOB 5-27-05 Culture Club",
@@ -1390,7 +1390,7 @@
     },
     {
       "id": 851,
-      "band": "Lil Benny Reunion",
+      "band": "Lil Benny",
       "date": "2005-05-21",
       "venue": "Cfe",
       "title": "Lil Benny Reunion 5-21-05 CFE",
@@ -1420,7 +1420,7 @@
     },
     {
       "id": 2266,
-      "band": "Ybi",
+      "band": "Young Black Image (YBI)",
       "date": "2005-04-30",
       "venue": "Good Food",
       "title": "YBI 4-30-05 Good Food",
@@ -1435,7 +1435,7 @@
     },
     {
       "id": 2965,
-      "band": "Mob",
+      "band": "M.O.B.",
       "date": "2005-02-21",
       "venue": "Club Levels",
       "title": "MOB 2-21-05 Club Levels",
@@ -1455,7 +1455,7 @@
     },
     {
       "id": 2870,
-      "band": "M O B",
+      "band": "M.O.B.",
       "date": "2005-02-15",
       "venue": "Carroll High School",
       "title": "M.O.B. 2-15-05 Carroll High School",
@@ -1470,7 +1470,7 @@
     },
     {
       "id": 2862,
-      "band": "Tcb",
+      "band": "TCB",
       "date": "2005-01-02",
       "venue": "Club Levels",
       "title": "TCB 1-2-05 Club Levels",
@@ -1490,7 +1490,7 @@
     },
     {
       "id": 2960,
-      "band": "Mob",
+      "band": "M.O.B.",
       "date": "2004-12-12",
       "venue": "Mad Chef Cafe",
       "title": "MOB 12-12-04 Mad Chef Cafe",
@@ -1505,7 +1505,7 @@
     },
     {
       "id": 761,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "2004-09-29",
       "venue": "Cuzcos",
       "title": "Backyard 9-29-04 Cuzcos",
@@ -1520,7 +1520,7 @@
     },
     {
       "id": 2954,
-      "band": "Mob",
+      "band": "M.O.B.",
       "date": "2004-06-22",
       "venue": "Suitland Dance Hall",
       "title": "MOB 6-22-04 Suitland Dance Hall",
@@ -1540,7 +1540,7 @@
     },
     {
       "id": 659,
-      "band": "Ucb",
+      "band": "UCB",
       "date": "2004-04-06",
       "venue": "Club Neon",
       "title": "UCB 4-6-04 Club Neon",
@@ -1560,7 +1560,7 @@
     },
     {
       "id": 2935,
-      "band": "Ccb",
+      "band": "CCB",
       "date": "2004-03-26",
       "venue": "Club Neon",
       "title": "CCB 3-26-05 Club Neon",
@@ -1575,7 +1575,7 @@
     },
     {
       "id": 661,
-      "band": "Ucb",
+      "band": "UCB",
       "date": "2003-12-12",
       "venue": "Suitland Dancehall",
       "title": "UCB 12-12-03 Suitland Dancehall",
@@ -1595,7 +1595,7 @@
     },
     {
       "id": 748,
-      "band": "911 Club U",
+      "band": "911",
       "date": "2003-10-30",
       "venue": null,
       "title": "911 Club U 10-30-03",
@@ -1630,7 +1630,7 @@
     },
     {
       "id": 747,
-      "band": "911 Cada Vez",
+      "band": "911",
       "date": "2003-05-07",
       "venue": null,
       "title": "911 Cada Vez 5-7-03",
@@ -1650,7 +1650,7 @@
     },
     {
       "id": 744,
-      "band": "911 Tradewinds",
+      "band": "911",
       "date": "2003-04-27",
       "venue": null,
       "title": "911 Tradewinds 4-27-03",
@@ -1670,7 +1670,7 @@
     },
     {
       "id": 2636,
-      "band": "S O U L O",
+      "band": "S.O.U.L.O",
       "date": "2002-12-14",
       "venue": "Club U With Big G Feature",
       "title": "S.O.U.L.O. 12-14-02 Club U with Big G feature",
@@ -1710,7 +1710,7 @@
     },
     {
       "id": 2370,
-      "band": "Ccb",
+      "band": "CCB",
       "date": "2002-07-26",
       "venue": "Good Food",
       "title": "CCB 7-26-02 Good Food",
@@ -1760,7 +1760,7 @@
     },
     {
       "id": 746,
-      "band": "911 Tradewinds",
+      "band": "911",
       "date": "2001-11-04",
       "venue": null,
       "title": "911 Tradewinds 11-4-01",
@@ -1795,7 +1795,7 @@
     },
     {
       "id": 1866,
-      "band": "S O U L O",
+      "band": "S.O.U.L.O",
       "date": "2001-06-10",
       "venue": "Bike Fest",
       "title": "S.O.U.L.O. 6-10-01 Bike Fest",
@@ -1810,7 +1810,7 @@
     },
     {
       "id": 2212,
-      "band": "Backyard At 501 Club With Juvenile",
+      "band": "Backyard Band",
       "date": "2000-11-29",
       "venue": null,
       "title": "Backyard at 501 Club with Juvenile 11-29-00",
@@ -1825,7 +1825,7 @@
     },
     {
       "id": 2888,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "2000-07-27",
       "venue": "Metro Club Wit Ronnie T And Pop",
       "title": "Backyard 07-27-00 Metro Club wit Ronnie T and POP",
@@ -1845,7 +1845,7 @@
     },
     {
       "id": 1851,
-      "band": "Maiesha And The Hip Huggers",
+      "band": "Maiesha And HipHuggers",
       "date": "2000-07-09",
       "venue": "Classics",
       "title": "Maiesha and the Hip Huggers 7-9-00 Classics",
@@ -1860,7 +1860,7 @@
     },
     {
       "id": 1285,
-      "band": "Ne Groovers",
+      "band": "Northeast Groovers",
       "date": "1999-11-10",
       "venue": "Metro Club",
       "title": "NE Groovers 11-10-99 Metro Club",
@@ -1880,7 +1880,7 @@
     },
     {
       "id": 848,
-      "band": "Lil Benny And The Legends",
+      "band": "Lil Benny",
       "date": "1999-10-06",
       "venue": "Heart And Soul Cafe",
       "title": "Lil Benny and the Legends 10-6-99 Heart and Soul Café",
@@ -1900,7 +1900,7 @@
     },
     {
       "id": 1021,
-      "band": "Ne Groovers",
+      "band": "Northeast Groovers",
       "date": "1999-09-25",
       "venue": "Icebox",
       "title": "NE Groovers 9-25-99 IceBox",
@@ -1935,7 +1935,7 @@
     },
     {
       "id": 2897,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "1998-05-06",
       "venue": "Icebox",
       "title": "Backyard 5-6-98 IceBox",
@@ -1950,7 +1950,7 @@
     },
     {
       "id": 1129,
-      "band": "Huck A Bucks",
+      "band": "Huck-A-Bucks",
       "date": "1998-03-27",
       "venue": "Icebox",
       "title": "Huck-A-Bucks 3-27-98 IceBox",
@@ -1970,7 +1970,7 @@
     },
     {
       "id": 2385,
-      "band": "Ne Groovers",
+      "band": "Northeast Groovers",
       "date": "1997-06-14",
       "venue": "Dezulu Cave",
       "title": "NE Groovers 6-14-97 DeZulu Cave",
@@ -1985,7 +1985,7 @@
     },
     {
       "id": 1706,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "1996-03-26",
       "venue": "Ibex",
       "title": "Backyard 3-26-96 IBEX",
@@ -2000,7 +2000,7 @@
     },
     {
       "id": 2906,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "1996-02-17",
       "venue": "Eastside",
       "title": "Backyard 2-17-96 Eastside",
@@ -2015,7 +2015,7 @@
     },
     {
       "id": 2329,
-      "band": "Re",
+      "band": "Rare Essence",
       "date": "1995-09-29",
       "venue": "Rythms",
       "title": "RE 9-29-95 Rythms",
@@ -2035,7 +2035,7 @@
     },
     {
       "id": 764,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "1995-07-07",
       "venue": "Bumpers",
       "title": "Backyard 7-7-95 Bumpers",
@@ -2050,7 +2050,7 @@
     },
     {
       "id": 686,
-      "band": "Re",
+      "band": "Rare Essence",
       "date": "1995-07-01",
       "venue": "Black Hole",
       "title": "RE 7-1-95 Black Hole",
@@ -2065,7 +2065,7 @@
     },
     {
       "id": 1130,
-      "band": "Huck A Bucks",
+      "band": "Huck-A-Bucks",
       "date": "1995-05-21",
       "venue": "Ibex",
       "title": "Huck-A-Bucks 5-21-95 Ibex",
@@ -2085,7 +2085,7 @@
     },
     {
       "id": 1128,
-      "band": "Huck A Bucks",
+      "band": "Huck-A-Bucks",
       "date": "1995-05-14",
       "venue": "Ibex",
       "title": "Huck-A-Bucks 5-14-95 Ibex",
@@ -2105,7 +2105,7 @@
     },
     {
       "id": 763,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "1995-04-11",
       "venue": "Ibex",
       "title": "Backyard 4-11-95 IBEX",
@@ -2125,7 +2125,7 @@
     },
     {
       "id": 685,
-      "band": "Re",
+      "band": "Rare Essence",
       "date": "1994-07-20",
       "venue": "Eastside",
       "title": "RE 7-20-94 Eastside",
@@ -2140,7 +2140,7 @@
     },
     {
       "id": 760,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "1994-06-16",
       "venue": "Metro Club",
       "title": "Backyard 6-16-94 Metro Club",
@@ -2160,7 +2160,7 @@
     },
     {
       "id": 759,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "1994-02-03",
       "venue": "Metro Club",
       "title": "Backyard 2-3-94 Metro Club",
@@ -2175,7 +2175,7 @@
     },
     {
       "id": 758,
-      "band": "Backyard",
+      "band": "Backyard Band",
       "date": "1993-08-01",
       "venue": "Sheraton Hotel",
       "title": "Backyard 8-1-93 Sheraton hotel",
@@ -2190,7 +2190,7 @@
     },
     {
       "id": 788,
-      "band": "Ne Groovers",
+      "band": "Northeast Groovers",
       "date": "1993-06-09",
       "venue": "Metro Club",
       "title": "NE Groovers 6-9-93 Metro Club",
@@ -2205,7 +2205,7 @@
     },
     {
       "id": 787,
-      "band": "Ne Groovers",
+      "band": "Northeast Groovers",
       "date": "1993-05-14",
       "venue": "W U S T",
       "title": "NE Groovers 5-14-93 W.U.S.T",
@@ -2225,7 +2225,7 @@
     },
     {
       "id": 786,
-      "band": "Ne Groovers",
+      "band": "Northeast Groovers",
       "date": "1992-11-20",
       "venue": "Ballou",
       "title": "NE Groovers 11-20-92 Ballou",
@@ -2245,7 +2245,7 @@
     },
     {
       "id": 784,
-      "band": "Ne Groovers",
+      "band": "Northeast Groovers",
       "date": "1992-08-03",
       "venue": "Wilmers Park",
       "title": "NE Groovers 8-3-92 Wilmers Park",
@@ -2265,7 +2265,7 @@
     },
     {
       "id": 782,
-      "band": "Ne Groovers",
+      "band": "Northeast Groovers",
       "date": "1991-11-17",
       "venue": "Raquet Fitness",
       "title": "NE Groovers 11-17-91 Raquet & Fitness",
@@ -2290,7 +2290,7 @@
     },
     {
       "id": 2762,
-      "band": "Re",
+      "band": "Rare Essence",
       "date": "1991-04-05",
       "venue": "Triples",
       "title": "RE 4-5-91 Triples",
@@ -2305,7 +2305,7 @@
     },
     {
       "id": 615,
-      "band": "Re",
+      "band": "Rare Essence",
       "date": "1990-05-19",
       "venue": "Triples",
       "title": "RE 5-19-90 Triples",
@@ -2320,7 +2320,7 @@
     },
     {
       "id": 776,
-      "band": "Junkyard",
+      "band": "Junkyard Band",
       "date": "1989-05-30",
       "venue": "Crosscreek Virginia",
       "title": "Junkyard 5-30-89 Crosscreek (Virginia)",
@@ -2335,7 +2335,7 @@
     },
     {
       "id": 610,
-      "band": "Re",
+      "band": "Rare Essence",
       "date": "1989-05-13",
       "venue": "Safari",
       "title": "RE 5-13-89 Safari",
@@ -2355,7 +2355,7 @@
     },
     {
       "id": 775,
-      "band": "Junkyard",
+      "band": "Junkyard Band",
       "date": "1989-04-15",
       "venue": "Safari Club",
       "title": "Junkyard 4-15-89 Safari Club",
@@ -2375,7 +2375,7 @@
     },
     {
       "id": 682,
-      "band": "Re",
+      "band": "Rare Essence",
       "date": "1988-11-24",
       "venue": "Metro Club",
       "title": "RE 11-24-88 Metro Club",
@@ -2390,7 +2390,7 @@
     },
     {
       "id": 774,
-      "band": "Junkyard",
+      "band": "Junkyard Band",
       "date": "1988-09-02",
       "venue": "Cheriys",
       "title": "Junkyard 9-2-88 Cheriys",
@@ -2469,83 +2469,8 @@
       ]
     },
     {
-      "id": 1001,
-      "band": "1001",
-      "date": null,
-      "venue": null,
-      "title": "NE Groovers 11-8-97 IceBox",
-      "link": "https://papalace.com/product/1001/",
-      "tracks": [
-        {
-          "title": "Do Dat Der",
-          "url": "https://papalace.com/wp-content/uploads/2024/07/08-Do-Dat-Der.mp3",
-          "size": 7103539
-        },
-        {
-          "title": "Funky Hump",
-          "url": "https://papalace.com/wp-content/uploads/2024/07/03-Funky-Hump.mp3",
-          "size": 18577773
-        }
-      ]
-    },
-    {
-      "id": 1008,
-      "band": "1008",
-      "date": null,
-      "venue": null,
-      "title": "NE Groovers 8-13-97 Metro Club",
-      "link": "https://papalace.com/product/1008/",
-      "tracks": [
-        {
-          "title": "I ROLL",
-          "url": "https://papalace.com/wp-content/uploads/2024/07/09-I-ROLL.mp3",
-          "size": 6382325
-        },
-        {
-          "title": "HEE HEE HOW",
-          "url": "https://papalace.com/wp-content/uploads/2024/07/05-HEE-HEE-HOW.mp3",
-          "size": 9329465
-        }
-      ]
-    },
-    {
-      "id": 1134,
-      "band": "12 11 96 Ibex",
-      "date": null,
-      "venue": null,
-      "title": "12-11-96 Ibex",
-      "link": "https://papalace.com/product/12-11-96-ibex/",
-      "tracks": [
-        {
-          "title": "Track 6",
-          "url": "https://papalace.com/wp-content/uploads/2024/08/06-Track-6-1.mp3",
-          "size": 12108898
-        },
-        {
-          "title": "Track 3",
-          "url": "https://papalace.com/wp-content/uploads/2024/08/03-Track-3.mp3",
-          "size": 12119870
-        }
-      ]
-    },
-    {
-      "id": 633,
-      "band": "A Team 2023 Cambridge",
-      "date": null,
-      "venue": null,
-      "title": "A-Team 2023 Cambridge",
-      "link": "https://papalace.com/product/a-team-2023-cambridge/",
-      "tracks": [
-        {
-          "title": "Higher",
-          "url": "https://papalace.com/wp-content/uploads/2024/07/06-Higher.mp3",
-          "size": 12916085
-        }
-      ]
-    },
-    {
       "id": 637,
-      "band": "A Team Sept 2018 Allstar Series",
+      "band": "A-Team",
       "date": null,
       "venue": null,
       "title": "A-Team Sept 2018 Allstar series",
@@ -2559,8 +2484,23 @@
       ]
     },
     {
+      "id": 633,
+      "band": "A-Team",
+      "date": null,
+      "venue": null,
+      "title": "A-Team 2023 Cambridge",
+      "link": "https://papalace.com/product/a-team-2023-cambridge/",
+      "tracks": [
+        {
+          "title": "Higher",
+          "url": "https://papalace.com/wp-content/uploads/2024/07/06-Higher.mp3",
+          "size": 12916085
+        }
+      ]
+    },
+    {
       "id": 2778,
-      "band": "Am Fm 1987 Cross Creek",
+      "band": "AM/FM",
       "date": null,
       "venue": null,
       "title": "AM FM 1987 Cross Creek",
@@ -2574,58 +2514,8 @@
       ]
     },
     {
-      "id": 39,
-      "band": "Another Test",
-      "date": null,
-      "venue": null,
-      "title": "Junkyard 1986 Boston, Massachusetts",
-      "link": "https://papalace.com/product/another-test/",
-      "tracks": [
-        {
-          "title": "Get on up",
-          "url": "https://papalace.com/wp-content/uploads/2024/06/02-Track-2.mp3",
-          "size": 6010324
-        },
-        {
-          "title": "Freke a deke intro",
-          "url": "https://papalace.com/wp-content/uploads/2024/06/07-Track-7-1.mp3",
-          "size": 4350798
-        }
-      ]
-    },
-    {
-      "id": 1699,
-      "band": "Backyard Dec 2016 Still In The Game",
-      "date": null,
-      "venue": null,
-      "title": "Backyard Dec 2016 Still in the Game",
-      "link": "https://papalace.com/product/backyard-dec-2016-still-in-the-game/",
-      "tracks": [
-        {
-          "title": "12 – Trim The Tree (FINALboost)",
-          "url": "https://papalace.com/wp-content/uploads/2025/02/12-Trim-The-Tree-FINALboost.mp3",
-          "size": 12774666
-        }
-      ]
-    },
-    {
-      "id": 500,
-      "band": "Backyard Diamond Cuts 2021",
-      "date": null,
-      "venue": null,
-      "title": "Backyard Diamond Cuts 2021",
-      "link": "https://papalace.com/product/backyard-diamond-cuts-2021/",
-      "tracks": [
-        {
-          "title": "Girls wanna have fun",
-          "url": "https://papalace.com/wp-content/uploads/2024/06/Track_05.mp3",
-          "size": 11283359
-        }
-      ]
-    },
-    {
       "id": 1705,
-      "band": "Backyard The 08 Ticket",
+      "band": "Backyard Band",
       "date": null,
       "venue": null,
       "title": "Backyard The 08 Ticket",
@@ -2644,28 +2534,38 @@
       ]
     },
     {
-      "id": 803,
-      "band": "Bela Dona 2018 Ust Music Hall",
+      "id": 1699,
+      "band": "Backyard Band",
       "date": null,
       "venue": null,
-      "title": "Bela Dona 2018 Ust Music Hall",
-      "link": "https://papalace.com/product/bela-dona-2018-ust-music-hall/",
+      "title": "Backyard Dec 2016 Still in the Game",
+      "link": "https://papalace.com/product/backyard-dec-2016-still-in-the-game/",
       "tracks": [
         {
-          "title": "Hurtin me",
-          "url": "https://papalace.com/wp-content/uploads/2024/07/09-Hurtin-me.mp3",
-          "size": 5356780
-        },
+          "title": "12 – Trim The Tree (FINALboost)",
+          "url": "https://papalace.com/wp-content/uploads/2025/02/12-Trim-The-Tree-FINALboost.mp3",
+          "size": 12774666
+        }
+      ]
+    },
+    {
+      "id": 500,
+      "band": "Backyard Band",
+      "date": null,
+      "venue": null,
+      "title": "Backyard Diamond Cuts 2021",
+      "link": "https://papalace.com/product/backyard-diamond-cuts-2021/",
+      "tracks": [
         {
-          "title": "24K magic",
-          "url": "https://papalace.com/wp-content/uploads/2024/07/05-24K-magic.mp3",
-          "size": 6678892
+          "title": "Girls wanna have fun",
+          "url": "https://papalace.com/wp-content/uploads/2024/06/Track_05.mp3",
+          "size": 11283359
         }
       ]
     },
     {
       "id": 809,
-      "band": "Bela Dona Winter 2017",
+      "band": "Bela Dona",
       "date": null,
       "venue": null,
       "title": "Bela Dona Winter 2017",
@@ -2684,8 +2584,28 @@
       ]
     },
     {
+      "id": 803,
+      "band": "Bela Dona",
+      "date": null,
+      "venue": null,
+      "title": "Bela Dona 2018 Ust Music Hall",
+      "link": "https://papalace.com/product/bela-dona-2018-ust-music-hall/",
+      "tracks": [
+        {
+          "title": "Hurtin me",
+          "url": "https://papalace.com/wp-content/uploads/2024/07/09-Hurtin-me.mp3",
+          "size": 5356780
+        },
+        {
+          "title": "24K magic",
+          "url": "https://papalace.com/wp-content/uploads/2024/07/05-24K-magic.mp3",
+          "size": 6678892
+        }
+      ]
+    },
+    {
       "id": 2008,
-      "band": "Black Alley Fort Dupont Dc Sept 2020",
+      "band": "Black Alley",
       "date": null,
       "venue": null,
       "title": "Black Alley Fort Dupont DC Sept 2020",
@@ -2700,7 +2620,7 @@
     },
     {
       "id": 2355,
-      "band": "Ccb 2006 Just For The Hoods",
+      "band": "CCB",
       "date": null,
       "venue": null,
       "title": "CCB – 2006 – Just for the hoods",
@@ -2855,7 +2775,7 @@
     },
     {
       "id": 2773,
-      "band": "Eu 1987 Cross Creek",
+      "band": "E.U.",
       "date": null,
       "venue": null,
       "title": "EU 1987 Cross Creek",
@@ -2870,7 +2790,7 @@
     },
     {
       "id": 1744,
-      "band": "Familiar Faces 2004 Live At Takoma Station",
+      "band": "Familiar Faces",
       "date": null,
       "venue": null,
       "title": "Familiar Faces 2004 Live at Takoma Station",
@@ -2885,7 +2805,7 @@
     },
     {
       "id": 530,
-      "band": "Higher Heights The Journey",
+      "band": "Gospel GoGo",
       "date": null,
       "venue": null,
       "title": "Higher Heights – The Journey",
@@ -2899,8 +2819,43 @@
       ]
     },
     {
+      "id": 1134,
+      "band": "Huck-A-Bucks",
+      "date": null,
+      "venue": null,
+      "title": "12-11-96 Ibex",
+      "link": "https://papalace.com/product/12-11-96-ibex/",
+      "tracks": [
+        {
+          "title": "Track 6",
+          "url": "https://papalace.com/wp-content/uploads/2024/08/06-Track-6-1.mp3",
+          "size": 12108898
+        },
+        {
+          "title": "Track 3",
+          "url": "https://papalace.com/wp-content/uploads/2024/08/03-Track-3.mp3",
+          "size": 12119870
+        }
+      ]
+    },
+    {
+      "id": 1528,
+      "band": "Junkyard Band",
+      "date": null,
+      "venue": null,
+      "title": "Junkyard Lounge 66 – Sept 2020",
+      "link": "https://papalace.com/product/junkyard-lounge-66-sept-2020/",
+      "tracks": [
+        {
+          "title": "Slow jam",
+          "url": "https://papalace.com/wp-content/uploads/2024/12/07-Slow-jam.mp3",
+          "size": 8665816
+        }
+      ]
+    },
+    {
       "id": 773,
-      "band": "Junkard 1988 Mechanicsville Md Firehouse",
+      "band": "Junkyard Band",
       "date": null,
       "venue": null,
       "title": "Junkyard May 1988 Mechanicsville MD Firehouse",
@@ -2919,8 +2874,38 @@
       ]
     },
     {
+      "id": 772,
+      "band": "Junkyard Band",
+      "date": null,
+      "venue": null,
+      "title": "Junkyard 1988 Old Northwood HS",
+      "link": "https://papalace.com/product/junkyard-1988-old-northwood-hs/",
+      "tracks": [
+        {
+          "title": "Track 1",
+          "url": "https://papalace.com/wp-content/uploads/2024/07/01-Track-1-1.mp3",
+          "size": 11463410
+        }
+      ]
+    },
+    {
+      "id": 771,
+      "band": "Junkyard Band",
+      "date": null,
+      "venue": null,
+      "title": "Junkyard Feb 1987 RSVP",
+      "link": "https://papalace.com/product/junkyard-feb-1987-rsvp/",
+      "tracks": [
+        {
+          "title": "1987 Freak A Deke Zone",
+          "url": "https://papalace.com/wp-content/uploads/2024/07/01-JYB-Track-01.mp3",
+          "size": 16842752
+        }
+      ]
+    },
+    {
       "id": 770,
-      "band": "Junkyard 1987 Cheriys",
+      "band": "Junkyard Band",
       "date": null,
       "venue": null,
       "title": "Junkyard 1987 Cheriys",
@@ -2939,53 +2924,8 @@
       ]
     },
     {
-      "id": 772,
-      "band": "Junkyard 1988 Old Northwood Hs",
-      "date": null,
-      "venue": null,
-      "title": "Junkyard 1988 Old Northwood HS",
-      "link": "https://papalace.com/product/junkyard-1988-old-northwood-hs/",
-      "tracks": [
-        {
-          "title": "Track 1",
-          "url": "https://papalace.com/wp-content/uploads/2024/07/01-Track-1-1.mp3",
-          "size": 11463410
-        }
-      ]
-    },
-    {
-      "id": 771,
-      "band": "Junkyard Feb 1987 Rsvp",
-      "date": null,
-      "venue": null,
-      "title": "Junkyard Feb 1987 RSVP",
-      "link": "https://papalace.com/product/junkyard-feb-1987-rsvp/",
-      "tracks": [
-        {
-          "title": "1987 Freak A Deke Zone",
-          "url": "https://papalace.com/wp-content/uploads/2024/07/01-JYB-Track-01.mp3",
-          "size": 16842752
-        }
-      ]
-    },
-    {
-      "id": 1528,
-      "band": "Junkyard Lounge 66 Sept 2020",
-      "date": null,
-      "venue": null,
-      "title": "Junkyard Lounge 66 – Sept 2020",
-      "link": "https://papalace.com/product/junkyard-lounge-66-sept-2020/",
-      "tracks": [
-        {
-          "title": "Slow jam",
-          "url": "https://papalace.com/wp-content/uploads/2024/12/07-Slow-jam.mp3",
-          "size": 8665816
-        }
-      ]
-    },
-    {
       "id": 59,
-      "band": "Jyb Single",
+      "band": "Junkyard Band",
       "date": null,
       "venue": null,
       "title": "Junkyard 3-30-24 Oyster Bar",
@@ -2999,8 +2939,63 @@
       ]
     },
     {
+      "id": 39,
+      "band": "Junkyard Band",
+      "date": null,
+      "venue": null,
+      "title": "Junkyard 1986 Boston, Massachusetts",
+      "link": "https://papalace.com/product/another-test/",
+      "tracks": [
+        {
+          "title": "Get on up",
+          "url": "https://papalace.com/wp-content/uploads/2024/06/02-Track-2.mp3",
+          "size": 6010324
+        },
+        {
+          "title": "Freke a deke intro",
+          "url": "https://papalace.com/wp-content/uploads/2024/06/07-Track-7-1.mp3",
+          "size": 4350798
+        }
+      ]
+    },
+    {
+      "id": 850,
+      "band": "Lil Benny",
+      "date": null,
+      "venue": null,
+      "title": "Lil Benny Tribute CD",
+      "link": "https://papalace.com/product/lil-benny-tribute-cd/",
+      "tracks": [
+        {
+          "title": "Track 6",
+          "url": "https://papalace.com/wp-content/uploads/2024/07/06-Track-6-1.mp3",
+          "size": 5401226
+        }
+      ]
+    },
+    {
+      "id": 847,
+      "band": "Lil Benny",
+      "date": null,
+      "venue": null,
+      "title": "Lil Benny 1992",
+      "link": "https://papalace.com/product/lil-benny-1992/",
+      "tracks": [
+        {
+          "title": "Track 10",
+          "url": "https://papalace.com/wp-content/uploads/2024/07/10.mp3",
+          "size": 5539840
+        },
+        {
+          "title": "Track 5",
+          "url": "https://papalace.com/wp-content/uploads/2024/07/05-1.mp3",
+          "size": 4069376
+        }
+      ]
+    },
+    {
       "id": 845,
-      "band": "Lil Benny 1989 Metro Club",
+      "band": "Lil Benny",
       "date": null,
       "venue": null,
       "title": "Lil Benny 1989 Metro Club",
@@ -3020,7 +3015,7 @@
     },
     {
       "id": 843,
-      "band": "Lil Benny 1991 Outside",
+      "band": "Lil Benny",
       "date": null,
       "venue": null,
       "title": "Lil Benny 1991 Outside",
@@ -3034,43 +3029,8 @@
       ]
     },
     {
-      "id": 847,
-      "band": "Lil Benny 1992",
-      "date": null,
-      "venue": null,
-      "title": "Lil Benny 1992",
-      "link": "https://papalace.com/product/lil-benny-1992/",
-      "tracks": [
-        {
-          "title": "Track 10",
-          "url": "https://papalace.com/wp-content/uploads/2024/07/10.mp3",
-          "size": 5539840
-        },
-        {
-          "title": "Track 5",
-          "url": "https://papalace.com/wp-content/uploads/2024/07/05-1.mp3",
-          "size": 4069376
-        }
-      ]
-    },
-    {
-      "id": 850,
-      "band": "Lil Benny Tribute Cd",
-      "date": null,
-      "venue": null,
-      "title": "Lil Benny Tribute CD",
-      "link": "https://papalace.com/product/lil-benny-tribute-cd/",
-      "tracks": [
-        {
-          "title": "Track 6",
-          "url": "https://papalace.com/wp-content/uploads/2024/07/06-Track-6-1.mp3",
-          "size": 5401226
-        }
-      ]
-    },
-    {
       "id": 1819,
-      "band": "Lissen Da Grewp 2006 Galleria",
+      "band": "Lissen Da Grewp",
       "date": null,
       "venue": null,
       "title": "Lissen da Grewp 2006 Galleria",
@@ -3085,7 +3045,7 @@
     },
     {
       "id": 2947,
-      "band": "M O B December 2003 Mad Chef",
+      "band": "M.O.B.",
       "date": null,
       "venue": null,
       "title": "M.O.B. December 2003 Mad Chef",
@@ -3109,8 +3069,23 @@
       ]
     },
     {
+      "id": 20,
+      "band": "Main/Current Bands",
+      "date": null,
+      "venue": null,
+      "title": "PA Palace test file",
+      "link": "https://papalace.com/product/pa-palace-test-file/",
+      "tracks": [
+        {
+          "title": "PA_Palace_Potential_2012",
+          "url": "https://papalace.com/wp-content/uploads/2024/06/PA_Palace_Potential_2012.mp3",
+          "size": 1367461
+        }
+      ]
+    },
+    {
       "id": 1263,
-      "band": "Mature Clientele 2024 Summer Heat V2",
+      "band": "Mature Clientele",
       "date": null,
       "venue": null,
       "title": "Mature Clientele 2024 Summer Heat v2",
@@ -3129,23 +3104,48 @@
       ]
     },
     {
-      "id": 2199,
-      "band": "Ms Kim And Scooby Aug 20th Outside Cookout",
+      "id": 1008,
+      "band": "Northeast Groovers",
       "date": null,
       "venue": null,
-      "title": "Ms Kim and Scooby Aug 20th Outside Cookout",
-      "link": "https://papalace.com/product/ms-kim-and-scooby-aug-20th-outside-cookout/",
+      "title": "NE Groovers 8-13-97 Metro Club",
+      "link": "https://papalace.com/product/1008/",
       "tracks": [
         {
-          "title": "Track 11",
-          "url": "https://papalace.com/wp-content/uploads/2025/05/11-Track-11.mp3",
-          "size": 5910314
+          "title": "I ROLL",
+          "url": "https://papalace.com/wp-content/uploads/2024/07/09-I-ROLL.mp3",
+          "size": 6382325
+        },
+        {
+          "title": "HEE HEE HOW",
+          "url": "https://papalace.com/wp-content/uploads/2024/07/05-HEE-HEE-HOW.mp3",
+          "size": 9329465
+        }
+      ]
+    },
+    {
+      "id": 1001,
+      "band": "Northeast Groovers",
+      "date": null,
+      "venue": null,
+      "title": "NE Groovers 11-8-97 IceBox",
+      "link": "https://papalace.com/product/1001/",
+      "tracks": [
+        {
+          "title": "Do Dat Der",
+          "url": "https://papalace.com/wp-content/uploads/2024/07/08-Do-Dat-Der.mp3",
+          "size": 7103539
+        },
+        {
+          "title": "Funky Hump",
+          "url": "https://papalace.com/wp-content/uploads/2024/07/03-Funky-Hump.mp3",
+          "size": 18577773
         }
       ]
     },
     {
       "id": 781,
-      "band": "Ne Groovers 1990 Oh Annex",
+      "band": "Northeast Groovers",
       "date": null,
       "venue": null,
       "title": "NE Groovers 1990 OH Annex",
@@ -3174,23 +3174,8 @@
       ]
     },
     {
-      "id": 20,
-      "band": "Pa Palace Test File",
-      "date": null,
-      "venue": null,
-      "title": "PA Palace test file",
-      "link": "https://papalace.com/product/pa-palace-test-file/",
-      "tracks": [
-        {
-          "title": "PA_Palace_Potential_2012",
-          "url": "https://papalace.com/wp-content/uploads/2024/06/PA_Palace_Potential_2012.mp3",
-          "size": 1367461
-        }
-      ]
-    },
-    {
       "id": 1861,
-      "band": "Pc Groovers Old Classic",
+      "band": "PC Groovers",
       "date": null,
       "venue": null,
       "title": "PC Groovers – Old Classic",
@@ -3204,23 +3189,8 @@
       ]
     },
     {
-      "id": 2129,
-      "band": "Physical Wunder American Legion 1991",
-      "date": null,
-      "venue": null,
-      "title": "Physical Wunder American Legion 1991",
-      "link": "https://papalace.com/product/physical-wunder-american-legion-1991/",
-      "tracks": [
-        {
-          "title": "Track 04",
-          "url": "https://papalace.com/wp-content/uploads/2025/05/04-Track-04.mp3",
-          "size": 2807758
-        }
-      ]
-    },
-    {
       "id": 2136,
-      "band": "Physical Wunder Westmoreland Va 1991",
+      "band": "Physical Wunder",
       "date": null,
       "venue": null,
       "title": "Physical Wunder Westmoreland VA 1991",
@@ -3234,8 +3204,23 @@
       ]
     },
     {
+      "id": 2129,
+      "band": "Physical Wunder",
+      "date": null,
+      "venue": null,
+      "title": "Physical Wunder American Legion 1991",
+      "link": "https://papalace.com/product/physical-wunder-american-legion-1991/",
+      "tracks": [
+        {
+          "title": "Track 04",
+          "url": "https://papalace.com/wp-content/uploads/2025/05/04-Track-04.mp3",
+          "size": 2807758
+        }
+      ]
+    },
+    {
       "id": 2757,
-      "band": "Prophecy 1984 Tc Williams 2",
+      "band": "Prophecy",
       "date": null,
       "venue": null,
       "title": "Prophecy 1984 TC Williams",
@@ -3249,23 +3234,8 @@
       ]
     },
     {
-      "id": 2882,
-      "band": "Prophecy 1985 Chuck E Cheeses",
-      "date": null,
-      "venue": null,
-      "title": "Prophecy 1985 Chuck-E-Cheeses",
-      "link": "https://papalace.com/product/prophecy-1985-chuck-e-cheeses/",
-      "tracks": [
-        {
-          "title": "Bumpity Bump",
-          "url": "https://papalace.com/wp-content/uploads/2026/06/14-Bumpity-bumpTrack-14.mp3",
-          "size": 6731340
-        }
-      ]
-    },
-    {
       "id": 1539,
-      "band": "Prophecy 1989 Crosscreek",
+      "band": "Prophecy",
       "date": null,
       "venue": null,
       "title": "Prophecy 1989 Crosscreek",
@@ -3279,8 +3249,38 @@
       ]
     },
     {
+      "id": 2882,
+      "band": "Prophecy Band",
+      "date": null,
+      "venue": null,
+      "title": "Prophecy 1985 Chuck-E-Cheeses",
+      "link": "https://papalace.com/product/prophecy-1985-chuck-e-cheeses/",
+      "tracks": [
+        {
+          "title": "Bumpity Bump",
+          "url": "https://papalace.com/wp-content/uploads/2026/06/14-Bumpity-bumpTrack-14.mp3",
+          "size": 6731340
+        }
+      ]
+    },
+    {
+      "id": 2783,
+      "band": "Rare Essence",
+      "date": null,
+      "venue": null,
+      "title": "RE Feb 1990 Triples",
+      "link": "https://papalace.com/product/re-feb-1990-triples/",
+      "tracks": [
+        {
+          "title": "Track 8",
+          "url": "https://papalace.com/wp-content/uploads/2026/03/08-Track-8.mp3",
+          "size": 7192838
+        }
+      ]
+    },
+    {
       "id": 683,
-      "band": "Re 1988 Safari Club",
+      "band": "Rare Essence",
       "date": null,
       "venue": null,
       "title": "RE 1988 Safari Club",
@@ -3295,7 +3295,7 @@
     },
     {
       "id": 612,
-      "band": "Re 1989 With Stinky Dink",
+      "band": "Rare Essence",
       "date": null,
       "venue": null,
       "title": "RE 1989 with Stinky Dink",
@@ -3309,23 +3309,8 @@
       ]
     },
     {
-      "id": 2783,
-      "band": "Re Feb 1990 Triples",
-      "date": null,
-      "venue": null,
-      "title": "RE Feb 1990 Triples",
-      "link": "https://papalace.com/product/re-feb-1990-triples/",
-      "tracks": [
-        {
-          "title": "Track 8",
-          "url": "https://papalace.com/wp-content/uploads/2026/03/08-Track-8.mp3",
-          "size": 7192838
-        }
-      ]
-    },
-    {
       "id": 828,
-      "band": "Reaction Strong 2019",
+      "band": "Reaction",
       "date": null,
       "venue": null,
       "title": "Reaction Strong 2019",
@@ -3345,7 +3330,7 @@
     },
     {
       "id": 1453,
-      "band": "Se7en Sept 2015 Poetic Crank",
+      "band": "Se7en",
       "date": null,
       "venue": null,
       "title": "Se7en Sept 2016 poetic crank",
@@ -3364,8 +3349,23 @@
       ]
     },
     {
+      "id": 2199,
+      "band": "Sirius Company",
+      "date": null,
+      "venue": null,
+      "title": "Ms Kim and Scooby Aug 20th Outside Cookout",
+      "link": "https://papalace.com/product/ms-kim-and-scooby-aug-20th-outside-cookout/",
+      "tracks": [
+        {
+          "title": "Track 11",
+          "url": "https://papalace.com/wp-content/uploads/2025/05/11-Track-11.mp3",
+          "size": 5910314
+        }
+      ]
+    },
+    {
       "id": 495,
-      "band": "Suttle Long Time No See",
+      "band": "Suttle Thoughts",
       "date": null,
       "venue": null,
       "title": "Suttle – Long Time No See",
@@ -3380,7 +3380,7 @@
     },
     {
       "id": 2767,
-      "band": "Trouble Funk 1983 Beaver Heights",
+      "band": "Trouble Funk",
       "date": null,
       "venue": null,
       "title": "Trouble Funk 1983 Beaver Heights",
@@ -3395,7 +3395,7 @@
     },
     {
       "id": 3020,
-      "band": "Ucb Neighborhood Life",
+      "band": "UCB",
       "date": null,
       "venue": null,
       "title": "UCB Neighborhood life",
@@ -3410,7 +3410,7 @@
     },
     {
       "id": 1784,
-      "band": "Ucb The Blend 2010",
+      "band": "UCB",
       "date": null,
       "venue": null,
       "title": "UCB The Blend 2010",
@@ -3430,7 +3430,7 @@
     },
     {
       "id": 2178,
-      "band": "What Band Dec 2022 Martinis",
+      "band": "What Band",
       "date": null,
       "venue": null,
       "title": "What band Dec 2022 Martinis",

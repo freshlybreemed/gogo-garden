@@ -75,11 +75,32 @@ const entities = (s) =>
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&nbsp;/g, ' ');
-const title = (t) => entities(t?.rendered ?? '').replace(/\s+/g, ' ').trim();
+const title = (t) => entities(typeof t === 'string' ? t : (t?.rendered ?? '')).replace(/\s+/g, ' ').trim();
 const tc = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
 
+// Categories that aren't a band.
+const NON_BAND = new Set(['latest releases', 'dj pa', 'uncategorized', 'main bands', 'other bands']);
+
+/** Canonical band name: the product category, tidied. Full names for the ones that abbreviate. */
+const BAND_ALIASES = new Map([
+  ['ne groovers', 'Northeast Groovers'],
+  ['backyard band', 'Backyard Band'],
+  ['m.o.b.', 'M.O.B.'],
+  ['ucb', 'UCB'],
+  ['ccb', 'CCB'],
+  ['tcb', 'TCB'],
+  ['re', 'Rare Essence'],
+  ['911', '911'],
+]);
+function bandName(categories) {
+  const cat = (categories ?? []).map((c) => title(c.name)).find((n) => n && !NON_BAND.has(n.toLowerCase()));
+  if (!cat) return null;
+  return BAND_ALIASES.get(cat.toLowerCase()) ?? tc(cat); // "Junkyard band" -> "Junkyard Band"
+}
+
 console.log('fetching PA Palace catalog…');
-const [products, media] = await Promise.all([pageThrough('/wp-json/wp/v2/product'), pageThrough('/wp-json/wp/v2/media')]);
+// Store API products carry the band category (and name) inline; media gives the audio files.
+const [products, media] = await Promise.all([pageThrough('/wp-json/wc/store/v1/products'), pageThrough('/wp-json/wp/v2/media')]);
 
 // Audio, grouped by the product it hangs off.
 const audioByPost = new Map();
@@ -98,11 +119,12 @@ for (const p of products) {
   const info = parseSlug(p.slug);
   tapes.push({
     id: p.id,
-    band: tc(info.band) || title(p.title),
+    // The product category is the real band; fall back to the slug if a tape has no band category.
+    band: bandName(p.categories) || tc(info.band) || title(p.name),
     date: info.date,
     venue: info.venue ? tc(info.venue) : null,
-    title: title(p.title),
-    link: p.link,
+    title: title(p.name),
+    link: p.permalink,
     tracks: tracks.map((t, i) => ({
       // Strip a leading "01-" / "04 - " track number from the filename title.
       title: t.title.replace(/^\s*\d{1,2}\s*[-_.]\s*/, '').replace(/\.(mp3|m4a|wav|aac)$/i, '').replace(/-/g, ' ').trim() || `Track ${i + 1}`,

@@ -34,6 +34,14 @@ export type Catalog = {
 
 const TTL_MS = 60_000;
 
+/**
+ * Bands that live in the data as two records but are really one, as {aliasId: canonicalId}.
+ * The alias's songs fold into the canonical band and its /bands/<id> link keeps working.
+ */
+const BAND_MERGES: Record<string, string> = {
+  '61': '7', // "Black Liberty" -> "Black Liberty Band"
+};
+
 /** Songs added in the last two weeks are "new"; a band is new when its first tape is. */
 const NEW_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 
@@ -243,6 +251,18 @@ async function load(): Promise<Catalog> {
     bandAcc.get(id)!.songs.push(song);
   }
 
+  // Fold merged-away band records into their canonical band before building anything.
+  const bandIdAliases = new Map<string, string>();
+  for (const [fromId, toId] of Object.entries(BAND_MERGES)) {
+    const from = bandAcc.get(fromId);
+    const to = bandAcc.get(toId);
+    if (!from || !to) continue;
+    to.songs.push(...from.songs);
+    to.image = to.image ?? from.image;
+    bandAcc.delete(fromId);
+    bandIdAliases.set(fromId, toId);
+  }
+
   const aliases = new Set<string>();
   for (const b of bandAcc.values()) aliases.add(normalizeName(b.name));
   for (const a of artists) for (const n of [a.name, a.shortName]) if (n) aliases.add(normalizeName(n));
@@ -436,7 +456,14 @@ async function load(): Promise<Catalog> {
 
   return {
     bands,
-    bandById: new Map(bands.map((b) => [b.id, b])),
+    bandById: (() => {
+      const map = new Map(bands.map((b) => [b.id, b]));
+      for (const [fromId, toId] of bandIdAliases) {
+        const band = map.get(toId);
+        if (band) map.set(fromId, band);
+      }
+      return map;
+    })(),
     shows,
     showByHref: new Map([...aliasHrefs, ...shows.map((s) => [s.href, s] as const)]),
     showsByBand,
