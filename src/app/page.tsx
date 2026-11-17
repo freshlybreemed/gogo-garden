@@ -138,7 +138,7 @@ export default async function Home() {
 
       {top.length ? (
         <section aria-labelledby="top" className="mt-12">
-          <SectionHead id="top" title="Most streamed" />
+          <SectionHead id="top" title="Most streamed" href="/leaderboard" linkLabel="Leaderboard" />
           <TrackList tracks={top} variant="ranked" source="Most streamed" />
         </section>
       ) : null}

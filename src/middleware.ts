@@ -4,7 +4,7 @@ import { createServerClient } from '@supabase/ssr';
 // Account-only areas. Everything else (home, bands, venues, shows, search, auth pages) is open to
 // logged-out listeners; anonymous plays are capped client-side (see src/lib/freePlays.ts).
 // Pages and server actions here also check the user themselves; this is the first line, not the only one.
-const PRIVATE = [/^\/liked(\/|$)/, /^\/playlists(\/|$)/, /^\/upload(\/|$)/, /^\/admin(\/|$)/];
+const PRIVATE = [/^\/account(\/|$)/, /^\/me(\/|$)/, /^\/liked(\/|$)/, /^\/playlists(\/|$)/, /^\/upload(\/|$)/, /^\/admin(\/|$)/];
 
 /** Refresh the Supabase session on every request, and send logged-out visitors of account-only pages to log in. */
 export async function middleware(request: NextRequest) {
