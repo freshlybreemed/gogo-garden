@@ -42,6 +42,9 @@ const DROP = (name) => /^dj pa\b/i.test(name) || /^main[/ ]/i.test(name) || /^(u
 
 const fixBand = (name) => PALACE_FIX.get(name) ?? name;
 
+// Category names that fetch-papalace.mjs expands to full band names.
+const PHOTO_FULL_NAMES = new Map([['negroovers', 'Northeast Groovers'], ['backyardband', 'Backyard Band'], ['re', 'Rare Essence']]);
+
 /** ISO "2010-08-07" -> "8-7-10", the way the garden writes tape dates. */
 function shortDate(iso) {
   const [y, m, d] = iso.split('-').map(Number);
@@ -51,7 +54,13 @@ function shortDate(iso) {
 async function catalogPhotos() {
   const out = new Map();
   const cats = await (await fetch(`${BASE}/wp-json/wc/store/v1/products/categories?per_page=100`, { headers: { 'User-Agent': UA } })).json();
-  for (const t of cats) if (t.image?.src) out.set(norm(fixBand(t.name)), t.image.src);
+  for (const t of cats) {
+    if (!t.image?.src) continue;
+    out.set(norm(fixBand(t.name)), t.image.src);
+    // papalace.json already uses full names ("NE Groovers" -> "Northeast Groovers"); match those too.
+    const full = PHOTO_FULL_NAMES.get(norm(t.name));
+    if (full) out.set(norm(full), t.image.src);
+  }
   return out;
 }
 
