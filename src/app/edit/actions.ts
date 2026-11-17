@@ -34,9 +34,10 @@ export async function saveTrackTitles(showHref: string, titles: Record<string, s
   return run(async () => {
     const user = await signedIn();
     const catalog = await getCatalog();
-    const tracks = catalog.tracksByShow.get(showHref) ?? [];
-    const show = catalog.shows.find((s) => s.href === showHref);
+    // Resolve through showByHref so a merged-in folder's old link still finds its show.
+    const show = catalog.showByHref.get(showHref);
     if (!show) throw new EditError('Unknown show.');
+    const tracks = catalog.tracksByShow.get(show.href) ?? [];
     let changed = 0;
     for (const [id, title] of Object.entries(titles)) {
       const track = tracks.find((t) => t.id === id);

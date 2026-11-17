@@ -83,6 +83,102 @@ function byDateDesc(a: ShowModel, b: ShowModel) {
   return a.title.localeCompare(b.title);
 }
 
+type Tape = {
+  album: string;
+  songs: SongDoc[];
+  info: ReturnType<typeof parseAlbum>;
+  loose: boolean;
+  venueSlug: string | null;
+};
+
+/** A venue as a merge key: "Club Mirrors part 2" and "club mirrors" are the same room. */
+function venueKey(t: Tape) {
+  if (t.venueSlug) return t.venueSlug;
+  // A "venue" that's really the band and date ("Mcb11-12-05") isn't a room.
+  if (/\d{1,2}-\d{1,2}-\d{2,4}/.test(t.info.venue ?? '')) return '';
+  const v = (t.info.venue ?? '').replace(/\b(part|pt|disc|cd)\.?\s*\d+\b/gi, '');
+  return normalizeName(v);
+}
+
+/** A tape title as a merge key: case, punctuation, the band's own name and "Disc 2" don't count. */
+function titleKey(t: Tape, bandName: string) {
+  const title = t.info.title.toLowerCase().split(bandName.toLowerCase()).join(' ');
+  const key = normalizeName(title.replace(/\b(disc|cd|part|pt)\.?\s*\d+\b/g, ''));
+  // Junk names ("Unknown Album", "<Unknown>", a blog URL) say nothing about which tape it is.
+  if (key.length < 3 || /^unknown|^http|blogspot/.test(key)) return null;
+  return key;
+}
+
+/**
+ * Group one band's folders into shows.
+ * Dated: the same date is one show, unless the band played two named rooms that day; folders
+ * with no venue join the biggest room. Undated: titles that match by titleKey merge.
+ */
+function groupTapes(tapes: Tape[], bandName: string): Tape[][] {
+  const groups: Tape[][] = [];
+  const byDate = new Map<string, Tape[]>();
+  const byTitle = new Map<string, Tape[]>();
+  for (const t of tapes) {
+    const fullDate = t.info.kind === 'live' && t.info.date && /^\d{4}-\d{2}-\d{2}$/.test(t.info.date) ? t.info.date : null;
+    if (fullDate) {
+      byDate.set(fullDate, [...(byDate.get(fullDate) ?? []), t]);
+      continue;
+    }
+    const key = !t.info.date && !t.loose ? titleKey(t, bandName) : null;
+    if (key) byTitle.set(key, [...(byTitle.get(key) ?? []), t]);
+    else groups.push([t]);
+  }
+  groups.push(...byTitle.values());
+  for (const day of byDate.values()) {
+    const rooms = new Map<string, Tape[]>();
+    const unplaced: Tape[] = [];
+    for (const t of day) {
+      const k = venueKey(t);
+      if (k) rooms.set(k, [...(rooms.get(k) ?? []), t]);
+      else unplaced.push(t);
+    }
+    if (!rooms.size) {
+      groups.push(unplaced);
+      continue;
+    }
+    const size = (l: Tape[]) => l.reduce((n, t) => n + t.songs.length, 0);
+    const biggest = [...rooms.values()].sort((a, b) => size(b) - size(a))[0];
+    biggest.push(...unplaced);
+    groups.push(...rooms.values());
+  }
+  return groups;
+}
+
+/**
+ * Merged tapes often carry the same song twice: one file uploaded under two folders, or a disc
+ * imported twice with two sets of tags ("So Beautiful" / "Beautiful/", same track number and length).
+ * Drop a song that matches one already kept on any of:
+ *  - the same file;
+ *  - the same disc and track number, within 2 seconds;
+ *  - the same real title, within 3 seconds ("Track 3"-style titles never count as a match).
+ */
+function dedupeSongs(tapes: Tape[]) {
+  const urls = new Set<string>();
+  const slots: { slot: string; duration: number }[] = [];
+  const named: { title: string; duration: number }[] = [];
+  const kept: SongDoc[] = [];
+  for (const tape of tapes) {
+    for (const s of tape.songs) {
+      if (urls.has(s.url)) continue;
+      const slot = Number.isFinite(s.trackNumber) ? `${tape.info.disc ?? 1}:${s.trackNumber}` : null;
+      if (slot && slots.some((x) => x.slot === slot && Math.abs(x.duration - s.duration) <= 2)) continue;
+      const generic = genericTrackNumber(s.title) !== null || /^unknown title$/i.test(s.title.trim());
+      const title = normalizeName(s.title);
+      if (!generic && named.some((n) => n.title === title && Math.abs(n.duration - s.duration) <= 3)) continue;
+      urls.add(s.url);
+      if (slot) slots.push({ slot, duration: s.duration });
+      if (!generic) named.push({ title, duration: s.duration });
+      kept.push(s);
+    }
+  }
+  return kept;
+}
+
 function trackOrder(a: SongDoc, b: SongDoc) {
   const an = Number.isFinite(a.trackNumber) ? a.trackNumber : Infinity;
   const bn = Number.isFinite(b.trackNumber) ? b.trackNumber : Infinity;
@@ -157,6 +253,7 @@ async function load(): Promise<Catalog> {
   const tracksByShow = new Map<string, TrackModel[]>();
   const tracks: TrackModel[] = [];
   const haystack = new Map<string, string>();
+  const aliasHrefs = new Map<string, ShowModel>();
 
   for (const acc of bandAcc.values()) {
     const palette = paletteFor(acc.id + acc.name);
@@ -175,7 +272,10 @@ async function load(): Promise<Catalog> {
       else byAlbum.set(s.album, [s]);
     }
 
-    const bandShows: ShowModel[] = [];
+    // One night or one tape often arrives as several folders: "3-6-09 @ kemma inst." and
+    // "kemma inst. 3-6-09", "Disc 1" / "Disc 2", "Club Mirrors part 1" / "part 2", or a
+    // studio tape typed two ways. Those become one show (see groupTapes).
+    const tapeList: Tape[] = [];
     for (const [album, albumSongs] of byAlbum) {
       albumSongs.sort(trackOrder);
       const first = albumSongs[0];
@@ -186,6 +286,20 @@ async function load(): Promise<Catalog> {
         venue: loose ? null : first.venue,
         aliases,
       });
+      tapeList.push({ album, songs: albumSongs, info, loose, venueSlug: first.venueSlug });
+    }
+
+    const bandShows: ShowModel[] = [];
+    for (const tapes of groupTapes(tapeList, acc.name)) {
+      // Discs in order; within a disc the fullest tape first. The fullest tape overall names the show.
+      tapes.sort((a, b) => (a.info.disc ?? 1) - (b.info.disc ?? 1) || b.songs.length - a.songs.length || a.album.localeCompare(b.album));
+      const lead = [...tapes].sort((a, b) => b.songs.length - a.songs.length)[0];
+      const placed = tapes.find((t) => t.info.venue) ?? lead;
+      const discs = new Set(tapes.map((t) => t.info.disc ?? 1));
+      const { album, loose } = lead;
+      const info = { ...lead.info, venue: lead.info.venue ?? placed.info.venue, disc: discs.size > 1 ? null : lead.info.disc };
+      const albumSongs = dedupeSongs(tapes);
+      const first = { venueSlug: lead.venueSlug ?? placed.venueSlug };
       // A "cover" that's just the band's main photo isn't album art: let the photo pool fill it.
       const ownCover = (u: string) => (u && u !== acc.image ? u : '');
       const showImage = mostCommon(albumSongs.map((s) => ownCover(s.imageUrl))) ?? poolFor(album);
@@ -242,6 +356,11 @@ async function load(): Promise<Catalog> {
       }
       bandShows.push(show);
       tracksByShow.set(href, showTracks);
+      // Links to a folder that got merged in keep working.
+      for (const t of tapes.filter((x) => x !== lead)) {
+        const slug = slugify([t.info.date, t.info.venue ?? t.info.title].filter(Boolean).join(' ')) || 'tape';
+        aliasHrefs.set(`/shows/${encodeURIComponent(acc.id)}/${slug}-${shortHash(t.album)}`, show);
+      }
       tracks.push(...showTracks);
     }
 
@@ -319,7 +438,7 @@ async function load(): Promise<Catalog> {
     bands,
     bandById: new Map(bands.map((b) => [b.id, b])),
     shows,
-    showByHref: new Map(shows.map((s) => [s.href, s])),
+    showByHref: new Map([...aliasHrefs, ...shows.map((s) => [s.href, s] as const)]),
     showsByBand,
     tracksByShow,
     tracks,
