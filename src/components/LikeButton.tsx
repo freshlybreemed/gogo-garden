@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import { useLikesStore } from '@/stores/LikesStore';
 import { IconHeart } from './icons';
 
 export function LikeButton({ url, title, className }: { url: string; title: string; className?: string }) {
   const router = useRouter();
+  const pathname = usePathname();
   const liked = useLikesStore((s) => s.liked.has(url));
   const loaded = useLikesStore((s) => s.loaded);
   const load = useLikesStore((s) => s.load);
@@ -24,7 +25,7 @@ export function LikeButton({ url, title, className }: { url: string; title: stri
       aria-label={liked ? `Unlike ${title}` : `Like ${title}`}
       onClick={async (e) => {
         e.stopPropagation();
-        if ((await toggle(url)) === 'login') router.push('/login');
+        if ((await toggle(url)) === 'login') router.push(`/login?next=${encodeURIComponent(pathname || '/')}`);
       }}
       className={clsx(
         'inline-flex h-10 w-10 shrink-0 items-center justify-center hover:text-paper',

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import clsx from 'clsx';
 import { BandArt } from './art/BandArt';
 import { NowPlayingMark } from './art/NowPlayingMark';
-import { formatRunTime, fountain, longDate, plural, shortDate, venueHref, yearSpan } from '@/lib/shows';
+import { bandPhoto, formatRunTime, fountain, longDate, plural, shortDate, venueHref, yearSpan } from '@/lib/shows';
 import type { BandModel, ShowModel } from '@/lib/types';
 
 /**
@@ -52,11 +52,11 @@ export function ShowCard({ show, hideBand = false }: { show: ShowModel; hideBand
               href={venueHref(show.venueSlug)}
               className="relative z-10 mt-1 line-clamp-2 self-start font-display text-[18px] leading-[1.05] font-extrabold uppercase decoration-2 underline-offset-2 hover:underline"
             >
-              {show.venue ?? 'Venue unknown'}
+              {show.venue}
             </Link>
           ) : (
             <span className="mt-1 line-clamp-2 font-display text-[18px] leading-[1.05] font-extrabold uppercase tnum">
-              {show.venue ?? (show.date ? null : show.year) ?? 'Venue unknown'}
+              {show.venue ?? (show.date ? null : show.year)}
             </span>
           )
         ) : show.date ? (
@@ -66,10 +66,10 @@ export function ShowCard({ show, hideBand = false }: { show: ShowModel; hideBand
         ) : null}
         {show.note ? <span className="mt-1 line-clamp-1 text-[12.5px] italic">{show.note}</span> : null}
         <span className="mt-auto flex items-end justify-between gap-2 border-t border-ink/25 pt-1.5 text-[12px] font-medium">
-          {show.isNew ? (
+          {show.isNew || show.newTracks ? (
             <span className="flex items-center gap-1.5 truncate font-semibold">
               <NewDot />
-              Newly added
+              {show.isNew ? 'Newly added' : `+${show.newTracks} new track${show.newTracks === 1 ? '' : 's'}`}
             </span>
           ) : (
             <span className="tnum truncate">
@@ -95,7 +95,8 @@ export function BandCard({ band, priority }: { band: BandModel; priority?: boole
     <Link href={`/bands/${encodeURIComponent(band.id)}`} className="group block min-w-0 outline-offset-4">
       <BandArt
         name={band.name}
-        image={band.image}
+        image={bandPhoto(band)}
+        fallback={band.image}
         palette={band.palette}
         priority={priority}
         className={clsx(
@@ -172,14 +173,14 @@ export function ShowRows({ shows }: { shows: ShowModel[] }) {
                 </Link>
               ) : (
                 <span className="block truncate font-display text-[20px] leading-tight font-extrabold text-paper/70 uppercase">
-                  {show.venue ?? 'Venue unknown'}
+                  {show.venue}
                 </span>
               )}
               <span className="flex items-center gap-1.5 truncate text-[13px] text-dust">
-                {show.isNew ? (
+                {show.isNew || show.newTracks ? (
                   <span className="flex shrink-0 items-center gap-1.5 font-semibold text-leaf-light">
                     <NewDot />
-                    Newly added
+                    {show.isNew ? 'Newly added' : `+${show.newTracks} new`}
                   </span>
                 ) : null}
                 <span className="truncate">

@@ -34,16 +34,21 @@ export type Catalog = {
 
 const TTL_MS = 60_000;
 
-/** Songs from the latest import batch, or added in the last two weeks, are "new". */
-const NEW_SOURCE = 'frshly-ingest-2026-11';
+/**
+ * Bands that live in the data as two records but are really one, as {aliasId: canonicalId}.
+ * The alias's songs fold into the canonical band and its /bands/<id> link keeps working.
+ */
+const BAND_MERGES: Record<string, string> = {
+  '61': '7', // "Black Liberty" -> "Black Liberty Band"
+};
+
+/** Songs added in the last two weeks are "new"; a band is new when its first tape is. */
 const NEW_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
-/** Bands added with the 2026-11 ingest start at id 45. */
-const FIRST_NEW_BAND_ID = 45;
 
 // Not `lastModified`: streamUp stamps that on every play, so it would mark
 // any recently played show as new.
 function isNewSong(s: SongDoc, now: number) {
-  return s.source === NEW_SOURCE || now - Date.parse(s.addedAt) < NEW_WINDOW_MS;
+  return now - Date.parse(s.addedAt) < NEW_WINDOW_MS;
 }
 const g = globalThis as unknown as { _catalog?: { at: number; promise: Promise<Catalog> } };
 
@@ -57,6 +62,11 @@ export function getCatalog(): Promise<Catalog> {
     });
   }
   return g._catalog.promise;
+}
+
+/** Drop the cached catalog so the next request reloads it (after uploads / moderation). */
+export function invalidateCatalog() {
+  g._catalog = undefined;
 }
 
 /** Keep the cached count in step with a streamUp so "most streamed" stays live. */
@@ -79,6 +89,102 @@ function byDateDesc(a: ShowModel, b: ShowModel) {
   if (a.date) return -1;
   if (b.date) return 1;
   return a.title.localeCompare(b.title);
+}
+
+type Tape = {
+  album: string;
+  songs: SongDoc[];
+  info: ReturnType<typeof parseAlbum>;
+  loose: boolean;
+  venueSlug: string | null;
+};
+
+/** A venue as a merge key: "Club Mirrors part 2" and "club mirrors" are the same room. */
+function venueKey(t: Tape) {
+  if (t.venueSlug) return t.venueSlug;
+  // A "venue" that's really the band and date ("Mcb11-12-05") isn't a room.
+  if (/\d{1,2}-\d{1,2}-\d{2,4}/.test(t.info.venue ?? '')) return '';
+  const v = (t.info.venue ?? '').replace(/\b(part|pt|disc|cd)\.?\s*\d+\b/gi, '');
+  return normalizeName(v);
+}
+
+/** A tape title as a merge key: case, punctuation, the band's own name and "Disc 2" don't count. */
+function titleKey(t: Tape, bandName: string) {
+  const title = t.info.title.toLowerCase().split(bandName.toLowerCase()).join(' ');
+  const key = normalizeName(title.replace(/\b(disc|cd|part|pt)\.?\s*\d+\b/g, ''));
+  // Junk names ("Unknown Album", "<Unknown>", a blog URL) say nothing about which tape it is.
+  if (key.length < 3 || /^unknown|^http|blogspot/.test(key)) return null;
+  return key;
+}
+
+/**
+ * Group one band's folders into shows.
+ * Dated: the same date is one show, unless the band played two named rooms that day; folders
+ * with no venue join the biggest room. Undated: titles that match by titleKey merge.
+ */
+function groupTapes(tapes: Tape[], bandName: string): Tape[][] {
+  const groups: Tape[][] = [];
+  const byDate = new Map<string, Tape[]>();
+  const byTitle = new Map<string, Tape[]>();
+  for (const t of tapes) {
+    const fullDate = t.info.kind === 'live' && t.info.date && /^\d{4}-\d{2}-\d{2}$/.test(t.info.date) ? t.info.date : null;
+    if (fullDate) {
+      byDate.set(fullDate, [...(byDate.get(fullDate) ?? []), t]);
+      continue;
+    }
+    const key = !t.info.date && !t.loose ? titleKey(t, bandName) : null;
+    if (key) byTitle.set(key, [...(byTitle.get(key) ?? []), t]);
+    else groups.push([t]);
+  }
+  groups.push(...byTitle.values());
+  for (const day of byDate.values()) {
+    const rooms = new Map<string, Tape[]>();
+    const unplaced: Tape[] = [];
+    for (const t of day) {
+      const k = venueKey(t);
+      if (k) rooms.set(k, [...(rooms.get(k) ?? []), t]);
+      else unplaced.push(t);
+    }
+    if (!rooms.size) {
+      groups.push(unplaced);
+      continue;
+    }
+    const size = (l: Tape[]) => l.reduce((n, t) => n + t.songs.length, 0);
+    const biggest = [...rooms.values()].sort((a, b) => size(b) - size(a))[0];
+    biggest.push(...unplaced);
+    groups.push(...rooms.values());
+  }
+  return groups;
+}
+
+/**
+ * Merged tapes often carry the same song twice: one file uploaded under two folders, or a disc
+ * imported twice with two sets of tags ("So Beautiful" / "Beautiful/", same track number and length).
+ * Drop a song that matches one already kept on any of:
+ *  - the same file;
+ *  - the same disc and track number, within 2 seconds;
+ *  - the same real title, within 3 seconds ("Track 3"-style titles never count as a match).
+ */
+function dedupeSongs(tapes: Tape[]) {
+  const urls = new Set<string>();
+  const slots: { slot: string; duration: number }[] = [];
+  const named: { title: string; duration: number }[] = [];
+  const kept: SongDoc[] = [];
+  for (const tape of tapes) {
+    for (const s of tape.songs) {
+      if (urls.has(s.url)) continue;
+      const slot = Number.isFinite(s.trackNumber) ? `${tape.info.disc ?? 1}:${s.trackNumber}` : null;
+      if (slot && slots.some((x) => x.slot === slot && Math.abs(x.duration - s.duration) <= 2)) continue;
+      const generic = genericTrackNumber(s.title) !== null || /^unknown title$/i.test(s.title.trim());
+      const title = normalizeName(s.title);
+      if (!generic && named.some((n) => n.title === title && Math.abs(n.duration - s.duration) <= 3)) continue;
+      urls.add(s.url);
+      if (slot) slots.push({ slot, duration: s.duration });
+      if (!generic) named.push({ title, duration: s.duration });
+      kept.push(s);
+    }
+  }
+  return kept;
 }
 
 function trackOrder(a: SongDoc, b: SongDoc) {
@@ -110,7 +216,14 @@ async function load(): Promise<Catalog> {
     for (const n of [a.name, a.shortName]) if (n) artistByName.set(normalizeName(n), a);
   }
 
-  type BandAcc = { id: string; name: string; fullName: string | null; image: string | null; songs: SongDoc[] };
+  type BandAcc = {
+    id: string;
+    name: string;
+    fullName: string | null;
+    image: string | null;
+    artist: ArtistModel | null;
+    songs: SongDoc[];
+  };
   const bandAcc = new Map<string, BandAcc>();
   for (const a of artists) {
     bandAcc.set(a.id, {
@@ -118,6 +231,7 @@ async function load(): Promise<Catalog> {
       name: displayName(a),
       fullName: a.name && a.name !== displayName(a) ? a.name : null,
       image: a.image || null,
+      artist: a,
       songs: [],
     });
   }
@@ -131,10 +245,22 @@ async function load(): Promise<Catalog> {
       const slug = slugify(song.artist) || 'unknown';
       id = `x-${slug}`;
       if (!bandAcc.has(id)) {
-        bandAcc.set(id, { id, name: song.artist || 'Unknown band', fullName: null, image: null, songs: [] });
+        bandAcc.set(id, { id, name: song.artist || 'Unknown band', fullName: null, image: null, artist: null, songs: [] });
       }
     }
     bandAcc.get(id)!.songs.push(song);
+  }
+
+  // Fold merged-away band records into their canonical band before building anything.
+  const bandIdAliases = new Map<string, string>();
+  for (const [fromId, toId] of Object.entries(BAND_MERGES)) {
+    const from = bandAcc.get(fromId);
+    const to = bandAcc.get(toId);
+    if (!from || !to) continue;
+    to.songs.push(...from.songs);
+    to.image = to.image ?? from.image;
+    bandAcc.delete(fromId);
+    bandIdAliases.set(fromId, toId);
   }
 
   const aliases = new Set<string>();
@@ -147,12 +273,17 @@ async function load(): Promise<Catalog> {
   const tracksByShow = new Map<string, TrackModel[]>();
   const tracks: TrackModel[] = [];
   const haystack = new Map<string, string>();
+  const aliasHrefs = new Map<string, ShowModel>();
 
   for (const acc of bandAcc.values()) {
     const palette = paletteFor(acc.id + acc.name);
 
     // Fall back to the most common cover on the band's songs.
     const image = acc.image ?? mostCommon(acc.songs.map((s) => s.imageUrl));
+    // The band's photo pool: main, alternate, then extras. A show with no cover of its own
+    // takes one of these (always the same one for that show), so tapes don't all look alike.
+    const photos = [...new Set([acc.image, acc.artist?.altImage, ...(acc.artist?.photos ?? [])].filter((u): u is string => Boolean(u)))];
+    const poolFor = (key: string) => (photos.length > 1 ? photos[parseInt(shortHash(key), 36) % photos.length] : image);
 
     const byAlbum = new Map<string, SongDoc[]>();
     for (const s of acc.songs) {
@@ -161,7 +292,10 @@ async function load(): Promise<Catalog> {
       else byAlbum.set(s.album, [s]);
     }
 
-    const bandShows: ShowModel[] = [];
+    // One night or one tape often arrives as several folders: "3-6-09 @ kemma inst." and
+    // "kemma inst. 3-6-09", "Disc 1" / "Disc 2", "Club Mirrors part 1" / "part 2", or a
+    // studio tape typed two ways. Those become one show (see groupTapes).
+    const tapeList: Tape[] = [];
     for (const [album, albumSongs] of byAlbum) {
       albumSongs.sort(trackOrder);
       const first = albumSongs[0];
@@ -172,7 +306,23 @@ async function load(): Promise<Catalog> {
         venue: loose ? null : first.venue,
         aliases,
       });
-      const showImage = mostCommon(albumSongs.map((s) => s.imageUrl)) ?? image;
+      tapeList.push({ album, songs: albumSongs, info, loose, venueSlug: first.venueSlug });
+    }
+
+    const bandShows: ShowModel[] = [];
+    for (const tapes of groupTapes(tapeList, acc.name)) {
+      // Discs in order; within a disc the fullest tape first. The fullest tape overall names the show.
+      tapes.sort((a, b) => (a.info.disc ?? 1) - (b.info.disc ?? 1) || b.songs.length - a.songs.length || a.album.localeCompare(b.album));
+      const lead = [...tapes].sort((a, b) => b.songs.length - a.songs.length)[0];
+      const placed = tapes.find((t) => t.info.venue) ?? lead;
+      const discs = new Set(tapes.map((t) => t.info.disc ?? 1));
+      const { album, loose } = lead;
+      const info = { ...lead.info, venue: lead.info.venue ?? placed.info.venue, disc: discs.size > 1 ? null : lead.info.disc };
+      const albumSongs = dedupeSongs(tapes);
+      const first = { venueSlug: lead.venueSlug ?? placed.venueSlug };
+      // A "cover" that's just the band's main photo isn't album art: let the photo pool fill it.
+      const ownCover = (u: string) => (u && u !== acc.image ? u : '');
+      const showImage = mostCommon(albumSongs.map((s) => ownCover(s.imageUrl))) ?? poolFor(album);
       const showYear = info.date?.slice(0, 4) ?? (loose ? null : mostCommon(albumSongs.map((s) => s.year)));
       const slugBase = slugify([info.date, info.venue ?? info.title].filter(Boolean).join(' ')) || 'tape';
       const href = `/shows/${encodeURIComponent(acc.id)}/${slugBase}-${shortHash(album)}`;
@@ -194,7 +344,8 @@ async function load(): Promise<Catalog> {
         duration: albumSongs.reduce((n, s) => n + s.duration, 0),
         streams: albumSongs.reduce((n, s) => n + s.streams, 0),
         addedAt: albumSongs.reduce((max, s) => (s.addedAt > max ? s.addedAt : max), ''),
-        isNew: albumSongs.some((s) => isNewSong(s, now)),
+        newTracks: albumSongs.filter((s) => isNewSong(s, now)).length,
+        isNew: albumSongs.every((s) => isNewSong(s, now)),
         image: showImage,
         year: showYear,
       };
@@ -210,10 +361,11 @@ async function load(): Promise<Catalog> {
         bandName: acc.name,
         palette,
         showHref: href,
-        showName: info.kind === 'live' ? (info.venue ?? 'Unknown venue') : info.title,
+        showName: info.kind === 'live' ? (info.venue ?? '') : info.title,
         showDate: info.date,
         venueSlug: info.kind === 'live' ? first.venueSlug : null,
-        image: s.imageUrl || showImage,
+        image: ownCover(s.imageUrl) || showImage,
+        bandImage: image,
         year: s.year ?? showYear,
       }));
       for (const t of showTracks) {
@@ -224,24 +376,37 @@ async function load(): Promise<Catalog> {
       }
       bandShows.push(show);
       tracksByShow.set(href, showTracks);
+      // Links to a folder that got merged in keep working.
+      for (const t of tapes.filter((x) => x !== lead)) {
+        const slug = slugify([t.info.date, t.info.venue ?? t.info.title].filter(Boolean).join(' ')) || 'tape';
+        aliasHrefs.set(`/shows/${encodeURIComponent(acc.id)}/${slug}-${shortHash(t.album)}`, show);
+      }
       tracks.push(...showTracks);
     }
 
     bandShows.sort(byDateDesc);
     shows.push(...bandShows);
     showsByBand.set(acc.id, bandShows);
-    const dates = bandShows.map((s) => s.date).filter((d): d is string => Boolean(d)).sort();
+    // Every track counts toward the span: its show date, else its own year. That way undated
+    // tapes and loose singles (which have no show-level year) still stretch it.
+    const dates = acc.songs.map((s) => s.showDate ?? s.year).filter((d): d is string => Boolean(d)).sort();
     bands.push({
       id: acc.id,
       name: acc.name,
       fullName: acc.fullName,
       image,
+      altImage: acc.artist?.altImage ?? null,
+      photos,
       palette,
       showCount: bandShows.length,
       trackCount: acc.songs.length,
       firstDate: dates[0] ?? null,
       lastDate: dates[dates.length - 1] ?? null,
-      isNew: /^\d+$/.test(acc.id) && Number(acc.id) >= FIRST_NEW_BAND_ID,
+      isNew: acc.songs.length > 0 && acc.songs.every((s) => isNewSong(s, now)),
+      bio: acc.artist?.bio ?? null,
+      founded: acc.artist?.founded ?? null,
+      members: acc.artist?.members ?? [],
+      sources: acc.artist?.sources ?? [],
     });
   }
 
@@ -291,9 +456,16 @@ async function load(): Promise<Catalog> {
 
   return {
     bands,
-    bandById: new Map(bands.map((b) => [b.id, b])),
+    bandById: (() => {
+      const map = new Map(bands.map((b) => [b.id, b]));
+      for (const [fromId, toId] of bandIdAliases) {
+        const band = map.get(toId);
+        if (band) map.set(fromId, band);
+      }
+      return map;
+    })(),
     shows,
-    showByHref: new Map(shows.map((s) => [s.href, s])),
+    showByHref: new Map([...aliasHrefs, ...shows.map((s) => [s.href, s] as const)]),
     showsByBand,
     tracksByShow,
     tracks,
@@ -309,7 +481,8 @@ async function load(): Promise<Catalog> {
 export function recentlyAdded(c: Catalog, limit: number) {
   // Every kind of tape counts: singles and undated PAs are new growth too.
   return [...c.shows]
-    .sort((a, b) => b.addedAt.localeCompare(a.addedAt) || byDateDesc(a, b))
+    // Whole new shows first, then older shows that just gained tracks.
+    .sort((a, b) => Number(b.isNew) - Number(a.isNew) || b.addedAt.localeCompare(a.addedAt) || byDateDesc(a, b))
     .slice(0, limit);
 }
 
@@ -331,24 +504,128 @@ export function popularForBand(c: Catalog, bandId: string, limit: number) {
     .map(({ t }) => t);
 }
 
+export type SearchSection = 'bands' | 'venues' | 'shows' | 'tracks';
+
+/** Loose form for matching: lowercase, no punctuation, "impressionz" ~ "impressions", no "band"/"the". */
+function loose(s: string) {
+  return s
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .split(' ')
+    .filter((w) => w && w !== 'band' && w !== 'the')
+    .map((w) => w.replace(/z$/, 's'))
+    .join(' ');
+}
+
+/** How well `q` names `name`: 3 exact, 2 starts with, 1 contains every word, 0 no. */
+function nameScore(q: string, name: string) {
+  const a = loose(q);
+  const b = loose(name);
+  if (!a || !b) return 0;
+  if (a === b || a.replace(/ /g, '') === b.replace(/ /g, '')) return 3;
+  if (b.startsWith(a)) return 2;
+  return a.split(' ').every((w) => b.includes(w)) ? 1 : 0;
+}
+
+/** Full names and nicknames people search by, keyed by the band's name on the site. */
+const KNOWN_AS: Record<string, string[]> = {
+  BYB: ['Backyard Band', 'Backyard'],
+  TOB: ['TakeOva Band', 'Take Over Band'],
+  TCB: ['Total Control Band', 'TC Bounce'],
+  'New Impressionz': ['NIB', 'New Impressions'],
+  'New Vision': ['NVB'],
+  'Nexx Level': ['NLB', 'Next Level'],
+  'Tru Expressionz': ['TEB', 'True Expressions'],
+  'E.U.': ['EU', 'Experience Unlimited'],
+  'Rare Essence': ['RE'],
+  'Junkyard Band': ['JYB', 'Junkyard'],
+  NEG: ['Northeast Groovers'],
+  '3DB': ['Third Dimension Band'],
+  CCB: ['Critical Condition Band'],
+  Reaction: ['Reaction Band'],
+  Renegade: ['Renegade Band'],
+  'Chuck Brown': ['Chuck Brown and the Soul Searchers', 'Soul Searchers'],
+};
+
+/** Every name a band goes by: site name, full name, known nicknames, and "X, better known as" from the bio. */
+function bandNames(b: BandModel) {
+  const fromBio = b.bio?.match(/^([A-Z][^,.]{2,50}),? (?:better )?known as/)?.[1];
+  return [b.name, b.fullName, ...(KNOWN_AS[b.name] ?? []), fromBio].filter((n): n is string => Boolean(n));
+}
+
+const DATE_RE = /^(\d{1,2}[-/.]\d{1,2}([-/.]\d{2,4})?|(19|20)\d{2})$/;
+
+/**
+ * Search, plus a guess at what the person meant so the page can lead with it:
+ * a band name puts bands (and their shows) first, a date puts shows first,
+ * a venue puts venues first, a song title puts tracks first.
+ */
 export function searchCatalog(c: Catalog, query: string) {
   const q = query.trim().toLowerCase();
-  if (!q) return { bands: [], venues: [], shows: [], tracks: [], trackTotal: 0 };
+  const order: SearchSection[] = ['bands', 'venues', 'tracks', 'shows'];
+  if (!q) return { bands: [], venues: [], shows: [], tracks: [], trackTotal: 0, order };
   const words = q.split(/\s+/);
   const hit = (s: string) => words.every((w) => s.includes(w));
 
-  const bands = c.bands.filter((b) => hit(b.name.toLowerCase()));
-  const venues = c.venues.filter((v) => {
-    const doc = c.venueDocs.get(v.slug);
-    return hit([v.name, v.city ?? '', ...(doc?.aka ?? [])].join(' ').toLowerCase());
-  });
+  const scoredBands = c.bands
+    .map((b) => ({ b, score: Math.max(...bandNames(b).map((n) => nameScore(q, n))) }))
+    .filter((x) => x.score > 0)
+    .sort((x, y) => y.score - x.score || y.b.trackCount - x.b.trackCount);
+  const bands = scoredBands.map((x) => x.b);
+  const bandScore = scoredBands[0]?.score ?? 0;
+
+  const scoredVenues = c.venues
+    .map((v) => {
+      const doc = c.venueDocs.get(v.slug);
+      const names = [v.name, ...(doc?.aka ?? [])];
+      const score = Math.max(...names.map((n) => nameScore(q, n)), hit([v.name, v.city ?? '', ...(doc?.aka ?? [])].join(' ').toLowerCase()) ? 1 : 0);
+      return { v, score };
+    })
+    .filter((x) => x.score > 0)
+    .sort((x, y) => y.score - x.score || y.v.showCount - x.v.showCount);
+  const venues = scoredVenues.map((x) => x.v);
+  const venueScore = scoredVenues[0]?.score ?? 0;
+
+  const topBandIds = new Set(scoredBands.filter((x) => x.score === bandScore).map((x) => x.b.id));
   const shows = c.shows
-    .filter((s) => hit([s.bandName, s.album, s.venue ?? '', s.title, s.note ?? ''].join(' ').toLowerCase()))
+    .filter(
+      (s) =>
+        (bandScore >= 2 && topBandIds.has(s.bandId)) ||
+        hit([s.bandName, s.album, s.venue ?? '', s.title, s.note ?? ''].join(' ').toLowerCase()),
+    )
     .sort(byDateDesc);
+
   const allTracks = c.tracks.filter((t) => hit(c.haystack.get(t.id) ?? ''));
-  // Title matches first.
-  allTracks.sort((a, b) => Number(hit(b.title.toLowerCase())) - Number(hit(a.title.toLowerCase())));
-  return { bands, venues, shows: shows.slice(0, 24), tracks: allTracks.slice(0, 100), trackTotal: allTracks.length };
+  const titleScore = (t: TrackModel) => nameScore(q, t.title);
+  // Best title matches first, then most played.
+  allTracks.sort((a, b) => titleScore(b) - titleScore(a) || b.streams - a.streams);
+  const trackScore = allTracks.length ? titleScore(allTracks[0]) : 0;
+
+  const isDate = DATE_RE.test(q);
+  const score: Record<SearchSection, number> = {
+    bands: bands.length ? bandScore + 0.3 : -1, // a band name beats a same-named song
+    venues: venues.length ? venueScore + 0.2 : -1,
+    shows: shows.length ? (isDate ? 4 : bandScore >= 2 ? bandScore : 0.5) : -1,
+    tracks: allTracks.length ? (trackScore || 0.4) : -1,
+  };
+  // Shows sit right after their band when the search is a band name.
+  if (bandScore >= 2 && shows.length) score.shows = score.bands - 0.1;
+  order.sort((x, y) => score[y] - score[x]);
+
+  return { bands, venues, shows: shows.slice(0, 24), tracks: allTracks.slice(0, 100), trackTotal: allTracks.length, order };
+}
+
+/** Shows with untitled cuts ("Part 3"), most untitled first. */
+export function untitledShows(c: Catalog, limit = 200) {
+  return c.shows
+    .map((show) => {
+      const tracks = c.tracksByShow.get(show.href) ?? [];
+      return { show, untitled: tracks.filter((t) => t.part !== null).length, total: tracks.length };
+    })
+    .filter((x) => x.untitled > 0)
+    .sort((a, b) => b.untitled - a.untitled || b.show.streams - a.show.streams)
+    .slice(0, limit);
 }
 
 export function sampleTracks(c: Catalog, n: number) {

@@ -171,3 +171,25 @@ export const IconPlaylistAdd = (p: P) => (
     <path d="M3 6h12M3 11h12M3 16h7M18 13v8M14 17h8" />
   </Icon>
 );
+
+export const IconPencil = (p: P) => (
+  <Icon {...p}>
+    <path d="M4 20l1-5L15.5 4.5l4 4L9 19z" />
+    <path d="M13 7l4 4" />
+  </Icon>
+);
+
+export const IconTrophy = (p: P) => (
+  <Icon {...p}>
+    <path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H3v2a4 4 0 0 0 4 4M17 6h4v2a4 4 0 0 1-4 4M12 14v4M8 21h8" />
+  </Icon>
+);
+
+export const IconTape = (p: P) => (
+  <Icon {...p}>
+    <rect x="3" y="6" width="18" height="12" />
+    <circle cx="9" cy="12" r="2" />
+    <circle cx="15" cy="12" r="2" />
+    <path d="M9 14h6" />
+  </Icon>
+);

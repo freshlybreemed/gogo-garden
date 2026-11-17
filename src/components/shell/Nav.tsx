@@ -10,7 +10,7 @@ import { useLikesStore } from '@/stores/LikesStore';
 import { usePlaylistsStore } from '@/stores/PlaylistsStore';
 import { fountain } from '@/lib/shows';
 import { Equalizer } from '../art/Equalizer';
-import { IconBands, IconHome, IconPin, IconSearch, IconUser } from '../icons';
+import { IconBands, IconHome, IconPin, IconSearch, IconTape, IconTrophy, IconUser } from '../icons';
 
 export type NavBand = { id: string; name: string; palette: number; showCount: number; isNew: boolean };
 
@@ -19,6 +19,8 @@ const LINKS = [
   { href: '/search', label: 'Search', icon: IconSearch },
   { href: '/bands', label: 'Bands', icon: IconBands },
   { href: '/venues', label: 'Venues', icon: IconPin },
+  { href: '/leaderboard', label: 'Leaderboard', short: 'Top', icon: IconTrophy },
+  { href: '/palace', label: 'PA Palace', short: 'Palace', icon: IconTape },
 ] as const;
 
 function isActive(pathname: string, href: string) {
@@ -133,12 +135,21 @@ export function Sidebar({ bands, initialLoggedIn }: { bands: NavBand[]; initialL
 
       <div className="border-t border-rule px-5 py-3 text-[14px]">
         {loggedIn ? (
-          <span className="flex gap-4">
+          <span className="flex flex-wrap gap-x-4 gap-y-1">
+            <Link href="/me" className="font-semibold text-paper hover:text-crank">
+              Profile
+            </Link>
             <Link href="/liked" className="font-semibold text-paper hover:text-crank">
               Liked
             </Link>
             <Link href="/playlists" className="font-semibold text-paper hover:text-crank">
               Playlists
+            </Link>
+            <Link href="/upload" className="font-semibold text-paper hover:text-crank">
+              Upload
+            </Link>
+            <Link href="/feedback" className="text-dust hover:text-paper">
+              Feedback
             </Link>
             <button type="button" onClick={signOut} className="font-semibold text-dust hover:text-paper">
               Log out
@@ -151,6 +162,9 @@ export function Sidebar({ bands, initialLoggedIn }: { bands: NavBand[]; initialL
             </Link>
             <Link href="/signup" className="text-dust hover:text-paper">
               Sign up
+            </Link>
+            <Link href="/feedback" className="text-dust hover:text-paper">
+              Feedback
             </Link>
           </span>
         )}
@@ -167,11 +181,17 @@ export function MobileTop({ initialLoggedIn }: { initialLoggedIn: boolean }) {
       <Wordmark className="scale-90 origin-left" />
       {loggedIn ? (
         <span className="flex items-center gap-3">
+          <Link href="/me" aria-label="Your profile" className="inline-flex h-11 items-center px-1 text-paper">
+            <IconUser className="h-5 w-5" />
+          </Link>
           <Link href="/liked" className="inline-flex h-11 items-center px-1 text-[14px] font-semibold text-paper">
             Liked
           </Link>
           <Link href="/playlists" className="inline-flex h-11 items-center px-1 text-[14px] font-semibold text-paper">
             Playlists
+          </Link>
+          <Link href="/upload" className="inline-flex h-11 items-center px-1 text-[14px] font-semibold text-paper">
+            Upload
           </Link>
           <button type="button" onClick={signOut} className="h-11 px-1 text-[14px] font-semibold text-dust hover:text-paper">
             Log out
@@ -200,8 +220,10 @@ export function TabBar() {
         'after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-[120px] after:bg-tar',
       )}
     >
-      <ul className="grid h-14 grid-cols-4">
-        {LINKS.map(({ href, label, icon: Icon }) => {
+      <ul className="grid h-14 grid-cols-6">
+        {LINKS.map((link) => {
+          const { href, icon: Icon } = link;
+          const label = 'short' in link ? link.short : link.label;
           const active = isActive(pathname, href);
           return (
             <li key={href}>

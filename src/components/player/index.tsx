@@ -25,6 +25,8 @@ import {
 } from '../icons';
 import { Slider } from './Slider';
 import { QueuePanel } from './QueuePanel';
+import { SignupGate } from '@/components/auth/SignupGate';
+import { useAppStore } from '@/stores/AppStore';
 
 /** Seconds of playback before a listen counts as a stream. */
 const STREAM_THRESHOLD_SECS = 30;
@@ -33,9 +35,31 @@ const STREAM_THRESHOLD_SECS = 30;
  * Lives in the root layout, so it (and the <audio> element) never unmounts
  * while the user navigates between routes.
  */
-export default function Player() {
+export default function Player({ initialLoggedIn = false }: { initialLoggedIn?: boolean }) {
   const current = usePlayerStore((s) => s.currentTrack);
   const [expanded, setExpanded] = useState(false);
+
+  // Free-play limit needs to know whether the server saw a session.
+  useEffect(() => {
+    useAppStore.getState().setSsrLoggedIn(initialLoggedIn);
+  }, [initialLoggedIn]);
+
+  // Space plays/pauses from anywhere on the page, unless you're typing or on a button/link
+  // (where Space already means "press this").
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.code !== 'Space' && e.key !== ' ') return;
+      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = e.target as HTMLElement | null;
+      if (el?.closest('input, textarea, select, button, a, [contenteditable="true"], [role="slider"], [role="button"]')) return;
+      const { currentTrack, toggle } = usePlayerStore.getState();
+      if (!currentTrack) return;
+      e.preventDefault(); // don't scroll the page
+      toggle();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   return (
     <>
@@ -47,8 +71,94 @@ export default function Player() {
         </>
       ) : null}
       <QueuePanel />
+      <SignupGate />
     </>
   );
+}
+
+const PRELOAD_AFTER_SECS = 5;
+/** Don't hold more than this in memory for the next track (a long live set). */
+const PRELOAD_MAX_BYTES = 60 * 1024 * 1024;
+
+function audioType(contentType: string | null, url: string) {
+  if (contentType?.startsWith('audio/')) return contentType;
+  // S3 serves some files as binary/octet-stream; Safari wants a real audio type on a blob.
+  return /\.(m4a|mp4|aac)$/i.test(url.split('?')[0]) ? 'audio/mp4' : 'audio/mpeg';
+}
+
+/**
+ * Next-track preload: download the next queued track into memory while this one plays,
+ * so auto-advance (and the next button) starts it instantly instead of waiting on S3.
+ * Kept to one track at a time; the same <audio> element plays it, which keeps iOS happy.
+ */
+function createPreloader() {
+  const ready: { current: { trackId: string; objectUrl: string } | null } = { current: null };
+  const inFlight: { current: { trackId: string; controller: AbortController } | null } = { current: null };
+  // The blob URL the <audio> element is playing right now (revoked once it moves on).
+  const playingUrl: { current: string | null } = { current: null };
+
+  const drop = () => {
+    inFlight.current?.controller.abort();
+    inFlight.current = null;
+    if (ready.current && ready.current.objectUrl !== playingUrl.current) URL.revokeObjectURL(ready.current.objectUrl);
+    ready.current = null;
+  };
+
+  const dispose = () => {
+    drop();
+    if (playingUrl.current) URL.revokeObjectURL(playingUrl.current);
+    playingUrl.current = null;
+  };
+
+  /** The src to play `track` from: its preloaded copy if we have one, else the network. */
+  const srcFor = (track: TrackModel) => {
+    const previous = playingUrl.current;
+    let src = track.url;
+    if (ready.current?.trackId === track.id) {
+      src = ready.current.objectUrl;
+      ready.current = null;
+    } else {
+      drop(); // Skipped somewhere else: that preload won't be used.
+    }
+    playingUrl.current = src.startsWith('blob:') ? src : null;
+    if (previous && previous !== src) URL.revokeObjectURL(previous);
+    return src;
+  };
+
+  /** Start fetching the next queued track, if it isn't already. */
+  const warm = () => {
+    const { queue, index } = usePlayerStore.getState();
+    const next = queue[index + 1];
+    if (!next) return;
+    if (ready.current?.trackId === next.id || inFlight.current?.trackId === next.id) return;
+    // Respect data saver / slow connections.
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    if (conn?.saveData || conn?.effectiveType === '2g' || conn?.effectiveType === 'slow-2g') return;
+    drop();
+    const controller = new AbortController();
+    const job = { trackId: next.id, controller };
+    inFlight.current = job;
+    void (async () => {
+      try {
+        const res = await fetch(next.url, { signal: controller.signal });
+        if (!res.ok) return;
+        if (Number(res.headers.get('content-length')) > PRELOAD_MAX_BYTES) {
+          controller.abort();
+          return;
+        }
+        const bytes = await res.arrayBuffer();
+        if (inFlight.current !== job) return;
+        const objectUrl = URL.createObjectURL(new Blob([bytes], { type: audioType(res.headers.get('content-type'), next.url) }));
+        ready.current = { trackId: next.id, objectUrl };
+      } catch {
+        /* aborted or offline: the track just streams normally */
+      } finally {
+        if (inFlight.current === job) inFlight.current = null;
+      }
+    })();
+  };
+
+  return { srcFor, warm, dispose };
 }
 
 /** The single <audio> element, driven by the store. */
@@ -59,6 +169,8 @@ function AudioEngine() {
   );
   // Swapping `src` can emit a pause; ignore those so the store stays "playing".
   const swappedAt = useRef(0);
+  const [preload] = useState(createPreloader);
+  useEffect(() => () => preload.dispose(), [preload]);
 
   // New track: swap the source. `playing` effect below starts it.
   useEffect(() => {
@@ -67,14 +179,14 @@ function AudioEngine() {
     if (audio.dataset.trackId !== track.id) {
       audio.dataset.trackId = track.id;
       swappedAt.current = performance.now();
-      audio.src = track.url;
+      audio.src = preload.srcFor(track);
       usePlayerStore.getState().setTrackDuration(track.duration || 0);
       usePlayerStore.getState().setProgress(0);
     }
     if (usePlayerStore.getState().playing) {
       audio.play().catch((err) => console.log('play() failed', err));
     }
-  }, [track]);
+  }, [track, preload]);
 
   useEffect(() => {
     const audio = ref.current;
@@ -101,7 +213,7 @@ function AudioEngine() {
       title: trackTitle(track),
       artist: track.bandName,
       album: [trackWhen(track), track.showName].filter(Boolean).join(' '),
-      artwork: track.image ? [{ src: track.image, sizes: '512x512' }] : [],
+      artwork: (track.image ?? track.bandImage) ? [{ src: (track.image ?? track.bandImage)!, sizes: '512x512' }] : [],
     });
     const handlers: [MediaSessionAction, MediaSessionActionHandler][] = [
       ['play', () => s().resume()],
@@ -143,6 +255,8 @@ function AudioEngine() {
         const s = usePlayerStore.getState();
         const t = e.currentTarget.currentTime;
         s.setProgress(t);
+        // A few seconds in (so the current track gets the bandwidth first), fetch the next one.
+        if (t > PRELOAD_AFTER_SECS) preload.warm();
         if (t > STREAM_THRESHOLD_SECS && s.currentTrack) {
           // Store dedupes, so this fires once per play of a track.
           void s.streamUp(s.currentTrack.id);
@@ -260,7 +374,7 @@ function TrackChip({ track, className }: { track: TrackModel; className?: string
     const d = trackWhen(track);
     return (
       <span className={clsx('relative block shrink-0 overflow-hidden', className)} aria-hidden="true">
-        <BandArt name={track.bandName} image={track.image} palette={track.palette} className="absolute inset-0" />
+        <BandArt name={track.bandName} image={track.image} fallback={track.bandImage} palette={track.palette} className="absolute inset-0" />
         {d ? (
           <span className="absolute bottom-0 left-0 bg-ink px-1 font-display text-[10px] leading-[1.4] font-black text-paper tnum">
             {d}
@@ -479,7 +593,7 @@ function NowPlayingSheet({ track, onClose }: { track: TrackModel; onClose: () =>
       >
         {track.image ? (
           <>
-            <BandArt name={track.bandName} image={track.image} palette={track.palette} className="absolute inset-0" priority />
+            <BandArt name={track.bandName} image={track.image} fallback={track.bandImage} palette={track.palette} className="absolute inset-0" priority />
             <span className="relative mt-auto self-start bg-ink px-2 py-1 text-paper">
               <span className="poster block text-[40px] leading-[0.9]">{trackWhen(track) ?? 'Tape'}</span>
               <span className="block font-display text-[16px] leading-tight font-extrabold uppercase">{track.showName}</span>

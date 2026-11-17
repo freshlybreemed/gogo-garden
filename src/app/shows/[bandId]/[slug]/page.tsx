@@ -5,8 +5,10 @@ import { SectionHead, ShowCard } from '@/components/cards';
 import { BandArt } from '@/components/art/BandArt';
 import { PlayButton } from '@/components/PlayButton';
 import { TrackList } from '@/components/TrackList';
+import { TitleEditor } from '@/components/edit/TitleEditor';
+import { currentUser } from '@/lib/supabase/server';
 import { getCatalog } from '@/lib/catalog';
-import { formatRunTime, fountain, longDate, plural, shortDate, venueHref } from '@/lib/shows';
+import { formatRunTime, fountain, longDate, plural, shortDate, trackTitle, venueHref } from '@/lib/shows';
 
 type Params = { params: Promise<{ bandId: string; slug: string }> };
 
@@ -25,7 +27,7 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
 }
 
 export default async function ShowPage(props: Params) {
-  const { catalog, show, tracks } = await findShow(props);
+  const [{ catalog, show, tracks }, user] = await Promise.all([findShow(props), currentUser()]);
   if (!show) notFound();
 
   const bandHref = `/bands/${encodeURIComponent(show.bandId)}`;
@@ -51,7 +53,7 @@ export default async function ShowPage(props: Params) {
         </Link>
         <div className="paper min-w-0 flex-1 border-t-2 border-dashed border-ink/30 px-5 pt-4 pb-5 sm:border-t-0 sm:border-l-2 md:px-8 md:pt-6">
           <p className="font-display text-[17px] font-extrabold uppercase">
-            {show.kind === 'live' ? 'Live PA' : 'Studio / mixtape'}
+            {show.kind === 'live' ? 'Live show' : 'Studio / mixtape'}
             {!show.date && show.year ? `, ${show.year}` : ''}
             {show.disc ? `, disc ${show.disc}` : ''}
           </p>
@@ -65,13 +67,13 @@ export default async function ShowPage(props: Params) {
                   href={venueHref(show.venueSlug)}
                   className="mt-2 block font-display text-[clamp(26px,4vw,48px)] leading-[0.95] font-black uppercase decoration-[3px] underline-offset-4 hover:underline"
                 >
-                  {show.venue ?? 'Venue unknown'}
+                  {show.venue}
                 </Link>
-              ) : (
+              ) : show.venue ? (
                 <span className="mt-2 block font-display text-[clamp(26px,4vw,48px)] leading-[0.95] font-black uppercase">
-                  {show.venue ?? 'Venue unknown'}
+                  {show.venue}
                 </span>
-              )}
+              ) : null}
             </h1>
           ) : (
             <h1 className="poster mt-1 text-[clamp(48px,8vw,112px)] leading-[0.85]">{show.title}</h1>
@@ -117,6 +119,11 @@ export default async function ShowPage(props: Params) {
             ? 'PA tapes run as one long set, so untitled cuts are numbered by their place on the tape.'
             : `Original album name: ${show.album}`}
         </p>
+        <TitleEditor
+          showHref={show.href}
+          signedIn={Boolean(user)}
+          tracks={tracks.map((t, i) => ({ id: t.id, position: i + 1, title: t.part !== null ? '' : trackTitle(t), placeholder: t.part !== null }))}
+        />
       </section>
 
       {nearby.length ? (

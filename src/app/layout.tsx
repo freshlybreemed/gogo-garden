@@ -75,7 +75,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <main id="main">{children}</main>
           </MainPad>
         </div>
-        <Player />
+        <Player initialLoggedIn={loggedIn} />
         <TabBar />
       </body>
     </html>

@@ -1,9 +1,10 @@
+import { Fragment } from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BandCard, SectionHead, ShowCard } from '@/components/cards';
 import { SearchBox } from '@/components/SearchBox';
 import { TrackList } from '@/components/TrackList';
-import { getCatalog, searchCatalog, type Catalog } from '@/lib/catalog';
+import { getCatalog, searchCatalog, type Catalog, type SearchSection } from '@/lib/catalog';
 import { normalizeName, plural, venueHref } from '@/lib/shows';
 import { IconPin } from '@/components/icons';
 
@@ -31,6 +32,79 @@ export default async function SearchPage({ searchParams }: Props) {
   const results = searchCatalog(catalog, q);
   const empty =
     q && !results.bands.length && !results.venues.length && !results.shows.length && !results.tracks.length;
+
+  const sections: Record<SearchSection, React.ReactNode> = {
+    bands: (
+      <>
+        {results.bands.length ? (
+        <section aria-labelledby="r-bands" className="mt-10">
+          <SectionHead id="r-bands" title="Bands" />
+          <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+            {results.bands.slice(0, 6).map((b) => (
+              <li key={b.id}>
+                <BandCard band={b} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      </>
+    ),
+    venues: (
+      <>
+        {results.venues.length ? (
+        <section aria-labelledby="r-venues" className="mt-10">
+          <SectionHead id="r-venues" title="Venues" />
+          <ul className="flex flex-wrap gap-2">
+            {results.venues.slice(0, 12).map((v) => (
+              <li key={v.slug}>
+                <Link
+                  href={venueHref(v.slug)}
+                  className="inline-flex h-12 items-center gap-2 border border-rule px-3 hover:border-paper"
+                >
+                  <IconPin className="h-4 w-4 text-dust" />
+                  <span className="poster text-[22px] leading-none">{v.name}</span>
+                  <span className="text-[12px] text-dust tnum">{plural(v.showCount, 'night')}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      </>
+    ),
+    tracks: (
+      <>
+        {results.tracks.length ? (
+        <section aria-labelledby="r-tracks" className="mt-10">
+          <SectionHead id="r-tracks" title="Tracks" />
+          <TrackList tracks={results.tracks} variant="mixed" source={`Search: ${q}`} />
+          {results.trackTotal > results.tracks.length ? (
+            <p className="mt-3 text-[13px] text-dust">
+              Showing the first {results.tracks.length} of {plural(results.trackTotal, 'track')}. Add a word to narrow it down.
+            </p>
+          ) : null}
+        </section>
+      ) : null}
+      </>
+    ),
+    shows: (
+      <>
+        {results.shows.length ? (
+        <section aria-labelledby="r-shows" className="mt-10">
+          <SectionHead id="r-shows" title="Shows and tapes" />
+          <ul className="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+            {results.shows.map((s) => (
+              <li key={s.key}>
+                <ShowCard show={s} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      </>
+    ),
+  };
 
   return (
     <div className="px-4 pt-5 md:px-8 md:pt-10">
@@ -62,63 +136,9 @@ export default async function SearchPage({ searchParams }: Props) {
         </p>
       ) : null}
 
-      {results.bands.length ? (
-        <section aria-labelledby="r-bands" className="mt-10">
-          <SectionHead id="r-bands" title="Bands" />
-          <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-            {results.bands.slice(0, 6).map((b) => (
-              <li key={b.id}>
-                <BandCard band={b} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {results.venues.length ? (
-        <section aria-labelledby="r-venues" className="mt-10">
-          <SectionHead id="r-venues" title="Venues" />
-          <ul className="flex flex-wrap gap-2">
-            {results.venues.slice(0, 12).map((v) => (
-              <li key={v.slug}>
-                <Link
-                  href={venueHref(v.slug)}
-                  className="inline-flex h-12 items-center gap-2 border border-rule px-3 hover:border-paper"
-                >
-                  <IconPin className="h-4 w-4 text-dust" />
-                  <span className="poster text-[22px] leading-none">{v.name}</span>
-                  <span className="text-[12px] text-dust tnum">{plural(v.showCount, 'night')}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {results.tracks.length ? (
-        <section aria-labelledby="r-tracks" className="mt-10">
-          <SectionHead id="r-tracks" title="Tracks" />
-          <TrackList tracks={results.tracks} variant="mixed" source={`Search: ${q}`} />
-          {results.trackTotal > results.tracks.length ? (
-            <p className="mt-3 text-[13px] text-dust">
-              Showing the first {results.tracks.length} of {plural(results.trackTotal, 'track')}. Add a word to narrow it down.
-            </p>
-          ) : null}
-        </section>
-      ) : null}
-
-      {results.shows.length ? (
-        <section aria-labelledby="r-shows" className="mt-10">
-          <SectionHead id="r-shows" title="Shows and tapes" />
-          <ul className="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-            {results.shows.map((s) => (
-              <li key={s.key}>
-                <ShowCard show={s} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+      {results.order.map((k) => (
+        <Fragment key={k}>{sections[k]}</Fragment>
+      ))}
     </div>
   );
 }

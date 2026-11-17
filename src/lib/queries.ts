@@ -1,7 +1,7 @@
 import 'server-only';
 import { ObjectId, type Document, type WithId } from 'mongodb';
 import { getDb } from './db';
-import type { ArtistModel, SongDoc, VenueDoc } from './types';
+import type { ArtistModel, BandMember, BandSource, SongDoc, VenueDoc } from './types';
 
 function str(value: unknown): string {
   return value === null || value === undefined ? '' : String(value);
@@ -15,6 +15,25 @@ function toArtist(doc: WithId<Document>): ArtistModel {
     shortName: str(doc.shortName),
     useShortName: Boolean(doc.useShortName),
     image: doc.image ? String(doc.image) : undefined,
+    altImage: doc.altImage ? String(doc.altImage) : undefined,
+    photos: Array.isArray(doc.photos) ? doc.photos.map(String).filter((u: string) => /^https:\/\//.test(u)) : undefined,
+    bio: str(doc.bio).trim() || undefined,
+    founded: str(doc.founded).trim() || undefined,
+    members: Array.isArray(doc.members)
+      ? doc.members
+          .filter((m: unknown) => m && typeof m === 'object' && str((m as BandMember).name).trim())
+          .map((m: BandMember): BandMember => ({
+            name: str(m.name).trim(),
+            role: str(m.role).trim() || null,
+            years: str(m.years).trim() || null,
+            social: str(m.social).trim() || null,
+          }))
+      : undefined,
+    sources: Array.isArray(doc.sources)
+      ? doc.sources
+          .filter((x: unknown) => x && typeof x === 'object' && /^https?:\/\//.test(str((x as BandSource).url)))
+          .map((x: BandSource): BandSource => ({ title: str(x.title).trim() || null, url: str(x.url) }))
+      : undefined,
   };
 }
 
@@ -54,7 +73,7 @@ export async function getSongs(): Promise<SongDoc[]> {
   const docs = await db
     .collection('music')
     .find(
-      {},
+      { hidden: { $ne: true } },
       {
         projection: {
           artistId: 1,

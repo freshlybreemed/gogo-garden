@@ -160,7 +160,7 @@ export function parseAlbum(
       kind: 'live',
       date,
       venue,
-      title: venue ?? 'Unknown venue',
+      title: venue ?? '',
       note: notes.filter(Boolean).join(', ') || null,
       disc,
     };
@@ -174,7 +174,7 @@ export function parseAlbum(
       kind: 'live',
       date: null,
       venue: venue || null,
-      title: venue || 'Unknown venue',
+      title: venue || '',
       note: notes.filter(Boolean).join(', ') || null,
       disc,
     };
@@ -262,12 +262,13 @@ export function formatRunTime(secs: number) {
  * one, deterministically, so its poster card, J-card spine and player chip match.
  */
 export const POSTER_PALETTES: ReadonlyArray<readonly [string, string, string]> = [
-  ['#FFE600', '#FF8A00', '#FF2E88'],
-  ['#9DFF3A', '#FFF04D', '#FFB000'],
-  ['#2FD6FF', '#B66BFF', '#FF4FD8'],
-  ['#FFC21A', '#FF6A1A', '#FF2B2B'],
-  ['#FF5FA2', '#FF9E4F', '#FFE94D'],
-  ['#C6FF00', '#3BFFB0', '#00D5FF'],
+  // Go-go poster fades in garden colors: sun, leaf, straw, crank, pollen, clay. Ink text reads on all of them.
+  ['#F6D743', '#F29E38', '#E8643A'],
+  ['#C5E59A', '#8BC34A', '#5E9E3A'],
+  ['#F4E3A1', '#D9B45A', '#B9853A'],
+  ['#FFB46B', '#FF7A45', '#E2502A'],
+  ['#E6E07A', '#A8CF5A', '#6DB25C'],
+  ['#F7C9A0', '#E59A6C', '#C86B4E'],
 ];
 
 export function paletteFor(key: string) {
@@ -323,4 +324,11 @@ export function place(city: string | null, state: string | null) {
 /** Short label for when a track is from: the show date ("3-30-11"), else its year ("2024"). */
 export function trackWhen(t: { showDate: string | null; year?: string | null }): string | null {
   return shortDate(t.showDate) ?? t.year ?? null;
+}
+
+/** The band photo for this page view: the main one about half the time, else another from the pool. */
+export function bandPhoto(band: { image: string | null; photos: string[] }) {
+  const others = band.photos.filter((p) => p !== band.image);
+  if (!others.length || Math.random() < 0.5) return band.image;
+  return others[Math.floor(Math.random() * others.length)];
 }

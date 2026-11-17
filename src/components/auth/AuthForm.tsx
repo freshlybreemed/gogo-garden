@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useShallow } from 'zustand/react/shallow';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { safeNext } from '@/lib/nextPath';
 import { useAppStore } from '@/stores/AppStore';
 import { useLoginStore } from '@/stores/LoginStore';
 
@@ -38,8 +38,19 @@ function friendly(err: unknown) {
   return msg || 'Something went wrong. Try again.';
 }
 
-export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
-  const router = useRouter();
+export function AuthForm({
+  mode,
+  next: nextParam,
+  reason,
+  error: errorParam,
+}: {
+  mode: 'login' | 'signup';
+  next?: string;
+  reason?: string;
+  error?: string;
+}) {
+  const next = safeNext(nextParam);
+  const nextQuery = next === '/' ? '' : `?next=${encodeURIComponent(next)}`;
   const setLoggedIn = useAppStore((s) => s.setLoggedIn);
   const f = useLoginStore(useShallow((s) => s));
   const isSignup = mode === 'signup';
@@ -79,15 +90,15 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
       }
       setLoggedIn(true);
       f.setPassword('');
-      // Back to wherever the gate sent them from (same-origin paths only).
-      const next = new URLSearchParams(window.location.search).get('next');
-      router.push(next && next.startsWith('/') && !next.startsWith('//') ? next : '/');
-      router.refresh();
+      // Full page load, not router.push: the client router cache can still hold prefetches made while
+      // logged out (which the old gate answered with a redirect to /signup), and a fresh request makes
+      // sure the new session cookie reaches middleware and the server-rendered layout.
+      window.location.assign(next);
+      return; // keep the button in its loading state while the page changes
     } catch (err) {
       f.setError(friendly(err));
-    } finally {
-      f.setLoading(false);
     }
+    f.setLoading(false);
   }
 
   const clear = () => f.error && f.setError('');
@@ -95,9 +106,19 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   return (
     <div className="mx-auto max-w-[30rem] px-4 pt-8 md:pt-16">
       <h1 className="poster text-[clamp(64px,12vw,112px)] leading-[0.8]">{isSignup ? 'Sign up' : 'Log in'}</h1>
+      {isSignup && reason === 'plays' ? (
+        <p role="status" className="mt-4 border-l-[3px] border-crank pl-3 text-[15px] font-semibold text-paper">
+          Make a free account to keep listening.
+        </p>
+      ) : null}
+      {!isSignup && errorParam === 'link' ? (
+        <p role="alert" className="mt-4 border-l-[3px] border-crank pl-3 text-[15px] text-paper">
+          That link expired or was already used. Log in below, or sign up again for a new link.
+        </p>
+      ) : null}
       <p className="mt-3 text-[15px] text-dust">
-        {isSignup ? 'Make an account to start listening. Already have one? ' : 'New here? '}
-        <Link href={isSignup ? '/login' : '/signup'} className="font-semibold text-paper underline underline-offset-4 hover:text-crank">
+        {isSignup ? 'It’s free. Already have an account? ' : 'New here? '}
+        <Link href={`${isSignup ? '/login' : '/signup'}${nextQuery}`} className="font-semibold text-paper underline underline-offset-4 hover:text-crank">
           {isSignup ? 'Log in' : 'Create an account'}
         </Link>
       </p>

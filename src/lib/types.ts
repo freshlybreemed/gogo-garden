@@ -6,7 +6,20 @@ export type ArtistModel = {
   shortName: string;
   useShortName: boolean;
   image?: string;
+  /** A second photo, shown some of the time (like an artist's alternate pictures). */
+  altImage?: string;
+  /** More band photos: they fill in for shows that have no cover, and rotate on band cards. */
+  photos?: string[];
+  bio?: string;
+  founded?: string;
+  members?: BandMember[];
+  sources?: BandSource[];
 };
+
+/** A known member of a band, from the researched write-up. */
+/** `social`: an Instagram @handle or a full https URL. */
+export type BandMember = { name: string; role: string | null; years: string | null; social?: string | null };
+export type BandSource = { title: string | null; url: string };
 
 /** Raw song document, lightly normalized (see queries.ts). */
 export type SongDoc = {
@@ -54,6 +67,8 @@ export type TrackModel = {
   venueSlug: string | null;
   /** Cover: the show's album art, else the band photo, else null (gradient card). */
   image: string | null;
+  /** The band photo, to fall back on when the cover art won't load. */
+  bandImage: string | null;
 };
 
 export type BandModel = {
@@ -62,13 +77,21 @@ export type BandModel = {
   /** Long name when the display name is a short one ("RE" -> "Reaction Band"). */
   fullName: string | null;
   image: string | null;
+  /** Alternate band photo; pages sometimes show it instead of `image`. */
+  altImage: string | null;
+  /** Every band photo, main first (main, alternate, then the rest). */
+  photos: string[];
   palette: number;
   showCount: number;
   trackCount: number;
   firstDate: string | null;
   lastDate: string | null;
-  /** New to the app (bands id >= 45). */
+  /** First tape landed in the last 14 days. */
   isNew: boolean;
+  bio: string | null;
+  founded: string | null;
+  members: BandMember[];
+  sources: BandSource[];
 };
 
 export type ShowModel = {
@@ -89,8 +112,10 @@ export type ShowModel = {
   duration: number;
   streams: number;
   addedAt: string;
-  /** Has songs from the latest ingest or added in the last 14 days. */
+  /** The whole show arrived in the last 14 days. */
   isNew: boolean;
+  /** Tracks added in the last 14 days (an older show that just gained a few shows "+N new"). */
+  newTracks: number;
   /** Year: the show date's, else the most common tag year (null for a Singles bucket). */
   year: string | null;
   /** Cover: most common album art on the show's songs, else the band photo. */

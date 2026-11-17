@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { BandArt } from '@/components/art/BandArt';
+import { BandAbout } from '@/components/band/BandAbout';
 import { SectionHead, ShowCard, ShowRows } from '@/components/cards';
 import { PlayButton } from '@/components/PlayButton';
 import { TrackList } from '@/components/TrackList';
 import { getCatalog, popularForBand } from '@/lib/catalog';
-import { fountain, plural, yearSpan } from '@/lib/shows';
+import { bandPhoto, fountain, plural, yearSpan } from '@/lib/shows';
+import { currentUser } from '@/lib/supabase/server';
 import type { ShowModel } from '@/lib/types';
 
 type Params = { params: Promise<{ id: string }> };
@@ -29,7 +31,7 @@ function byYear(shows: ShowModel[]) {
 
 export default async function BandPage({ params }: Params) {
   const { id } = await params;
-  const catalog = await getCatalog();
+  const [catalog, user] = await Promise.all([getCatalog(), currentUser()]);
   const band = catalog.bandById.get(decodeURIComponent(id));
   if (!band) notFound();
 
@@ -38,6 +40,7 @@ export default async function BandPage({ params }: Params) {
   const tapes = shows.filter((s) => s.kind === 'tape');
   const popular = popularForBand(catalog, band.id, 10);
   const years = yearSpan(band.firstDate, band.lastDate);
+  const photo = bandPhoto(band);
   const source = `${band.name}, popular`;
 
   return (
@@ -47,7 +50,8 @@ export default async function BandPage({ params }: Params) {
         <div className="flex flex-col gap-5 px-4 pt-5 pb-6 sm:flex-row sm:items-end sm:gap-8 md:px-8 md:pt-10 md:pb-8">
           <BandArt
             name={band.name}
-            image={band.image}
+            image={photo}
+            fallback={band.image}
             palette={band.palette}
             priority
             className="w-40 shrink-0 border-[3px] border-ink sm:w-52 lg:w-64"
@@ -86,9 +90,11 @@ export default async function BandPage({ params }: Params) {
         {popular.length ? (
           <section aria-labelledby="popular">
             <SectionHead id="popular" title="Popular" />
-            <TrackList tracks={popular} variant="mixed" source={source} />
+            <TrackList tracks={popular} variant="mixed" source={source} initial={5} />
           </section>
         ) : null}
+
+        <BandAbout band={band} signedIn={Boolean(user)} />
 
         {live.length ? (
           <section aria-labelledby="shows" className="mt-12">
